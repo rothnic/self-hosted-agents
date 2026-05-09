@@ -1,0 +1,85 @@
+{
+  "context": {
+    "bdd_features": [
+      {
+        "feature": "Agent workflow foundation",
+        "has_actor": true,
+        "has_adapter_boundary": true,
+        "has_operational_assertion": true,
+        "path": "tests/workflow/features/agent_workflow_foundation.feature"
+      }
+    ],
+    "blocked": [],
+    "specs": [
+      {
+        "id": "agent-workflow-foundation",
+        "missing_files": [],
+        "objective": "agentic-development-foundation",
+        "path": "specs/agent-workflow-foundation",
+        "status": "active"
+      }
+    ],
+    "tasks": [
+      {
+        "acceptance": "test -f AGENTS.md",
+        "done": true,
+        "id": "AWF-001",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add agent operating entrypoint"
+      },
+      {
+        "acceptance": "test -d .agents/skills/pm-steward",
+        "done": true,
+        "id": "AWF-002",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add project role skills"
+      },
+      {
+        "acceptance": "python3 scripts/agent-workflow/workflow.py spec-lint",
+        "done": true,
+        "id": "AWF-003",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add workflow CLI and validations"
+      },
+      {
+        "acceptance": "python3 scripts/agent-workflow/workflow.py workflow-fixture-test",
+        "done": true,
+        "id": "AWF-004",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add isolated workflow fixture"
+      },
+      {
+        "acceptance": "python3 scripts/agent-workflow/workflow.py bdd-lint",
+        "done": true,
+        "id": "AWF-005",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add implementation-agnostic BDD contracts"
+      },
+      {
+        "acceptance": "python3 scripts/agent-workflow/workflow.py bdd-run --adapter fixture",
+        "done": true,
+        "id": "AWF-006",
+        "objective": "agentic-development-foundation",
+        "priority": "P1",
+        "spec_id": "agent-workflow-foundation",
+        "title": "Add executable BDD adapter skeleton"
+      }
+    ]
+  },
+  "created_at": "2026-05-09T17:14:27.162269+00:00",
+  "dry_run": false,
+  "mode": "plan",
+  "next_action": "select one ready ticket or update specs",
+  "run_id": "run-plan-20260509T171427Z",
+  "trigger": "manual"
+}

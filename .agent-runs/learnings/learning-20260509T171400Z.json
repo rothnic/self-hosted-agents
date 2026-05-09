@@ -1,0 +1,5 @@
+{
+  "created_at": "2026-05-09T17:14:00.223988+00:00",
+  "note": "Initial fixture run showed the workflow can validate specs, BDD contracts, adapter execution, Beads availability, and human review pauses before product work.",
+  "source": "initial-implementation"
+}
