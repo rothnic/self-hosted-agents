@@ -1,0 +1,8 @@
+# Apps
+
+Runnable product implementations live here.
+
+- `mastra-ts/`: future TypeScript Mastra implementation.
+- `langgraph-python/`: future Python LangChain/LangGraph implementation.
+
+Each app should own its runtime-specific source, tests, and local setup. Shared contracts belong in `packages/` or specs.

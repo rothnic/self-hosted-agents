@@ -1,0 +1,9 @@
+{
+  "beads": null,
+  "created_at": "2026-05-09T18:30:27.314723+00:00",
+  "details": "Current specs/agent-workflow-foundation folder uses the local progressive split rather than native Spec Kit spec.md, plan.md, tasks.md artifacts. The Spec Kit substrate is installed and linted; migrate the active feature spec through Spec Kit skills/tooling before product implementation.",
+  "id": "health-20260509T183027Z",
+  "severity": "follow-up",
+  "source": "spec-kit-lint",
+  "title": "Migrate current workflow spec to native Spec Kit feature artifacts"
+}

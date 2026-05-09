@@ -1,0 +1,5 @@
+{
+  "id": "sample-human-review",
+  "reason": "acceptance criteria missing",
+  "decision_needed": "Confirm what acceptance check should close the sample fixture task."
+}

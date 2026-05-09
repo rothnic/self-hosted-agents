@@ -1,0 +1,56 @@
+{
+  "lifecycle_stage": "alpha",
+  "maintain_backward_compatibility": false,
+  "compatibility_policy": "Alpha: no shims, compatibility adapters, deprecated paths, migration layers, duplicate APIs, or backwards-compatibility scaffolding. No users yet; replace directly.",
+  "repo_hygiene": {
+    "allowed_root_entries": [
+      ".agent-runs",
+      ".agents",
+      ".beads",
+      ".git",
+      ".githooks",
+      ".gitignore",
+      ".python-version",
+      ".specify",
+      ".venv",
+      "AGENTS.md",
+      "README.md",
+      "apps",
+      "docs",
+      "objectives",
+      "packages",
+      "pyproject.toml",
+      "specs",
+      "tests",
+      "tools",
+      "uv.lock"
+    ],
+    "max_files_per_directory": 25,
+    "line_length_by_extension": {
+      ".feature": 140,
+      ".json": 240,
+      ".md": 200,
+      ".py": 140,
+      ".sh": 140,
+      ".yaml": 140,
+      ".yml": 140
+    },
+    "line_length_exempt_paths": [
+      ".beads/issues.jsonl",
+      ".agent-runs/",
+      ".agents/skills/speckit-",
+      ".specify/"
+    ],
+    "ignored_directories": [
+      ".git",
+      ".beads/.br_history",
+      ".beads/.br_recovery",
+      ".venv",
+      "build",
+      "dist",
+      ".eggs",
+      "*.egg-info",
+      "__pycache__"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+id:
+  prefix: "awf"
+defaults:
+  priority: 1
+  type: "task"
+sync:
+  auto_flush: true
