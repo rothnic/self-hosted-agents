@@ -1,0 +1,5 @@
+{
+  "created_at": "2026-05-10T21:29:09.874850+00:00",
+  "note": "After closing a Beads ticket, rerun workflow-state-lint and health-status --deep --json before commit; use git status --short --branch as the source of truth for intended tracked and untracked files; current fixture BDD driver proves feature discovery, not scenario-level semantics.",
+  "source": "t004-retrospective"
+}

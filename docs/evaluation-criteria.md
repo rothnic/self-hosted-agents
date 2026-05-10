@@ -5,8 +5,8 @@ Date: 2026-05-10
 ## Purpose
 
 This rubric defines how candidate agent application stacks are compared before the project chooses a deeper
-implementation path. It complements `docs/requirements-matrix.md` by turning high-level needs into evidence that can be
-checked against runnable apps.
+implementation path. It complements `docs/requirements-matrix.md` and `docs/comparison-evidence.md` by turning
+high-level needs into evidence that can be checked against runnable apps.
 
 Do not use this rubric to declare a final winner from research alone. A candidate should only be promoted after it has
 implementation evidence from a runnable app, shared contracts, traces, evaluations, and setup notes.
@@ -114,7 +114,7 @@ gap created by the candidate stack.
 For each candidate implementation slice:
 
 1. Run the same shared behavior contract.
-2. Capture traces, evaluation outputs, setup notes, service topology, and maintenance gaps.
+2. Capture the evidence groups defined in `docs/comparison-evidence.md`.
 3. Score each criterion from 1-4 and record the evidence behind the score.
 4. Update `docs/requirements-matrix.md` only after implementation or bounded research changes the evidence.
 5. Bring any score of `1` or any custom critical infrastructure warning to the next CEO-level roadmap review.

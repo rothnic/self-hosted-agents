@@ -7,8 +7,8 @@ Date: 2026-05-10
 Map the project owner's high-level needs into candidate implementation paths. This matrix should change as prototypes
 reveal hidden constraints, integration gaps, or better preferences.
 
-Use `docs/evaluation-criteria.md` as the scoring rubric before promoting any candidate beyond research or a first
-implementation slice.
+Use `docs/evaluation-criteria.md` as the scoring rubric and `docs/comparison-evidence.md` as the required evidence
+checklist before promoting any candidate beyond research or a first implementation slice.
 
 ## Target User
 

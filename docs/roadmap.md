@@ -42,7 +42,8 @@ Initial requirement areas:
 ### Phase 2: Shared Comparison Harness
 
 Define common behavior contracts, fixtures, trace expectations, evaluation outputs, and demo scenarios. Shared assets
-belong in `packages/` or `tests/`; app internals stay isolated.
+belong in `packages/` or `tests/`; app internals stay isolated. Candidate evidence expectations are defined in
+`docs/comparison-evidence.md`.
 
 ### Phase 3: Candidate Implementations
 
