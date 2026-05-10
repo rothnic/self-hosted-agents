@@ -1,23 +1,58 @@
-# Cron Workflow
+# Automated Increment Workflow
 
-The workflow can run from a basic scheduler because all coordination state is in repo artifacts and Beads Rust.
+The workflow can run from Codex app automations, local cron, or another scheduler because coordination state lives in
+repo artifacts and Beads Rust. The scheduler is replaceable; the repo remains authoritative.
+
+The default increment boundary is one Spec Kit phase. For the solution-comparison roadmap, the first target increment
+is Phase 3 of `002-solution-comparison-roadmap`.
 
 ## Roles
 
-- Planner: checks health, reviews objectives/specs/tickets/reports/learnings, and creates planning output.
-- Ticket planner: turns approved open spec tasks into Beads tickets so the executable backlog is populated.
-- Worker: checks health, finds ready work, claims one item, and stops unless the claim is safe.
-- Health: reports harness status and logs actionable issues.
-- Next action: reports the canonical human/agent options for the current state.
+- PM/review: checks health, reviews completed work, captures learnings, refreshes backlog, and opens review gates.
+- Orchestrator: reads increment state, finds unclaimed unblocked work, assigns worker branches, and routes blockers.
+- Worker: claims one ticket, works on a focused branch, verifies the ticket, records evidence, and pushes.
+- Integrator: reviews completed worker branches, integrates safe work into the feature branch, and prepares review.
+- Health: runs lightweight checks and logs issues before automation silently stalls.
+
+Routine worker branches target the feature branch for the increment. Agents must not merge to `main`; the normal human
+gate is the final feature-branch PR to `main` or an explicit architecture, product, priority, or scope decision.
+
+## Verification Surface
+
+Agents should use one command instead of remembering long checklists:
+
+```bash
+uv run awf verify --profile ticket --json
+uv run awf verify --profile increment --json
+uv run awf verify --profile health --json
+uv run awf verify --profile pre-merge --json
+```
+
+`verify` runs the checks for the selected context, includes acceptance evidence when ticket work is active, summarizes
+git status, Beads readiness, review-gate state, failures, and returns one `next_action`. Pass `--write` to store the
+result under `.agent-runs/verifications/`.
+
+## Increment State
+
+Phase state lives in `.agent-runs/increments/<increment-id>.json`. The ledger records objective/spec context, phase,
+feature branch, child tickets, active worker branches, claims, blockers, validation evidence, review status, learning
+proposals, and the next action.
+
+Beads remains the executable backlog. Increment membership and role routing use normal labels instead of a Beads schema
+fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 
 ## Example Schedules
 
 ```cron
-*/30 * * * * cd /repo && uv run awf cron-tick --role worker --worker-id worker-1 --write
-0 */4 * * * cd /repo && uv run awf cron-tick --role planner --write
-15 * * * * cd /repo && uv run awf health-status --deep --json
-*/15 * * * * cd /repo && uv run awf next-action --json
+0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review --write
+*/15 * * * * cd /repo && uv run awf automation-loop --role orchestrator --write
+*/30 * * * * cd /repo && uv run awf automation-loop --role worker --worker-id worker-1 --write
+10 * * * * cd /repo && uv run awf automation-loop --role integrator --write
+*/20 * * * * cd /repo && uv run awf automation-loop --role health --write
 ```
+
+Codex app automation prompts for these roles live in
+`docs/orchestration/codex-automation-prompts.md`.
 
 ## Separation
 
@@ -28,6 +63,11 @@ requires human judgment, the worker logs an issue and exits.
 Spec `tasks.md` files are planning artifacts. They are not the normal worker queue. When Beads is available, workers use
 `uv run awf ready-work`; ticket planner owns syncing approved tasks into Beads. If ready work is empty but open approved
 tasks exist, the next action is ticket sync, not direct implementation from `tasks.md`.
+
+Blocked work does not stop the whole increment unless every remaining task depends on it. A worker that hits a blocker
+records the blocker, comments or marks the Beads ticket, creates a follow-up when actionable, and exits. The
+orchestrator keeps assigning other unblocked work. The PM/review loop later reprioritizes, decomposes, or asks a
+targeted human question.
 
 ## Session Cadence
 

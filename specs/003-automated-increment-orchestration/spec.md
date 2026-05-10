@@ -1,0 +1,110 @@
+# Feature Specification: Automated Increment Orchestration
+
+**Feature Branch**: `003-automated-increment-orchestration`
+**Created**: 2026-05-10
+**Status**: Draft
+**Input**: User direction: "Create a repo-native orchestration layer so Codex automations can keep work moving without
+manual hand holding, with centralized planning, decentralized execution, and review at increment boundaries."
+
+## User Scenarios & Testing *(mandatory)*
+
+### User Story 1 - One Verification Surface (Priority: P1)
+
+As an agent running manually or on a schedule, I can run one command for the current context and receive the checks,
+evidence summary, failure details, and next safe action.
+
+**Why this priority**: Agents should not need to remember long hand-built validation checklists.
+
+**Independent Test**: Run `uv run awf verify --profile health --json` and
+`uv run awf verify --profile increment --json`; confirm each response includes checks, git state, Beads readiness,
+review-gate status, failures, and one `next_action`.
+
+**Acceptance Scenarios**:
+
+1. **Given** a scheduled agent is checking health, **When** it runs the health profile, **Then** it receives the
+   lightweight workflow checks and the next safe action.
+2. **Given** an increment is being prepared for review, **When** the increment profile runs, **Then** the full workflow
+   gate is summarized without requiring the agent to assemble commands.
+
+---
+
+### User Story 2 - Increment State Tracks Decentralized Work (Priority: P1)
+
+As an orchestrator, I can read phase-level increment state and see objective/spec context, child work, worker branches,
+claims, blockers, stale claims, validation evidence, and review status.
+
+**Why this priority**: Decentralized workers need shared state that survives session boundaries.
+
+**Independent Test**: Run `uv run awf increment-status --json` and confirm it reports Phase 3 child tickets, claims,
+blockers, review status, and a safe next action.
+
+**Acceptance Scenarios**:
+
+1. **Given** a spec phase with open child work, **When** increment status is requested, **Then** the output identifies
+   whether PM/review, orchestration, worker, integration, or human review should happen next.
+2. **Given** a claim is old or work is blocked, **When** increment status is requested, **Then** stale and blocked work
+   remain visible instead of stopping the whole increment silently.
+
+---
+
+### User Story 3 - Scheduled Roles Move Work Without Merging To Main (Priority: P2)
+
+As the project owner, I can allow scheduled roles to plan, assign, implement, verify, and integrate work on feature
+branches while human review remains at the increment boundary.
+
+**Why this priority**: The project should keep moving without turning every worker step into a manual decision.
+
+**Independent Test**: Run each automation loop in dry form and confirm roles return a bounded action without merging to
+`main` or crossing human gates.
+
+**Acceptance Scenarios**:
+
+1. **Given** ready unblocked work exists, **When** the orchestrator loop runs, **Then** it claims one safe item and
+   assigns a worker branch.
+2. **Given** an increment is complete, **When** the integrator loop verifies it, **Then** it prepares human review rather
+   than merging to `main`.
+3. **Given** a worker hits a blocker, **When** the automation loop reports status, **Then** the blocker is visible to
+   the PM/review loop and unblocked work can continue.
+
+## Requirements *(mandatory)*
+
+- **FR-001**: The CLI MUST provide `uv run awf verify --profile <ticket|increment|health|pre-merge> --json`.
+- **FR-002**: `verify` MUST run the context-appropriate workflow checks and return a single `next_action`.
+- **FR-003**: `verify --write` MUST store compact handoff evidence under `.agent-runs/verifications/`.
+- **FR-004**: Increment state MUST be represented as `.agent-runs/increments/<increment-id>.json`.
+- **FR-005**: Increment state MUST include objective, spec, phase, feature branch, child tickets, active claims,
+  blockers, stale claims, validation evidence, review status, and learning proposals when present.
+- **FR-006**: Increment membership SHOULD use normal Beads epics, dependencies, comments, and labels instead of a
+  custom Beads schema.
+- **FR-007**: Automation MUST split PM/review, orchestrator, worker, integrator, and health concerns.
+- **FR-008**: Workers MUST act on one claimed ticket and must not close it without passing verification evidence.
+- **FR-009**: Blocked work MUST be recorded and visible; one blocker MUST NOT idle the whole increment unless it blocks
+  all remaining work through dependencies.
+- **FR-010**: Integrators and scheduled workers MUST NOT merge to `main`.
+- **FR-011**: Human review MUST occur at increment boundaries, architecture/product decisions, and unresolved
+  scope/priority questions.
+- **FR-012**: The workflow fixture MUST cover verification, backlog creation behavior, work selection, evidence
+  recording, human review stopping, and blocker rerouting.
+
+### Key Entities
+
+- **Increment Ledger**: Phase-level state file under `.agent-runs/increments/`.
+- **Verification Artifact**: Compact run output under `.agent-runs/verifications/`.
+- **Automation Role**: One scheduled concern: PM/review, orchestrator, worker, integrator, or health.
+- **Worker Branch**: Focused branch for one claimed ticket, normally targeting the increment feature branch.
+- **Review Gate**: A human boundary for increment approval or unresolved product, architecture, priority, or scope.
+
+## Success Criteria *(mandatory)*
+
+- **SC-001**: Agents can run one verification command for ticket, increment, health, and pre-merge contexts.
+- **SC-002**: Increment status answers what should happen next from repo state without human CLI operation.
+- **SC-003**: Scheduled loops can return safe next actions for PM/review, orchestrator, worker, integrator, and health.
+- **SC-004**: The workflow fixture validates that automation stops at human review instead of merging to `main`.
+- **SC-005**: Blocked and stale work are visible to planning loops, while unrelated unblocked work can continue.
+
+## Assumptions
+
+- Codex app automations are the initial scheduler, using worktrees where useful.
+- Repo state, Beads, and `.agent-runs/` remain authoritative over any specific runner.
+- Subagents may help with read-heavy review or research but are not required for orchestration.
+- Actual scheduling of Codex app automations happens after this repo-native command surface passes manual validation.

@@ -209,13 +209,19 @@ needed, relevant workflow checks pass, and reviewer/human gates are resolved.
 
 Cron-like runners use the same CLI and repo artifacts as humans:
 
-- Planner cadence: `uv run awf cron-tick --role planner --write`
-- Worker cadence: `uv run awf cron-tick --role worker --worker-id <id> --write`
-- Health cadence: `uv run awf health-status --deep --json`
+- PM/review cadence: `uv run awf automation-loop --role pm-review --write`
+- Orchestrator cadence: `uv run awf automation-loop --role orchestrator --write`
+- Worker cadence: `uv run awf automation-loop --role worker --worker-id <id> --write`
+- Integrator cadence: `uv run awf automation-loop --role integrator --write`
+- Health cadence: `uv run awf automation-loop --role health --write`
 
-The planner reviews health, objectives, specs, tickets, run reports, and learnings. It creates planning artifacts and logs issues.
-Workers only inspect ready work, claim one unclaimed task, and stop if a gate or missing acceptance evidence is found.
-Work separation is handled through Beads ready work plus `.agent-runs/claims/`; workers do not mutate unless a task is claimed.
+The PM/review loop reviews health, objectives, specs, tickets, run reports, and learnings.
+It refreshes backlog when ready work runs low and opens phase review gates when needed.
+The orchestrator reads increment state, claims unblocked work, and assigns worker branches.
+Workers only inspect claimed work, verify with `uv run awf verify --profile ticket`, record evidence, and push.
+The integrator reviews completed worker branches, verifies the increment, and stops at the human review boundary.
+Work separation is handled through Beads ready work plus `.agent-runs/claims/`; workers do not mutate unless a task is
+claimed.
 If a cron run finds a problem, it must log it with `uv run awf issue-log --write` before exiting.
 
 ## Skill Routing
@@ -274,6 +280,7 @@ A task is complete only when:
 - The requested change is implemented in the smallest coherent slice.
 - The acceptance command named by the task passes.
 - Relevant `awf` checks pass: `spec-lint`, `bdd-lint`, `bdd-run`, `review-gate`, `repo-hygiene`, or `workflow-fixture-test`.
+- For automation handoffs, `uv run awf verify --profile ticket` or `uv run awf verify --profile increment` passes.
 - A reviewer or automated review command can verify evidence without relying on hidden context.
 - Follow-up work discovered during implementation is recorded as spec tasks or Beads tickets instead of being silently skipped.
 
@@ -287,8 +294,12 @@ uv run awf context-index --json
 uv run awf spec-kit-lint
 uv run awf workflow-run --mode plan --dry-run
 uv run awf health-status --deep
+uv run awf verify --profile increment --json
 uv run awf next-action --json
-uv run awf cron-tick --role planner --write
+uv run awf automation-loop --role pm-review --write
+uv run awf automation-loop --role orchestrator --write
+uv run awf automation-loop --role worker --worker-id worker-1 --write
+uv run awf automation-loop --role integrator --write
 uv run awf spec-lint
 uv run awf review-gate
 uv run awf repo-hygiene

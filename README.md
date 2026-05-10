@@ -23,6 +23,7 @@ After bootstrap:
 uv run awf --help
 uv run awf context-index
 uv run awf health-status --deep
+uv run awf verify --profile health --json
 uv run awf bdd-run --driver fixture
 uv run awf repo-hygiene
 uv run awf workflow-fixture-test
@@ -31,8 +32,10 @@ uv run awf workflow-fixture-test
 For cron-style orchestration, use:
 
 ```bash
-uv run awf cron-tick --role planner --write
-uv run awf cron-tick --role worker --worker-id worker-1 --write
+uv run awf automation-loop --role pm-review --write
+uv run awf automation-loop --role orchestrator --write
+uv run awf automation-loop --role worker --worker-id worker-1 --write
+uv run awf automation-loop --role integrator --write
 ```
 
 ## Operating Model
@@ -45,6 +48,6 @@ uv run awf cron-tick --role worker --worker-id worker-1 --write
 - `objectives/`, Spec Kit-managed `specs/`, `docs/adr/`, and `docs/research/` hold durable planning context.
 - `tests/workflow/features/` holds BDD contracts for implementation-agnostic e2e behavior.
 - `.beads/` holds local-first ticket state through Beads Rust.
-- `.agent-runs/` holds run reports, manifests, blocked states, and learnings.
+- `.agent-runs/` holds run reports, manifests, blocked states, increments, verifications, and learnings.
 
 Product framework work is intentionally deferred until this foundation validates cleanly.

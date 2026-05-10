@@ -1,0 +1,89 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "acceptance_source": {
+    "external_ref": null,
+    "id": "awf-3w1",
+    "status": "open",
+    "title": "Propose the first Python-first candidate app slice based on the requirement matrix"
+  },
+  "checks": [
+    {
+      "command": "uv run awf bootstrap",
+      "detail": "",
+      "name": "bootstrap",
+      "ok": true
+    },
+    {
+      "command": "uv run awf spec-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf spec-kit-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-kit-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf bdd-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "bdd-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf bdd-run --driver fixture",
+      "detail": "",
+      "name": "bdd-run-fixture",
+      "ok": true
+    },
+    {
+      "command": "uv run awf review-gate",
+      "detail": "",
+      "name": "review-gate",
+      "ok": true
+    },
+    {
+      "command": "uv run awf repo-hygiene",
+      "detail": "",
+      "error_count": 0,
+      "name": "repo-hygiene",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-state-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "workflow-state-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-fixture-test",
+      "detail": "",
+      "failed_results": [],
+      "name": "workflow-fixture-test",
+      "ok": true,
+      "result_count": 13
+    }
+  ],
+  "failed_checks": [],
+  "git": {
+    "branch": "codex/automated-increment-orchestration",
+    "changed_files": 14,
+    "clean": false,
+    "summary": "14 changed file(s)"
+  },
+  "next_action": "orchestrator-loop should continue assigning unblocked work",
+  "ok": true,
+  "profile": "increment",
+  "ready_work": {
+    "blocked_count": 0,
+    "human_required_count": 0,
+    "ready_count": 6,
+    "source": "beads"
+  },
+  "review_gate_ok": true
+}
