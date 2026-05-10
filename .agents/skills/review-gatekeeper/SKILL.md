@@ -25,6 +25,8 @@ the decision in a compact form.
 Use the `AGENTS.md` next-action response template for review handoffs so the human can see process position, git status,
 work in progress, dependencies, recommendation, available options, meta-process notes, and what will happen after
 approval.
+Do not ask the human reviewer to operate workflow commands manually. Agents should run the checks, summarize evidence,
+and ask only for the approval, rejection, prioritization, or clarification decision that requires human judgment.
 
 ## Gate Reasons
 

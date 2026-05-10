@@ -831,6 +831,103 @@ def meta_process_notes(health: dict[str, Any], ready: dict[str, Any], status_tex
     }
 
 
+def executive_next_action(
+    bootstrap_ok: bool,
+    health: dict[str, Any],
+    ready: dict[str, Any],
+    context: dict[str, Any],
+    status_text: str,
+) -> dict[str, Any]:
+    position = process_position_summary(bootstrap_ok, health, ready, context, status_text)
+    git_state = position["git"]
+    open_tasks = position["work_in_progress"]["open_spec_tasks"]
+    ready_count = position["work_in_progress"]["ready_work"]
+    human_count = position["work_in_progress"]["human_required"]
+    blocked_count = position["work_in_progress"]["blocked"]
+
+    if not bootstrap_ok or health.get("issues"):
+        return {
+            "where_we_are": "The workflow foundation is present, but the harness needs agent triage before more work starts.",
+            "why_it_matters": "A failing workflow check means the backlog or evidence may be unreliable.",
+            "recommendation": "Let the health-status agent diagnose and repair the failing check before product planning.",
+            "agent_will_do_next": (
+                "Run the health checks, isolate the failing workflow area, log a durable issue if needed, "
+                "and propose or implement the smallest repair."
+            ),
+            "what_i_need_from_you": "Only a decision if the repair changes scope, priority, architecture, or acceptance criteria.",
+            "questions": [],
+        }
+    if human_count:
+        return {
+            "where_we_are": "Work is paused at a human review gate.",
+            "why_it_matters": "Agents should not move into implementation until the human decision is recorded.",
+            "recommendation": "Review the approval brief and choose approve, request changes, or defer.",
+            "agent_will_do_next": (
+                "Record your decision, update the linked ticket/task state, rerun validation, "
+                "and continue to the next safe lane."
+            ),
+            "what_i_need_from_you": "Approve the gate, request specific changes, or say what information is missing.",
+            "questions": [
+                "Do you approve the current gate?",
+                "If not, what change or evidence would make it approvable?",
+            ],
+        }
+    if ready_count:
+        return {
+            "where_we_are": "There is Beads-backed work ready for an implementation agent.",
+            "why_it_matters": "The agent can move the project forward without asking you to manage the workflow manually.",
+            "recommendation": "Let an implementer claim one ready ticket and execute its acceptance check.",
+            "agent_will_do_next": (
+                "Claim one ticket, make the smallest coherent change, run the acceptance command, "
+                "and return review evidence."
+            ),
+            "what_i_need_from_you": "No action unless the ticket exposes a scope or product decision.",
+            "questions": [],
+        }
+    if open_tasks or blocked_count:
+        return {
+            "where_we_are": "The spec has remaining planned work, but nothing is currently implementer-ready.",
+            "why_it_matters": "The backlog needs agent planning/ticketing before workers can safely execute.",
+            "recommendation": "Let the planner/ticket-planner convert the remaining approved scope into Beads-ready work.",
+            "agent_will_do_next": (
+                "Inspect open tasks and dependencies, sync or repair backlog tickets, "
+                "and present any human decisions needed."
+            ),
+            "what_i_need_from_you": "Only answer questions where the spec does not define priority, acceptance, or scope.",
+            "questions": [],
+        }
+    if git_state["clean"]:
+        return {
+            "where_we_are": "The workflow foundation is approved, clean, and has no ready implementation backlog.",
+            "why_it_matters": "The next value-producing move is product discovery and roadmap shaping, not more workflow operation.",
+            "recommendation": (
+                "Have the PM/research agents draft the first product-roadmap options "
+                "and come back with a short decision brief."
+            ),
+            "agent_will_do_next": (
+                "Review the objective, inspect existing app placeholders and constraints, "
+                "research likely first product slices, and propose 2-3 roadmap options."
+            ),
+            "what_i_need_from_you": "Answer the strategic product questions or approve the recommended discovery path.",
+            "questions": [
+                "Who is the first target user for this self-hosted agents project?",
+                (
+                    "Which first outcome matters most: a working local demo, framework comparison, "
+                    "automation reliability, or an operator dashboard?"
+                ),
+                "What constraint should dominate the next roadmap choice: speed, learning value, reliability, or extensibility?",
+            ],
+        }
+    return {
+        "where_we_are": "The workflow is healthy, but local changes are still pending review or publication.",
+        "why_it_matters": "Agents should checkpoint approved work before layering new planning or implementation on top.",
+        "recommendation": "Let the agent finish the git checkpoint and then continue into product-roadmap discovery.",
+        "agent_will_do_next": "Review status, commit or push approved work as appropriate, then produce the next product decision brief.",
+        "what_i_need_from_you": "Only a decision if the pending changes have not already been approved.",
+        "questions": [],
+    }
+
+
 def next_action_data() -> dict[str, Any]:
     bootstrap_status = bootstrap_data()
     bootstrap_ok = all(item["ok"] for item in bootstrap_status["checks"])
@@ -847,6 +944,8 @@ def next_action_data() -> dict[str, Any]:
                 "label": "Fix workflow health",
                 "owner": "health-status",
                 "command": "uv run awf health-status --deep --json",
+                "agent_next_step": "Diagnose and repair the failing workflow health check.",
+                "user_action": "Review only if the fix needs a scope or architecture decision.",
                 "recommended": True,
             }
         )
@@ -857,6 +956,8 @@ def next_action_data() -> dict[str, Any]:
                 "label": "Review and approve the pending human gate",
                 "owner": "human reviewer",
                 "command": "uv run awf ready-work --json",
+                "agent_next_step": "Present the approval brief, then record the human decision and rerun validation.",
+                "user_action": "Approve, request changes, or say what evidence is missing.",
                 "recommended": not options,
             }
         )
@@ -867,6 +968,8 @@ def next_action_data() -> dict[str, Any]:
                 "label": "Claim one implementer-ready Beads item",
                 "owner": "implementer",
                 "command": "uv run awf claim-work --worker-id <id> --write",
+                "agent_next_step": "Claim one ready ticket, implement it, and return acceptance evidence.",
+                "user_action": "No action unless a product or scope decision appears.",
                 "recommended": not options,
             }
         )
@@ -877,6 +980,8 @@ def next_action_data() -> dict[str, Any]:
                 "label": "Plan the next objective/spec/backlog action",
                 "owner": "pm-steward",
                 "command": "uv run awf workflow-run --mode plan --dry-run",
+                "agent_next_step": "Research and draft the next product-roadmap options, then ask targeted CEO-level questions.",
+                "user_action": "Choose a direction or answer the targeted questions.",
                 "recommended": True,
             }
         )
@@ -887,16 +992,20 @@ def next_action_data() -> dict[str, Any]:
                 "label": "Review local uncommitted changes",
                 "owner": "reviewer",
                 "command": "git diff",
+                "agent_next_step": "Summarize pending changes and recommend commit, revise, or defer.",
+                "user_action": "Approve the checkpoint or request changes.",
                 "recommended": False,
             }
         )
 
     recommendation = next((option for option in options if option["recommended"]), options[0])
+    executive_brief = executive_next_action(bootstrap_ok, health, ready, context, status.stdout.strip())
     return {
         "ok": health["ok"] and bootstrap_ok,
         "recommendation": recommendation,
         "options": options[:4],
         "process_position": process_position_summary(bootstrap_ok, health, ready, context, status.stdout.strip()),
+        "executive_brief": executive_brief,
         "meta_process": meta_process_notes(health, ready, status.stdout.strip()),
         "bootstrap": bootstrap_status,
         "health": health,

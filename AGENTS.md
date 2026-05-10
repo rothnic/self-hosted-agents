@@ -64,7 +64,10 @@ When Beads is available, implementers must not choose work directly from `tasks.
 and claim one Beads item. `tasks.md` is used by spec/decomposition roles and as an explicit fallback only when Beads
 is unavailable.
 
-When a user asks "what next?", run the startup/status path and give 2-4 concrete options with one recommendation:
+When a user asks "what next?", the agent runs the startup/status path and gives a CEO-level decision brief with 2-4
+concrete options and one recommendation. Do not tell the human to run workflow commands as the next step; use workflow
+commands as agent instrumentation, then translate the result into a business/product decision or a small set of
+targeted questions.
 
 ```bash
 uv run awf next-action --json
@@ -86,66 +89,56 @@ Choose the recommendation by state:
 - If Beads has ready work: load `implementer`, claim one item, and execute only that item.
 - If no ready work exists: load `pm-steward` to propose the next objective/spec/backlog action.
 
-Use this response template for every next-action or human-review handoff:
+Use this response template for every next-action or human-review handoff. The visible user-facing request should be a
+decision, answer, approval, or prioritization choice, not a CLI command.
 
 ```markdown
-## Process Position
+## Executive Snapshot
 
-- Current phase:
-- State-machine step:
-- Active role:
-- Plain-language status:
+- Where we are:
+- Why it matters:
+- Current repo state:
+- Work in progress:
 
-## What This Is About
+## Agent Assessment
 
 - Objective:
-- Current gate/ticket:
-- Why you are seeing this:
-
-## Current State
-
-- Git:
-- Health:
-- Work in progress:
-- Ready work:
-- Human required:
-- Blocked/dependent work:
-
-## What Changed Since Last Review
-
-- Change summary:
-- Evidence recorded:
-- Checks run:
+- What the agent checked:
+- What changed recently:
+- Blockers or risks:
+- Research/context needed:
 
 ## Recommendation
 
-Recommended option: <option id/title>
+Recommended path:
 Reason:
-Owner:
-Command or decision needed:
+Agent will do next:
+What I need from you:
 
-## Options
+## Your Options
 
-1. Recommended: <action> - <effect>
-2. <action> - <effect>
-3. <action> - <effect>
+1. Recommended: <decision/action> - <business or project effect>
+2. <decision/action> - <business or project effect>
+3. <decision/action> - <business or project effect>
 
-## Meta-Process Notes
+## Questions To Answer
+
+1. <specific question that unblocks the next agent action>
+2. <optional question>
+3. <optional question>
+
+## Meta-Process
 
 - Learning/process follow-up:
-- Backlog/spec hygiene:
+- Automation opportunity:
 - Risk to watch:
-
-## What Happens After Approval
-
-- State changes:
-- Work unblocked:
-- Next command:
 ```
 
-Keep the filled response concise, but include enough context that a human opening the message can tell what project,
-gate, process position, git state, changed work, dependencies, choices, and meta-process follow-ups are involved without
-running commands manually.
+Keep the filled response concise, but include enough context that a human opening the message can tell where the project
+stands, what decision is needed, why the recommendation is grounded in repo state, and what agents will do after the
+human responds. If more information is needed, the agent should gather bounded research first, then ask targeted
+questions. If the next action is safe and does not require a human decision, the agent should proceed instead of asking
+the human to operate the workflow manually.
 
 ## Role Swimlanes
 
