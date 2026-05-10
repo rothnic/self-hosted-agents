@@ -13,7 +13,7 @@
 
 - [X] T004 [US3] Define shared behavior contract for the first comparable agent workflow
 - [X] T005 [US3] Define shared trace and evaluation evidence expected from each candidate app
-- [ ] T006 [US3] Document where shared packages, fixtures, and app-local implementation code belong
+- [X] T006 [US3] Document where shared packages, fixtures, and app-local implementation code belong
 
 ## Phase 3: Candidate App Planning
 

@@ -80,6 +80,6 @@ candidate options only after these evidence groups exist or the missing groups a
 
 ## Storage Rule
 
-T006 will define exact locations for shared packages, fixtures, and app-local implementation code. Until then, evidence
-expectations live here, summarized comparison findings belong in `docs/requirements-matrix.md`, and durable task
-evidence belongs in Beads comments or run reports.
+Exact locations for shared packages, fixtures, and app-local implementation code are defined in
+`docs/project-structure.md`. Evidence expectations live here, summarized comparison findings belong in
+`docs/requirements-matrix.md`, and durable task evidence belongs in Beads comments or run reports.
