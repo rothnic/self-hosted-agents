@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-10T20:53:54.071798+00:00",
+  "id": "awf-res",
+  "work": {
+    "created_at": "2026-05-10T20:05:54.111547Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T004\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-res",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Define shared behavior contract for the first comparable agent workflow",
+    "updated_at": "2026-05-10T20:05:54.111547Z"
+  },
+  "worker_id": "codex"
+}
