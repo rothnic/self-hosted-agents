@@ -29,6 +29,17 @@ Spec `tasks.md` files are planning artifacts. They are not the normal worker que
 `uv run awf ready-work`; ticket planner owns syncing approved tasks into Beads. If ready work is empty but open approved
 tasks exist, the next action is ticket sync, not direct implementation from `tasks.md`.
 
+## Session Cadence
+
+Interactive agent sessions should be bounded by workflow phase. A planner session should end with an approved plan,
+targeted questions, or populated Beads work. An implementation session should usually complete one claimed ticket,
+verify it, record evidence, and stop at a clean pushed checkpoint. A review session should record the human decision and
+handoff the next role.
+
+Recommend a new session after a pushed commit, a resolved human gate, a planning-to-implementation transition, an
+implementation-to-review transition, or a long run where current context could confuse the next action. The handoff must
+include git status, latest commit, active objective/spec, ready work, validation evidence, and recommended next role.
+
 ## Issue Path
 
 Any health or cron issue follows this path:

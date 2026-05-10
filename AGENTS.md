@@ -50,6 +50,41 @@ Use this loop to keep the project ratcheting forward:
 
 The loop pauses whenever the next transition would require guessing about scope, architecture, priority, acceptance, or behavior.
 
+## Session Boundaries
+
+Agents should not keep one conversation open indefinitely. Work is organized into deliberate sessions so planning,
+implementation, review, and learning remain understandable when another agent resumes later.
+
+Default session shape:
+
+1. **Planning session**: inspect state, gather needed research, update objective/spec/tasks/tickets, and end with a
+   clear recommendation or targeted human questions.
+2. **Implementation session**: claim one Beads ticket, make the smallest coherent change, verify it, record evidence,
+   then commit and push when approved or when the task is self-contained and already authorized.
+3. **Review session**: summarize verified changes, risks, validation, and explicit approval options for the human.
+4. **Learning session**: record process lessons or follow-up tickets when a run exposed workflow drift.
+
+Recommend starting a new session at these boundaries:
+
+- After a commit is pushed and the repo is clean.
+- After a human gate is approved, rejected, or deferred.
+- Before switching from planning/research into implementation.
+- Before switching from implementation into review or roadmap planning.
+- After one substantial ticket, three small tickets, or about 60-90 minutes of active work.
+- When the conversation is carrying enough historical detail that the next agent could misunderstand current state.
+- When the next step needs a different primary role or skill.
+
+When recommending a new session, the agent should provide a compact handoff:
+
+- Current branch, latest commit, and git cleanliness.
+- Current objective/spec and Beads ticket state.
+- Completed validation evidence.
+- Recommended next role, next ticket or decision, and why.
+- Any human decision still needed.
+
+The human should not have to manually manage this. Agents should say when a new session is the cleaner operating move,
+finish the current checkpoint, and provide a ready-to-use handoff prompt for the next session.
+
 ## State, Backlog, And Next Action
 
 Agents must be able to answer "what should happen next?" from repo state. Use this precedence order:
@@ -132,6 +167,7 @@ What I need from you:
 - Learning/process follow-up:
 - Automation opportunity:
 - Risk to watch:
+- New-session recommendation:
 ```
 
 Keep the filled response concise, but include enough context that a human opening the message can tell where the project

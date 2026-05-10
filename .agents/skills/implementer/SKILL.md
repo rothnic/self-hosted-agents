@@ -18,6 +18,8 @@ Complete one ready ticket without expanding scope.
 5. Make the smallest coherent change.
 6. Run the ticket acceptance command and any relevant checks.
 7. Update the linked task or ticket evidence.
+8. At completion, recommend a new session when the repo is clean and pushed, the next step is review/planning, or a
+   different primary skill should take over.
 
 ## Work Queue Rule
 

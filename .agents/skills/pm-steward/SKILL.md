@@ -30,7 +30,8 @@ missing specs, stale tickets, missing behavior contracts, and the next safe acti
 7. Give the user 2-4 concrete next-step options, clearly mark the recommended one, and state what agents will do next.
 8. Recommend one of: approve/merge verified changes, update specs, decompose epic, create tickets, run review gate,
    implement one ready ticket, or stop for human input.
-9. Write only a planning report unless explicitly asked to perform approved mutations.
+9. Recommend whether the next phase should happen in a new session.
+10. Write only a planning report unless explicitly asked to perform approved mutations.
 
 ## Next-Step Output Rules
 
@@ -45,6 +46,8 @@ missing specs, stale tickets, missing behavior contracts, and the next safe acti
 - If Beads has ready work, the implementer owns execution after claiming one issue.
 - If `tasks.md` has open work that is not in Beads, ticket planner owns backlog sync before implementers start.
 - If a decision affects scope, priority, architecture, or acceptance, the human owns that decision.
+- Recommend a new session after a clean pushed checkpoint, before switching from planning to implementation, or when
+  the next step needs a different primary role.
 
 ## Stop Conditions
 

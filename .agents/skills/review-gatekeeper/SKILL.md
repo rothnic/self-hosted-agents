@@ -27,6 +27,8 @@ work in progress, dependencies, recommendation, available options, meta-process 
 approval.
 Do not ask the human reviewer to operate workflow commands manually. Agents should run the checks, summarize evidence,
 and ask only for the approval, rejection, prioritization, or clarification decision that requires human judgment.
+After a review decision is recorded and the repo is clean, recommend starting a new session for the next planning or
+implementation phase. Include the latest commit, objective/spec, remaining Beads work, and recommended next role.
 
 ## Gate Reasons
 
