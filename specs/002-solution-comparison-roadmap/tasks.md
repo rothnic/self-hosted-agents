@@ -7,7 +7,7 @@
 
 - [X] T001 [US2] Create `docs/requirements-matrix.md` mapping high-level needs to candidate solution fit
 - [X] T002 [US2] Expand `docs/research/llm-observability-solution-space.md` with candidate-specific integration notes
-- [ ] T003 [US2] Define evaluation criteria for observability, evaluation, scalability, and operating effort
+- [X] T003 [US2] Define evaluation criteria for observability, evaluation, scalability, and operating effort
 
 ## Phase 2: Shared Comparison Harness
 

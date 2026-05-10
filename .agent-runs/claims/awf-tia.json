@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-10T20:41:28.588973+00:00",
+  "id": "awf-tia",
+  "work": {
+    "created_at": "2026-05-10T20:05:53.914247Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T003\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-tia",
+    "issue_type": "task",
+    "priority": 1,
+    "status": "open",
+    "title": "Define evaluation criteria for observability, evaluation, scalability, and operating effort",
+    "updated_at": "2026-05-10T20:05:53.914247Z"
+  },
+  "worker_id": "codex"
+}
