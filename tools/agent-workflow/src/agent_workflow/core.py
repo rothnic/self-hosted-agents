@@ -56,6 +56,7 @@ TASK_RE = re.compile(
     r"^- \[(?P<done>[ xX])\] (?P<id>T[0-9]{3,})"
     r"(?: \[(?P<parallel>P)\])?(?: \[(?P<story>[^\]]+)\])? (?P<title>.+)$"
 )
+OBJECTIVE_RE = re.compile(r"^ID:\s*`?([^`\s]+)`?\s*$", re.MULTILINE)
 
 
 @dataclass
@@ -235,6 +236,79 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
         except json.JSONDecodeError:
             items.append({"_invalid": line})
     return items
+
+
+def current_objective_id(root: Path = ROOT) -> str:
+    text = read_text(root / "objectives" / "current.md")
+    match = OBJECTIVE_RE.search(text)
+    return match.group(1) if match else "current"
+
+
+def task_external_ref(task: dict[str, Any]) -> str:
+    return f"specs/{task['spec_id']}/tasks.md#{task['id']}"
+
+
+def task_source_path(task: dict[str, Any]) -> str:
+    return f"specs/{task['spec_id']}/tasks.md"
+
+
+def task_has_beads_evidence(task: dict[str, Any], issues: list[dict[str, Any]]) -> bool:
+    task_id = task["id"]
+    external_ref = task_external_ref(task)
+    for issue in issues:
+        issue_text = "\n".join(
+            str(issue.get(key, "")) for key in ["id", "title", "description", "external_ref", "close_reason"]
+        )
+        if issue.get("external_ref") == external_ref or f"Task: {task_id}" in issue_text or task_id in issue_text:
+            return True
+        for comment in issue.get("comments", []):
+            text = str(comment.get("text", ""))
+            if external_ref in text or task_id in text:
+                return True
+    return False
+
+
+def is_human_review_issue(issue: dict[str, Any]) -> bool:
+    combined = " ".join(
+        str(issue.get(key, "")) for key in ["id", "title", "description", "issue_type", "external_ref"]
+    ).lower()
+    labels = {str(label).lower() for label in issue.get("labels", [])}
+    return (
+        "human review" in combined
+        or "human approval" in combined
+        or "review and approve" in combined
+        or "review-gate" in labels
+        or "human-review" in labels
+    )
+
+
+def issue_open_dependencies(issue: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        dep
+        for dep in issue.get("dependencies", [])
+        if str(dep.get("status", "")).lower() not in {"closed", "resolved", "done"}
+    ]
+
+
+def is_implementation_issue(issue: dict[str, Any]) -> bool:
+    return not is_human_review_issue(issue)
+
+
+def issue_has_required_metadata(issue: dict[str, Any]) -> bool:
+    text = str(issue.get("description", ""))
+    return all(
+        [
+            "Objective:" in text,
+            "Spec:" in text,
+            "Task:" in text,
+            "Acceptance:" in text,
+            bool(issue.get("external_ref")),
+        ]
+    )
+
+
+def beads_issues() -> list[dict[str, Any]]:
+    return read_jsonl(ROOT / ".beads" / "issues.jsonl")
 
 
 def context_index(args: argparse.Namespace) -> int:
@@ -468,28 +542,63 @@ def ticket_sync(args: argparse.Namespace) -> int:
 
 def ticket_sync_data(write: bool) -> dict[str, Any]:
     tasks = collect_tasks()
+    objective_id = current_objective_id()
+    existing = beads_issues()
+    existing_by_ref = {
+        issue.get("external_ref"): issue
+        for issue in existing
+        if issue.get("external_ref")
+    }
+    human_gates = [
+        issue
+        for issue in existing
+        if issue.get("status") == "open" and is_human_review_issue(issue)
+    ]
     proposals = []
     for task in tasks:
+        if task["done"]:
+            continue
+        external_ref = task_external_ref(task)
+        existing_issue = existing_by_ref.get(external_ref)
+        if existing_issue is None and is_human_review_issue({"title": task["title"]}) and human_gates:
+            existing_issue = human_gates[0]
+        implementation_task = is_implementation_issue({"title": task["title"]})
         proposals.append(
             {
                 "id": task["id"],
                 "title": task["title"],
-                "priority": 2,
+                "priority": 1 if task["story"] == "US2" else 2,
                 "type": "task",
-                "status": "closed" if task["done"] else "open",
+                "status": "open",
                 "spec_id": task["spec_id"],
-                "objective_id": "current",
+                "objective_id": objective_id,
                 "acceptance": task["acceptance"],
+                "external_ref": external_ref,
+                "source_path": task_source_path(task),
+                "existing_issue_id": existing_issue.get("id") if existing_issue else None,
+                "blocked_by": [issue["id"] for issue in human_gates if implementation_task],
             }
         )
     br = find_br()
     wrote = []
     if write and br:
         for proposal in proposals:
+            if proposal["existing_issue_id"]:
+                wrote.append(
+                    {
+                        "title": proposal["title"],
+                        "skipped": True,
+                        "reason": "existing issue",
+                        "issue_id": proposal["existing_issue_id"],
+                    }
+                )
+                continue
             title = proposal["title"]
             desc = (
-                f"Spec: {proposal['spec_id']}\n"
                 f"Objective: {proposal['objective_id']}\n"
+                f"Spec: {proposal['spec_id']}\n"
+                f"Task: {proposal['id']}\n"
+                f"Source: {proposal['source_path']}\n"
                 f"Acceptance: {proposal['acceptance']}"
             )
             proc = run(
@@ -503,15 +612,40 @@ def ticket_sync_data(write: bool) -> dict[str, Any]:
                     str(proposal["priority"]),
                     "--description",
                     desc,
+                    "--external-ref",
+                    proposal["external_ref"],
                     "--json",
                 ]
             )
+            issue_id = None
+            try:
+                created = json.loads(proc.stdout)
+                if isinstance(created, dict):
+                    issue_id = created.get("id")
+                elif isinstance(created, list) and created:
+                    issue_id = created[0].get("id")
+            except json.JSONDecodeError:
+                issue_id = None
+            dependencies = []
+            if issue_id:
+                for gate_id in proposal["blocked_by"]:
+                    dep_proc = run([br, "dep", "add", issue_id, gate_id, "--json"])
+                    dependencies.append(
+                        {
+                            "depends_on": gate_id,
+                            "returncode": dep_proc.returncode,
+                            "stdout": dep_proc.stdout.strip(),
+                            "stderr": dep_proc.stderr.strip(),
+                        }
+                    )
             wrote.append(
                 {
                     "title": title,
                     "returncode": proc.returncode,
                     "stdout": proc.stdout.strip(),
                     "stderr": proc.stderr.strip(),
+                    "issue_id": issue_id,
+                    "dependencies": dependencies,
                 }
             )
         run([br, "sync", "--flush-only"])
@@ -529,15 +663,247 @@ def ready_work(args: argparse.Namespace) -> int:
 def ready_work_data() -> dict[str, Any]:
     br = find_br()
     if br:
+        issues = beads_issues()
         proc = run([br, "ready", "--json"])
+        raw_ready = []
         if proc.returncode == 0:
             try:
-                ready = json.loads(proc.stdout)
+                raw_ready = json.loads(proc.stdout)
             except json.JSONDecodeError:
-                ready = []
-            return {"br": br, "ready": ready, "raw_stdout": proc.stdout}
+                raw_ready = []
+        human_required = [
+            issue for issue in issues if issue.get("status") == "open" and is_human_review_issue(issue)
+        ]
+        blocked = [
+            issue
+            for issue in issues
+            if issue.get("status") == "open"
+            and is_implementation_issue(issue)
+            and issue_open_dependencies(issue)
+        ]
+        ready = [
+            issue
+            for issue in raw_ready
+            if is_implementation_issue(issue) and not issue_open_dependencies(issue)
+        ]
+        return {
+            "br": br,
+            "source": "beads",
+            "ready": ready,
+            "human_required": human_required,
+            "blocked": blocked,
+            "raw_ready": raw_ready,
+            "raw_stdout": proc.stdout,
+        }
     ready = [task for task in collect_tasks() if not task["done"]]
-    return {"br": br, "ready": ready}
+    return {"br": br, "source": "tasks-fallback", "ready": ready, "human_required": [], "blocked": []}
+
+
+def completed_task_evidence_errors(tasks: list[dict[str, Any]], issues: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    for task in tasks:
+        if task["done"] and not task_has_beads_evidence(task, issues):
+            errors.append(f"{task_external_ref(task)} is complete but has no Beads evidence")
+    return errors
+
+
+def issue_metadata_errors(issues: list[dict[str, Any]]) -> list[str]:
+    errors = []
+    for issue in issues:
+        if issue.get("status") != "open" or not is_implementation_issue(issue):
+            continue
+        if not issue_has_required_metadata(issue):
+            errors.append(f"{issue.get('id', '<unknown>')} missing objective/spec/task/external_ref/acceptance metadata")
+    return errors
+
+
+def workflow_state_lint_result() -> tuple[int, dict[str, Any]]:
+    errors = []
+    warnings = []
+    tasks = collect_tasks()
+    issues = beads_issues()
+    ready = ready_work_data()
+
+    errors.extend(completed_task_evidence_errors(tasks, issues))
+    errors.extend(issue_metadata_errors(issues))
+
+    if ready.get("human_required") and ready.get("ready"):
+        ids = ", ".join(item.get("id", "<unknown>") for item in ready["ready"])
+        gates = ", ".join(item.get("id", "<unknown>") for item in ready["human_required"])
+        errors.append(f"implementation ready work ({ids}) is exposed while human review is required ({gates})")
+
+    data = {
+        "ok": not errors,
+        "errors": errors,
+        "warnings": warnings,
+        "completed_tasks_checked": len([task for task in tasks if task["done"]]),
+        "open_issues_checked": len([issue for issue in issues if issue.get("status") == "open"]),
+    }
+    return (0 if not errors else 1), data
+
+
+def git_state_summary(status_text: str) -> dict[str, Any]:
+    lines = [line for line in status_text.splitlines() if line.strip()]
+    branch = lines[0][3:] if lines and lines[0].startswith("## ") else "unknown"
+    changed = [line for line in lines[1:] if line]
+    return {
+        "branch": branch,
+        "clean": not changed,
+        "changed_files": len(changed),
+        "summary": "clean" if not changed else f"{len(changed)} changed file(s)",
+    }
+
+
+def process_position_summary(
+    bootstrap_ok: bool, health: dict[str, Any], ready: dict[str, Any], context: dict[str, Any], status_text: str
+) -> dict[str, Any]:
+    tasks = context.get("tasks", [])
+    open_tasks = [task for task in tasks if not task.get("done")]
+    completed_tasks = [task for task in tasks if task.get("done")]
+    health_ok = health.get("ok") and not health.get("issues")
+    human_required = ready.get("human_required", [])
+    implementer_ready = ready.get("ready", [])
+    blocked = ready.get("blocked", [])
+    git_state = git_state_summary(status_text)
+
+    if not bootstrap_ok or not health_ok:
+        phase = "workflow health triage"
+        step = "Bootstrap/Verify"
+        role = "health-status"
+        plain_status = "Workflow checks need attention before planning or implementation."
+    elif human_required:
+        phase = "human review gate"
+        step = "Review"
+        role = "review-gatekeeper"
+        plain_status = "Automation is paused for a human approval decision."
+    elif implementer_ready:
+        phase = "implementation"
+        step = "Claim"
+        role = "implementer"
+        plain_status = "At least one Beads ticket is ready for an implementer to claim."
+    elif open_tasks:
+        phase = "backlog planning"
+        step = "Ticket"
+        role = "ticket-planner"
+        plain_status = "Spec tasks remain, but no implementer-ready work is currently available."
+    else:
+        phase = "planning"
+        step = "Plan"
+        role = "pm-steward"
+        plain_status = "No ready work is available; the next objective or spec action should be selected."
+
+    return {
+        "phase": phase,
+        "state_machine_step": step,
+        "active_role": role,
+        "plain_language_status": plain_status,
+        "git": git_state,
+        "work_in_progress": {
+            "open_spec_tasks": len(open_tasks),
+            "completed_spec_tasks": len(completed_tasks),
+            "ready_work": len(implementer_ready),
+            "human_required": len(human_required),
+            "blocked": len(blocked),
+            "claims": len(health.get("claims", [])),
+        },
+    }
+
+
+def meta_process_notes(health: dict[str, Any], ready: dict[str, Any], status_text: str) -> dict[str, Any]:
+    git_state = git_state_summary(status_text)
+    if health.get("issues"):
+        learning = "Record the health failure with `uv run awf issue-log --write` before continuing."
+        risk = "Starting implementation before health is restored may create hidden workflow drift."
+    elif ready.get("human_required"):
+        learning = "After the human decision, record approval or requested changes in the linked Beads ticket."
+        risk = "Do not treat pending human-review tickets as implementer-ready work."
+    elif git_state["clean"]:
+        learning = "No meta-process follow-up is required unless the next run discovers drift."
+        risk = "No immediate workflow risk is visible from git or health state."
+    else:
+        learning = "Before closing the loop, capture review learnings or follow-up tickets for any process gaps found."
+        risk = "Uncommitted workflow changes should be reviewed before more work is layered on top."
+
+    return {
+        "learning_follow_up": learning,
+        "backlog_spec_hygiene": "Keep `tasks.md` as spec decomposition and Beads as the executable backlog.",
+        "risk_to_watch": risk,
+    }
+
+
+def next_action_data() -> dict[str, Any]:
+    bootstrap_status = bootstrap_data()
+    bootstrap_ok = all(item["ok"] for item in bootstrap_status["checks"])
+    context = context_index_data()
+    health = health_status_data(deep=True)
+    ready = ready_work_data()
+    status = run(["git", "status", "--short", "--branch"])
+    options = []
+
+    if not bootstrap_ok or health["issues"]:
+        options.append(
+            {
+                "id": "fix-health",
+                "label": "Fix workflow health",
+                "owner": "health-status",
+                "command": "uv run awf health-status --deep --json",
+                "recommended": True,
+            }
+        )
+    if ready.get("human_required"):
+        options.append(
+            {
+                "id": "human-review",
+                "label": "Review and approve the pending human gate",
+                "owner": "human reviewer",
+                "command": "uv run awf ready-work --json",
+                "recommended": not options,
+            }
+        )
+    if ready.get("ready"):
+        options.append(
+            {
+                "id": "implement-ready-work",
+                "label": "Claim one implementer-ready Beads item",
+                "owner": "implementer",
+                "command": "uv run awf claim-work --worker-id <id> --write",
+                "recommended": not options,
+            }
+        )
+    if not options:
+        options.append(
+            {
+                "id": "plan-next-work",
+                "label": "Plan the next objective/spec/backlog action",
+                "owner": "pm-steward",
+                "command": "uv run awf workflow-run --mode plan --dry-run",
+                "recommended": True,
+            }
+        )
+    if len(options) < 2 and status.stdout.strip():
+        options.append(
+            {
+                "id": "review-local-changes",
+                "label": "Review local uncommitted changes",
+                "owner": "reviewer",
+                "command": "git diff",
+                "recommended": False,
+            }
+        )
+
+    recommendation = next((option for option in options if option["recommended"]), options[0])
+    return {
+        "ok": health["ok"] and bootstrap_ok,
+        "recommendation": recommendation,
+        "options": options[:4],
+        "process_position": process_position_summary(bootstrap_ok, health, ready, context, status.stdout.strip()),
+        "meta_process": meta_process_notes(health, ready, status.stdout.strip()),
+        "bootstrap": bootstrap_status,
+        "health": health,
+        "ready_work": ready,
+        "context": context,
+        "git_status": status.stdout.strip(),
+    }
 
 
 def health_status_data(deep: bool) -> dict[str, Any]:
@@ -556,9 +922,10 @@ def health_status_data(deep: bool) -> dict[str, Any]:
         ("spec-kit-lint", spec_kit_lint),
         ("bdd-lint", bdd_lint),
         ("review-gate", review_gate),
+        ("workflow-state-lint", workflow_state_lint_result),
         ("repo-hygiene", repo_hygiene_result),
     ]:
-        if name == "repo-hygiene":
+        if name in {"repo-hygiene", "workflow-state-lint"}:
             code, data = fn()
         else:
             code, data = fn(check_args)
@@ -589,8 +956,11 @@ def health_status_data(deep: bool) -> dict[str, Any]:
             }
         )
 
+    human_required = ready.get("human_required", [])
     if issues:
         next_action = "log issues and stop for planner triage"
+    elif human_required:
+        next_action = "human review required"
     elif ready.get("ready"):
         next_action = "worker may claim one ready item"
     else:
@@ -602,6 +972,7 @@ def health_status_data(deep: bool) -> dict[str, Any]:
         "checks": checks,
         "issues": issues,
         "ready_count": len(ready.get("ready", [])),
+        "human_required_count": len(human_required),
         "claims": [rel(path) for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))],
         "next_action": next_action,
     }
@@ -838,6 +1209,59 @@ def workflow_fixture_test_result(write: bool) -> tuple[int, dict[str, Any]]:
     results.append({"name": "root fixture BDD driver run passes", "ok": code == 0, "data": data})
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
+    code, data = workflow_state_lint_result()
+    results.append({"name": "root workflow state lint passes", "ok": code == 0, "data": data})
+    ready = ready_work_data()
+    results.append(
+        {
+            "name": "human review work is separated from implementer ready work",
+            "ok": not any(is_human_review_issue(item) for item in ready.get("ready", []))
+            and not (ready.get("human_required") and ready.get("ready")),
+            "data": ready,
+        }
+    )
+    ticket_data = ticket_sync_data(write=False)
+    open_task_ids = {task["id"] for task in collect_tasks() if not task.get("done")}
+    existing_open_task_ids = {
+        proposal["id"] for proposal in ticket_data["proposals"] if proposal.get("existing_issue_id")
+    }
+    results.append(
+        {
+            "name": "ticket sync skips completed tasks and recognizes existing open work",
+            "ok": (
+                all(proposal["status"] == "open" for proposal in ticket_data["proposals"])
+                and not any(proposal["id"] == "T032" for proposal in ticket_data["proposals"])
+                and existing_open_task_ids.issubset(open_task_ids)
+            ),
+            "data": ticket_data,
+        }
+    )
+    synthetic_task = {
+        "id": "T999",
+        "title": "Synthetic complete task",
+        "done": True,
+        "spec_id": "001-workflow-foundation",
+    }
+    results.append(
+        {
+            "name": "workflow state lint detects completed task without Beads evidence",
+            "ok": bool(completed_task_evidence_errors([synthetic_task], [])),
+            "data": {"errors": completed_task_evidence_errors([synthetic_task], [])},
+        }
+    )
+    synthetic_issue = {
+        "id": "awf-synthetic",
+        "title": "Synthetic implementation",
+        "status": "open",
+        "description": "Spec: 001-workflow-foundation",
+    }
+    results.append(
+        {
+            "name": "workflow state lint detects missing Beads metadata",
+            "ok": bool(issue_metadata_errors([synthetic_issue])),
+            "data": {"errors": issue_metadata_errors([synthetic_issue])},
+        }
+    )
 
     ok = all(item["ok"] for item in results)
     if write:
@@ -931,8 +1355,10 @@ def main() -> int:
     bdd_run_p = sub.add_parser("bdd-run")
     bdd_run_p.add_argument("--driver", required=True)
     sub.add_parser("ready-work")
+    sub.add_parser("next-action")
     sub.add_parser("review-gate")
     sub.add_parser("repo-hygiene")
+    sub.add_parser("workflow-state-lint")
     sub.add_parser("install-hooks")
     sub.add_parser("run-report")
     sub.add_parser("workflow-fixture-test")
@@ -976,10 +1402,16 @@ def main() -> int:
         return ticket_sync(args)
     if args.command == "ready-work":
         return ready_work(args)
+    if args.command == "next-action":
+        return emit(next_action_data(), args.json)
     if args.command == "review-gate":
         return command_status_tuple(review_gate, args)
     if args.command == "repo-hygiene":
         return repo_hygiene(args)
+    if args.command == "workflow-state-lint":
+        code, data = workflow_state_lint_result()
+        emit(data, args.json)
+        return code
     if args.command == "install-hooks":
         return install_hooks(args)
     if args.command == "workflow-run":

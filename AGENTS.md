@@ -50,6 +50,132 @@ Use this loop to keep the project ratcheting forward:
 
 The loop pauses whenever the next transition would require guessing about scope, architecture, priority, acceptance, or behavior.
 
+## State, Backlog, And Next Action
+
+Agents must be able to answer "what should happen next?" from repo state. Use this precedence order:
+
+1. **Objective**: `objectives/current.md` defines what the project is trying to achieve.
+2. **Spec**: `specs/<id>/spec.md` and `plan.md` define approved intent and approach.
+3. **Spec tasks**: `specs/<id>/tasks.md` is the planning breakdown for a spec, not the worker queue.
+4. **Beads backlog**: `.beads/issues.jsonl` is the primary executable backlog for agents.
+5. **Claims and evidence**: `.agent-runs/claims/`, Beads comments, run reports, and check output prove status.
+
+When Beads is available, implementers must not choose work directly from `tasks.md`. They use `uv run awf ready-work`
+and claim one Beads item. `tasks.md` is used by spec/decomposition roles and as an explicit fallback only when Beads
+is unavailable.
+
+When a user asks "what next?", run the startup/status path and give 2-4 concrete options with one recommendation:
+
+```bash
+uv run awf next-action --json
+uv run awf bootstrap
+uv run awf context-index --json
+uv run awf health-status --deep --json
+uv run awf ready-work --json
+git status --short --branch
+```
+
+Choose the recommendation by state:
+
+- If health fails: load `health-status`, log or propose the issue, and stop before implementation.
+- If a review gate or human approval is open: load `review-gatekeeper` and ask for that decision.
+- If there are verified local changes waiting for human review: load `reviewer`; present approve/merge, request changes,
+  or continue options. Do not merge without explicit human approval.
+- If an approved spec has unsynced open tasks: load `ticket-planner` and run `uv run awf ticket-sync`; use `--write`
+  only when mutation is requested.
+- If Beads has ready work: load `implementer`, claim one item, and execute only that item.
+- If no ready work exists: load `pm-steward` to propose the next objective/spec/backlog action.
+
+Use this response template for every next-action or human-review handoff:
+
+```markdown
+## Process Position
+
+- Current phase:
+- State-machine step:
+- Active role:
+- Plain-language status:
+
+## What This Is About
+
+- Objective:
+- Current gate/ticket:
+- Why you are seeing this:
+
+## Current State
+
+- Git:
+- Health:
+- Work in progress:
+- Ready work:
+- Human required:
+- Blocked/dependent work:
+
+## What Changed Since Last Review
+
+- Change summary:
+- Evidence recorded:
+- Checks run:
+
+## Recommendation
+
+Recommended option: <option id/title>
+Reason:
+Owner:
+Command or decision needed:
+
+## Options
+
+1. Recommended: <action> - <effect>
+2. <action> - <effect>
+3. <action> - <effect>
+
+## Meta-Process Notes
+
+- Learning/process follow-up:
+- Backlog/spec hygiene:
+- Risk to watch:
+
+## What Happens After Approval
+
+- State changes:
+- Work unblocked:
+- Next command:
+```
+
+Keep the filled response concise, but include enough context that a human opening the message can tell what project,
+gate, process position, git state, changed work, dependencies, choices, and meta-process follow-ups are involved without
+running commands manually.
+
+## Role Swimlanes
+
+- **Human reviewer**: sets project objectives, approves specs and human gates, chooses priority when tradeoffs remain,
+  and approves merges. The human should not need to manually inspect status commands; agents present options and evidence.
+- **PM steward**: reads project state and returns the next safe action, options, blockers, and recommendation. It does not
+  implement product changes.
+- **Spec author / Spec Kit roles**: create or update native Spec Kit artifacts.
+- **Epic decomposer**: turns approved specs into small `tasks.md` slices with acceptance commands.
+- **Ticket planner**: turns approved open spec tasks into Beads backlog items and validates traceability.
+- **Implementer**: consumes Beads ready work, claims one item, makes the smallest coherent change, and records evidence.
+- **Test steward**: runs acceptance and workflow checks, then records precise failures or passing evidence.
+- **Reviewer**: reviews code/spec/ticket alignment and decides whether the change is ready for human approval.
+- **Review gatekeeper**: pauses automation when a human decision is required and resumes only after that decision is
+  recorded in a durable artifact.
+- **Retrospector**: records durable process learnings after a run.
+
+## Backlog Population
+
+Backlog population is spec driven:
+
+1. PM steward confirms the objective and approved spec.
+2. Epic decomposer updates `tasks.md` with small, independently verifiable slices.
+3. Ticket planner runs `uv run awf ticket-sync` to preview Beads tickets.
+4. With explicit write approval, ticket planner runs `uv run awf ticket-sync --write`.
+5. Implementers work only from `uv run awf ready-work`, not by scanning `tasks.md`.
+
+Completion is proven when the Beads issue has passing acceptance evidence, the linked task/spec state is updated when
+needed, relevant workflow checks pass, and reviewer/human gates are resolved.
+
 ## Scheduled Orchestration
 
 Cron-like runners use the same CLI and repo artifacts as humans:
@@ -132,10 +258,12 @@ uv run awf context-index --json
 uv run awf spec-kit-lint
 uv run awf workflow-run --mode plan --dry-run
 uv run awf health-status --deep
+uv run awf next-action --json
 uv run awf cron-tick --role planner --write
 uv run awf spec-lint
 uv run awf review-gate
 uv run awf repo-hygiene
+uv run awf workflow-state-lint
 uv run awf bdd-lint
 uv run awf bdd-run --driver fixture
 uv run awf workflow-fixture-test

@@ -141,6 +141,12 @@ def repo_hygiene(json_output: bool = typer.Option(False, "--json", help="Emit ty
     raise typer.Exit(run_core_tuple("repo-hygiene", core.repo_hygiene_result, json_output=json_output))
 
 
+@app.command("workflow-state-lint")
+def workflow_state_lint(json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output.")) -> None:
+    """Validate task, Beads, gate, and ready-work consistency."""
+    raise typer.Exit(run_core_tuple("workflow-state-lint", core.workflow_state_lint_result, json_output=json_output))
+
+
 @app.command("install-hooks")
 def install_hooks(json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output.")) -> None:
     """Install versioned git hooks by setting core.hooksPath to .githooks."""
@@ -168,6 +174,15 @@ def ready_work(json_output: bool = typer.Option(False, "--json", help="Emit type
     """Show ready Beads work, falling back to parseable spec tasks."""
     data = core.ready_work_data()
     print_envelope(CommandEnvelope(ok=True, command="ready-work", summary="Ready work.", data=data), json_output)
+
+
+@app.command("next-action")
+def next_action(json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output.")) -> None:
+    """Show the canonical next action and human/agent options from current repo state."""
+    data = core.next_action_data()
+    summary = data["recommendation"]["label"]
+    print_envelope(CommandEnvelope(ok=data["ok"], command="next-action", summary=summary, data=data), json_output)
+    raise typer.Exit(0 if data["ok"] else 1)
 
 
 @app.command("health-status")

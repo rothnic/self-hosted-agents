@@ -61,13 +61,15 @@
 
 ## Phase 6: Review Before Product Work
 
-- [ ] T025 [P] [US1] Run `tools/agent-workflow/bootstrap-dev.sh`
-- [ ] T026 [P] [US1] Run `uv run awf spec-kit-lint`
-- [ ] T027 [P] [US4] Run `uv run awf bdd-lint && uv run awf bdd-run --driver fixture`
-- [ ] T028 [P] [US2] Run `uv run awf review-gate`
-- [ ] T029 [P] [US1] Run `uv run awf repo-hygiene`
-- [ ] T030 [US4] Run `uv run awf workflow-fixture-test`
-- [ ] T031 [US2] Human review of the foundation before product implementation
+- [x] T025 [P] [US1] Run `tools/agent-workflow/bootstrap-dev.sh`
+- [x] T026 [P] [US1] Run `uv run awf spec-kit-lint`
+- [x] T027 [P] [US4] Run `uv run awf bdd-lint && uv run awf bdd-run --driver fixture`
+- [x] T028 [P] [US2] Run `uv run awf review-gate`
+- [x] T029 [P] [US1] Run `uv run awf repo-hygiene`
+- [x] T030 [US4] Run `uv run awf workflow-fixture-test`
+- [X] T031 [US2] Human review of the foundation before product implementation
+- [x] T032 [US2] Clarify state-driven role swimlanes, backlog ownership, and next-action guidance
+- [X] T033 [US3] Harden `uv run awf ticket-sync --write` as the idempotent Spec Kit task to Beads backlog bridge
 
 ## Dependencies & Execution Order
 

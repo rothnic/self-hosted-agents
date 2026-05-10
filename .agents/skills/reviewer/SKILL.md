@@ -21,3 +21,5 @@ Find bugs, process drift, missing acceptance criteria, and mismatches between sp
 ## Output
 
 Lead with findings ordered by severity. Include file and line references when reviewing local files.
+When the review is clean, state the human's next options: approve/merge, request changes, or continue with another
+ready Beads item. Do not imply that approval or merge happened unless it was explicitly requested and completed.
