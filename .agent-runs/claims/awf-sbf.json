@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-10T20:23:37.115664+00:00",
+  "id": "awf-sbf",
+  "work": {
+    "created_at": "2026-05-10T20:05:53.717033Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T002\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-sbf",
+    "issue_type": "task",
+    "priority": 1,
+    "status": "open",
+    "title": "Expand `docs/research/llm-observability-solution-space.md` with candidate-specific integration notes",
+    "updated_at": "2026-05-10T20:05:53.717033Z"
+  },
+  "worker_id": "codex-research"
+}
