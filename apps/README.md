@@ -6,3 +6,5 @@ Runnable product implementations live here.
 - `langgraph-python/`: future Python LangChain/LangGraph implementation.
 
 Each app should own its runtime-specific source, tests, and local setup. Shared contracts belong in `packages/` or specs.
+New candidate apps should be added only when the roadmap comparison identifies a separate solution path that needs real
+implementation evidence.

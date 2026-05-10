@@ -5,9 +5,10 @@
 ID: `agentic-development-foundation`
 Status: active
 
-Build an environment-agnostic operating system for coding agents that can inspect repo context, align objectives and
-specs, decompose approved work into tickets, pause for human review, implement small verified slices, and capture
-learnings for future runs.
+Build an environment-agnostic operating system for coding agents, then use it to compare self-hostable agent application
+stacks against real implementations. The first target user is the project owner as an engineer who prefers Python,
+cannot rely on approved self-hosted LangSmith access, and needs evidence-backed choices about observability,
+evaluation, orchestration, scalability, and operating effort.
 
 ## Success Criteria
 
@@ -15,6 +16,11 @@ learnings for future runs.
 - Specs, ADRs, research notes, tickets, behavior contracts, run reports, and learnings have clear homes.
 - Planning, ticketing, review-gate, BDD contract, and retrospective flows can run without product-specific implementation.
 - Workflow validation passes against an isolated fixture.
+- The product roadmap maps high-level system requirements into comparable implementation options.
+- Each candidate solution is tested as a separate runnable app while sharing common contracts, fixtures, and evaluation
+  assets where useful.
+- Roadmap reviews can be initiated by the human and should produce refreshed objectives, specs, tasks, tickets, and
+  comparison criteria without requiring manual workflow operation.
 
 ## Constraints
 
@@ -26,6 +32,6 @@ learnings for future runs.
 
 ## Non-Goals
 
-- Do not implement LangGraph, LangChain, Mastra, RAG, frontend, or product workflow features in this phase.
+- Do not treat a framework or observability platform as the winner before comparable implementation evidence exists.
 - Do not automate risky writes without explicit `--write`.
 - Do not let recurring agents bypass human review gates.

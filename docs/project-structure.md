@@ -20,6 +20,11 @@ The repository is organized by purpose so it can grow beyond a single Python app
 - `apps/langgraph-python/` will hold the Python LangChain/LangGraph implementation.
 
 Both apps should prove behavior through shared BDD contracts and future shared packages, not by sharing app internals.
+Additional candidate apps may be added when the roadmap comparison identifies a distinct implementation path worth
+testing, such as a Python-first stack using a different orchestration or observability approach.
+
+Candidate apps must remain runnable and independently understandable. Shared comparison assets belong in `packages/`,
+`tests/`, or docs; app internals should not be coupled just to make comparison easier.
 
 ## Python Tooling
 
