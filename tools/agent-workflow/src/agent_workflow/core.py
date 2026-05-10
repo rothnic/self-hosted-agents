@@ -176,10 +176,18 @@ def collect_specs(root: Path = ROOT) -> list[dict[str, Any]]:
     return specs
 
 
+def tasks_acceptance_command(tasks_path: Path) -> str:
+    for line in read_text(tasks_path).splitlines():
+        if line.startswith("**Acceptance**:"):
+            return line.split(":", 1)[1].strip().strip("`")
+    return "uv run awf workflow-fixture-test"
+
+
 def collect_tasks(root: Path = ROOT) -> list[dict[str, Any]]:
     tasks = []
     for spec in collect_specs(root):
         tasks_path = root / spec["path"] / "tasks.md"
+        acceptance = tasks_acceptance_command(tasks_path)
         for line in read_text(tasks_path).splitlines():
             match = TASK_RE.match(line)
             if match:
@@ -188,7 +196,7 @@ def collect_tasks(root: Path = ROOT) -> list[dict[str, Any]]:
                 item["done"] = item["done"].lower() == "x"
                 item["parallel"] = item["parallel"] == "P"
                 item["story"] = item["story"] or "shared"
-                item["acceptance"] = "uv run awf workflow-fixture-test"
+                item["acceptance"] = acceptance
                 tasks.append(item)
     return tasks
 
@@ -244,9 +252,9 @@ def read_json(path: Path) -> dict[str, Any] | None:
         return None
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-    except json.JSONDecodeError:
-        return {"ok": False, "error": f"invalid JSON in {rel(path)}"}
-    return data if isinstance(data, dict) else {"ok": False, "error": f"{rel(path)} is not a JSON object"}
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
 
 
 def write_json_artifact(directory: str, prefix: str, data: dict[str, Any]) -> str:
@@ -1336,6 +1344,7 @@ def parse_spec_phase_tasks(spec_id: str, phase: str) -> list[dict[str, Any]]:
     tasks_path = ROOT / "specs" / spec_id / "tasks.md"
     if not tasks_path.exists():
         return []
+    acceptance = tasks_acceptance_command(tasks_path)
     capture = False
     tasks = []
     for line in read_text(tasks_path).splitlines():
@@ -1351,7 +1360,7 @@ def parse_spec_phase_tasks(spec_id: str, phase: str) -> list[dict[str, Any]]:
             item["done"] = item["done"].lower() == "x"
             item["parallel"] = item["parallel"] == "P"
             item["story"] = item["story"] or "shared"
-            item["acceptance"] = "uv run awf workflow-fixture-test"
+            item["acceptance"] = acceptance
             tasks.append(item)
     return tasks
 
@@ -1568,12 +1577,12 @@ def automation_loop_data(
             "next_action": "health-loop should repair or log failures first",
         }
     if role == "pm-review":
-        planned = increment_plan_data(status["increment_id"], spec_id, phase, write=write)
         ticket_sync = (
             ticket_sync_data(write=write)
-            if planned["ready_count"] == 0
+            if status["ready_count"] == 0
             else {"write": write, "proposals": [], "created": []}
         )
+        planned = increment_plan_data(status["increment_id"], spec_id, phase, write=write)
         return {
             "ok": True,
             "role": role,
@@ -1592,16 +1601,23 @@ def automation_loop_data(
         worker_branch = f"codex/{chosen.get('id', 'work')}-{worker_slug}"
         if write and claim.get("ok") and claim.get("claimed", {}).get("path"):
             claim_path_obj = ROOT / claim["claimed"]["path"]
-            claim_data = read_json(claim_path_obj) or {}
-            claim_data.update(
-                {
-                    "increment_id": status["increment_id"],
-                    "feature_branch": status["feature_branch"],
-                    "worker_branch": worker_branch,
-                    "assigned_by": "automation-loop:orchestrator",
+            claim_data = read_json(claim_path_obj)
+            if claim_data:
+                claim_data.update(
+                    {
+                        "increment_id": status["increment_id"],
+                        "feature_branch": status["feature_branch"],
+                        "worker_branch": worker_branch,
+                        "assigned_by": "automation-loop:orchestrator",
+                    }
+                )
+                claim_path_obj.write_text(json.dumps(claim_data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            else:
+                claim = {
+                    **claim,
+                    "ok": False,
+                    "reason": f"claim file is missing or invalid: {rel(claim_path_obj)}",
                 }
-            )
-            claim_path_obj.write_text(json.dumps(claim_data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return {
             "ok": bool(claim.get("ok")),
             "role": role,
@@ -1902,6 +1918,17 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": ticket_data,
         }
     )
+    orchestration_tasks = [
+        task for task in collect_tasks() if task["spec_id"] == "003-automated-increment-orchestration"
+    ]
+    results.append(
+        {
+            "name": "task parser preserves tasks.md acceptance command",
+            "ok": bool(orchestration_tasks)
+            and all(task["acceptance"] == "uv run awf verify --profile increment --json" for task in orchestration_tasks),
+            "data": {"tasks": orchestration_tasks},
+        }
+    )
     synthetic_task = {
         "id": "T999",
         "title": "Synthetic complete task",
@@ -2083,151 +2110,3 @@ def spec_new_result(slug: str, objective: str, write: bool, force: bool) -> tupl
     proc = run(cmd)
     data = {"ok": proc.returncode == 0, "command": cmd, "stdout": proc.stdout.strip(), "stderr": proc.stderr.strip()}
     return (0 if proc.returncode == 0 else 1), data
-
-
-def command_status_tuple(fn, args: argparse.Namespace) -> int:
-    code, data = fn(args)
-    emit(data, args.json)
-    return code
-
-
-def main() -> int:
-    argv = sys.argv[1:]
-    trailing_json = "--json" in argv
-    if trailing_json:
-        argv = [item for item in argv if item != "--json"]
-    parser = argparse.ArgumentParser(description="Environment-agnostic agent workflow CLI")
-    parser.add_argument("--json", action="store_true", help="emit JSON")
-    sub = parser.add_subparsers(dest="command", required=True)
-
-    sub.add_parser("bootstrap")
-    sub.add_parser("context-index")
-    sub.add_parser("spec-lint")
-    sub.add_parser("spec-kit-lint")
-    sub.add_parser("bdd-lint")
-    bdd_run_p = sub.add_parser("bdd-run")
-    bdd_run_p.add_argument("--driver", required=True)
-    sub.add_parser("ready-work")
-    sub.add_parser("next-action")
-    sub.add_parser("review-gate")
-    sub.add_parser("repo-hygiene")
-    sub.add_parser("workflow-state-lint")
-    sub.add_parser("install-hooks")
-    sub.add_parser("run-report")
-    sub.add_parser("workflow-fixture-test")
-
-    verify_p = sub.add_parser("verify")
-    verify_p.add_argument("--profile", choices=sorted(VERIFY_PROFILES), required=True)
-    verify_p.add_argument("--write", action="store_true")
-
-    increment_status_p = sub.add_parser("increment-status")
-    increment_status_p.add_argument("--increment-id")
-    increment_status_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
-    increment_status_p.add_argument("--phase", default="Phase 3")
-
-    increment_plan_p = sub.add_parser("increment-plan")
-    increment_plan_p.add_argument("--increment-id")
-    increment_plan_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
-    increment_plan_p.add_argument("--phase", default="Phase 3")
-    increment_plan_p.add_argument("--write", action="store_true")
-
-    automation_p = sub.add_parser("automation-loop")
-    automation_p.add_argument("--role", choices=["pm-review", "orchestrator", "worker", "integrator", "health"], required=True)
-    automation_p.add_argument("--worker-id")
-    automation_p.add_argument("--increment-id")
-    automation_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
-    automation_p.add_argument("--phase", default="Phase 3")
-    automation_p.add_argument("--write", action="store_true")
-
-    spec_new_p = sub.add_parser("spec-new")
-    spec_new_p.add_argument("slug")
-    spec_new_p.add_argument("--objective", default="agentic-development-foundation")
-    spec_new_p.add_argument("--write", action="store_true")
-    spec_new_p.add_argument("--force", action="store_true")
-
-    ticket = sub.add_parser("ticket-sync")
-    ticket.add_argument("--dry-run", action="store_true")
-    ticket.add_argument("--write", action="store_true")
-
-    workflow = sub.add_parser("workflow-run")
-    workflow.add_argument("--mode", choices=["plan", "implement", "review"], required=True)
-    workflow.add_argument("--trigger", default="manual")
-    workflow.add_argument("--dry-run", action="store_true")
-    workflow.add_argument("--write", action="store_true")
-
-    learning = sub.add_parser("learning-capture")
-    learning.add_argument("--note")
-    learning.add_argument("--source", default="manual")
-    learning.add_argument("--write", action="store_true")
-
-    args = parser.parse_args(argv)
-    args.json = args.json or trailing_json
-    if args.command == "bootstrap":
-        return bootstrap(args)
-    if args.command == "context-index":
-        return context_index(args)
-    if args.command == "spec-lint":
-        return command_status_tuple(spec_lint, args)
-    if args.command == "spec-kit-lint":
-        return command_status_tuple(spec_kit_lint, args)
-    if args.command == "bdd-lint":
-        return command_status_tuple(bdd_lint, args)
-    if args.command == "bdd-run":
-        return bdd_run(args)
-    if args.command == "ticket-sync":
-        return ticket_sync(args)
-    if args.command == "ready-work":
-        return ready_work(args)
-    if args.command == "next-action":
-        return emit(next_action_data(), args.json)
-    if args.command == "review-gate":
-        return command_status_tuple(review_gate, args)
-    if args.command == "repo-hygiene":
-        return repo_hygiene(args)
-    if args.command == "workflow-state-lint":
-        code, data = workflow_state_lint_result()
-        emit(data, args.json)
-        return code
-    if args.command == "install-hooks":
-        return install_hooks(args)
-    if args.command == "workflow-run":
-        return workflow_run(args)
-    if args.command == "run-report":
-        return run_report(args)
-    if args.command == "learning-capture":
-        return learning_capture(args)
-    if args.command == "workflow-fixture-test":
-        return workflow_fixture_test(args)
-    if args.command == "verify":
-        data = verify_data(profile=args.profile, write=args.write)
-        emit(data, args.json)
-        return 0 if data["ok"] else 1
-    if args.command == "increment-status":
-        data = increment_status_data(increment_id=args.increment_id, spec_id=args.spec_id, phase=args.phase)
-        return emit(data, args.json)
-    if args.command == "increment-plan":
-        data = increment_plan_data(
-            increment_id=args.increment_id,
-            spec_id=args.spec_id,
-            phase=args.phase,
-            write=args.write,
-        )
-        return emit(data, args.json)
-    if args.command == "automation-loop":
-        data = automation_loop_data(
-            role=args.role,
-            write=args.write,
-            worker_id=args.worker_id,
-            increment_id=args.increment_id,
-            spec_id=args.spec_id,
-            phase=args.phase,
-        )
-        emit(data, args.json)
-        return 0 if data["ok"] else 1
-    if args.command == "spec-new":
-        return spec_new(args)
-    return 2
-
-
-if __name__ == "__main__":
-    sys.exit(main())
