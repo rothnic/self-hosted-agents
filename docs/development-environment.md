@@ -34,6 +34,14 @@ Commands use Rich help and human output by default. Pass `--json` to get a typed
 - `summary`
 - `data`
 
+Use `uv run awf verify --profile <ticket|increment|health|pre-merge> --json` when an agent needs the correct checks,
+evidence summary, and next action for the current context. Use `--write` to create a durable handoff artifact under
+`.agent-runs/verifications/`.
+
+Use `uv run awf automation-loop --role <pm-review|orchestrator|worker|integrator|health> --write` for scheduled
+Codex or cron-like runs. Each role reads repo state, mutates only its owned workflow artifacts, and returns one
+`next_action`.
+
 If a command fails, first run:
 
 ```bash
@@ -56,6 +64,7 @@ Run:
 ```bash
 uv run awf bootstrap
 uv run awf health-status --deep
+uv run awf verify --profile increment --json
 uv run awf spec-kit-lint
 uv run awf spec-lint
 uv run awf bdd-lint

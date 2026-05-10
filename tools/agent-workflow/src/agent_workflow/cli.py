@@ -199,6 +199,83 @@ def health_status(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("verify")
+def verify(
+    profile: str = typer.Option(..., "--profile", help="ticket, increment, health, or pre-merge."),
+    write: bool = typer.Option(False, "--write", help="Write a verification artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Run the right workflow checks for a ticket, increment, health, or pre-merge context."""
+    data = core.verify_data(profile=profile, write=write)
+    print_envelope(
+        CommandEnvelope(ok=data["ok"], command="verify", summary=data.get("next_action", "verify failed"), data=data),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
+@app.command("increment-status")
+def increment_status(
+    increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
+    spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
+    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Show phase-level increment state, child tickets, blockers, claims, and next action."""
+    data = core.increment_status_data(increment_id=increment_id, spec_id=spec_id, phase=phase)
+    print_envelope(
+        CommandEnvelope(ok=data["ok"], command="increment-status", summary=data["next_action"], data=data),
+        json_output,
+    )
+
+
+@app.command("increment-plan")
+def increment_plan(
+    increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
+    spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
+    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    write: bool = typer.Option(False, "--write", help="Write increment ledger and Beads labels."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Create or refresh the increment ledger for a spec phase."""
+    data = core.increment_plan_data(increment_id=increment_id, spec_id=spec_id, phase=phase, write=write)
+    print_envelope(
+        CommandEnvelope(ok=data["ok"], command="increment-plan", summary=data["next_action"], data=data),
+        json_output,
+    )
+
+
+@app.command("automation-loop")
+def automation_loop(
+    role: str = typer.Option(..., "--role", help="pm-review, orchestrator, worker, integrator, or health."),
+    worker_id: str | None = typer.Option(None, "--worker-id", help="Worker id for worker/orchestrator roles."),
+    increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
+    spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
+    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    write: bool = typer.Option(False, "--write", help="Mutate claims, ledgers, tickets, or evidence when safe."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Run one cron-safe PM/review, orchestrator, worker, integrator, or health loop."""
+    data = core.automation_loop_data(
+        role=role,
+        write=write,
+        worker_id=worker_id,
+        increment_id=increment_id,
+        spec_id=spec_id,
+        phase=phase,
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="automation-loop",
+            summary=data.get("next_action", "automation loop failed"),
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("issue-log")
 def issue_log(
     title: str = typer.Option(..., "--title", help="Issue title."),

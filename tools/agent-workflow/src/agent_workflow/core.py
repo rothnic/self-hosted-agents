@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -238,6 +239,24 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return items
 
 
+def read_json(path: Path) -> dict[str, Any] | None:
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {"ok": False, "error": f"invalid JSON in {rel(path)}"}
+    return data if isinstance(data, dict) else {"ok": False, "error": f"{rel(path)} is not a JSON object"}
+
+
+def write_json_artifact(directory: str, prefix: str, data: dict[str, Any]) -> str:
+    path_dir = ROOT / ".agent-runs" / directory
+    path_dir.mkdir(parents=True, exist_ok=True)
+    path = path_dir / f"{now_id(prefix)}.json"
+    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return rel(path)
+
+
 def current_objective_id(root: Path = ROOT) -> str:
     text = read_text(root / "objectives" / "current.md")
     match = OBJECTIVE_RE.search(text)
@@ -286,11 +305,14 @@ def issue_open_dependencies(issue: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         dep
         for dep in issue.get("dependencies", [])
+        if str(dep.get("type", "blocks")).lower() == "blocks"
         if str(dep.get("status", "")).lower() not in {"closed", "resolved", "done"}
     ]
 
 
 def is_implementation_issue(issue: dict[str, Any]) -> bool:
+    if str(issue.get("issue_type", "")).lower() == "epic":
+        return False
     return not is_human_review_issue(issue)
 
 
@@ -1087,6 +1109,541 @@ def health_status_data(deep: bool) -> dict[str, Any]:
     }
 
 
+def workflow_check(name: str) -> dict[str, Any]:
+    args = argparse.Namespace(json=False)
+    command = f"uv run awf {name}"
+    if name == "bootstrap":
+        data = bootstrap_data()
+        ok = all(item["ok"] for item in data["checks"])
+        return {"name": name, "command": command, "ok": ok, "data": data}
+    if name == "spec-lint":
+        code, data = spec_lint(args)
+    elif name == "spec-kit-lint":
+        code, data = spec_kit_lint(args)
+    elif name == "bdd-lint":
+        code, data = bdd_lint(args)
+    elif name == "bdd-run-fixture":
+        command = "uv run awf bdd-run --driver fixture"
+        code, data = bdd_run_result("fixture")
+    elif name == "review-gate":
+        code, data = review_gate(args)
+    elif name == "repo-hygiene":
+        code, data = repo_hygiene_result()
+    elif name == "workflow-state-lint":
+        code, data = workflow_state_lint_result()
+    elif name == "workflow-fixture-test":
+        code, data = workflow_fixture_test_result(write=False, include_orchestration=False)
+    else:
+        return {"name": name, "command": command, "ok": False, "data": {"error": f"unknown check {name}"}}
+    return {"name": name, "command": command, "ok": code == 0, "data": data}
+
+
+def extract_acceptance_command(item: dict[str, Any] | None) -> str | None:
+    if not item:
+        return None
+    for key in ["acceptance", "acceptance_command"]:
+        if item.get(key):
+            return str(item[key]).strip()
+    text = "\n".join(str(item.get(key, "")) for key in ["description", "close_reason"])
+    for line in text.splitlines():
+        if line.startswith("Acceptance:"):
+            return line.split(":", 1)[1].strip()
+    work = item.get("work")
+    return extract_acceptance_command(work) if isinstance(work, dict) else None
+
+
+def issue_by_id(issue_id: str) -> dict[str, Any] | None:
+    for issue in beads_issues():
+        if issue.get("id") == issue_id:
+            return issue
+    return None
+
+
+def active_claims() -> list[dict[str, Any]]:
+    claims = []
+    for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json")):
+        data = read_json(path)
+        if not data or data.get("error"):
+            continue
+        issue = issue_by_id(str(data.get("id", "")))
+        if issue and issue.get("status") == "open":
+            data["path"] = rel(path)
+            data["issue"] = issue
+            claims.append(data)
+    return claims
+
+
+def current_acceptance_item() -> dict[str, Any] | None:
+    claims = sorted(active_claims(), key=lambda item: str(item.get("claimed_at", "")), reverse=True)
+    if claims:
+        return claims[0]
+    ready = ready_work_data().get("ready", [])
+    return ready[0] if ready else None
+
+
+def run_acceptance_command(command: str | None) -> dict[str, Any]:
+    if not command:
+        return {
+            "name": "acceptance",
+            "command": "",
+            "ok": False,
+            "data": {"error": "no acceptance command found for active or ready work"},
+        }
+    if command == "uv run awf workflow-fixture-test":
+        check = workflow_check("workflow-fixture-test")
+        check["name"] = "acceptance"
+        check["command"] = command
+        return check
+    if not command.startswith("uv run awf "):
+        return {
+            "name": "acceptance",
+            "command": command,
+            "ok": False,
+            "data": {"error": "acceptance command is outside the awf command boundary"},
+        }
+    proc = run(shlex.split(command))
+    return {
+        "name": "acceptance",
+        "command": command,
+        "ok": proc.returncode == 0,
+        "data": {"returncode": proc.returncode, "stdout": proc.stdout.strip(), "stderr": proc.stderr.strip()},
+    }
+
+
+def compact_check_result(check: dict[str, Any]) -> dict[str, Any]:
+    data = check.get("data", {})
+    detail = data.get("error") or data.get("next_action") or ""
+    if not detail and data.get("errors"):
+        detail = "; ".join(str(error) for error in data["errors"][:3])
+    result = {
+        "name": check.get("name"),
+        "command": check.get("command"),
+        "ok": check.get("ok"),
+        "detail": detail,
+    }
+    if "results" in data:
+        result["result_count"] = len(data["results"])
+        result["failed_results"] = [item["name"] for item in data["results"] if not item.get("ok")]
+    if "errors" in data:
+        result["error_count"] = len(data["errors"])
+    return result
+
+
+def compact_acceptance_source(item: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not item:
+        return None
+    work = item.get("work") if isinstance(item.get("work"), dict) else item
+    return {
+        "id": work.get("id"),
+        "title": work.get("title"),
+        "status": work.get("status"),
+        "external_ref": work.get("external_ref"),
+    }
+
+
+VERIFY_PROFILES = {
+    "health": ["bootstrap", "review-gate", "workflow-state-lint", "repo-hygiene"],
+    "ticket": ["spec-lint", "spec-kit-lint", "bdd-lint", "review-gate", "repo-hygiene", "workflow-state-lint", "acceptance"],
+    "increment": [
+        "bootstrap",
+        "spec-lint",
+        "spec-kit-lint",
+        "bdd-lint",
+        "bdd-run-fixture",
+        "review-gate",
+        "repo-hygiene",
+        "workflow-state-lint",
+        "workflow-fixture-test",
+    ],
+    "pre-merge": [
+        "bootstrap",
+        "spec-lint",
+        "spec-kit-lint",
+        "bdd-lint",
+        "bdd-run-fixture",
+        "review-gate",
+        "repo-hygiene",
+        "workflow-state-lint",
+        "workflow-fixture-test",
+    ],
+}
+
+
+def verify_next_action(profile: str, checks: list[dict[str, Any]], ready: dict[str, Any]) -> str:
+    failed = [check for check in checks if not check["ok"]]
+    if failed:
+        if profile == "health":
+            return "health-loop should log issues and stop implementation"
+        return "fix failing checks before closing or integrating work"
+    if ready.get("human_required"):
+        return "pm-review-loop should present the human review gate"
+    if profile == "ticket":
+        return "record evidence and close the ticket if scope is complete"
+    if profile in {"increment", "pre-merge"}:
+        if ready.get("ready"):
+            return "orchestrator-loop should continue assigning unblocked work"
+        return "integrator-loop should prepare the increment review gate"
+    return health_status_data(deep=False)["next_action"]
+
+
+def verify_data(profile: str, write: bool) -> dict[str, Any]:
+    if profile not in VERIFY_PROFILES:
+        return {"ok": False, "profile": profile, "error": f"profile must be one of: {', '.join(VERIFY_PROFILES)}"}
+    acceptance_item = current_acceptance_item()
+    acceptance_command = extract_acceptance_command(acceptance_item)
+    checks = []
+    for name in VERIFY_PROFILES[profile]:
+        checks.append(run_acceptance_command(acceptance_command) if name == "acceptance" else workflow_check(name))
+    ready = ready_work_data()
+    status = run(["git", "status", "--short", "--branch"]).stdout.strip()
+    failed = [check for check in checks if not check["ok"]]
+    data = {
+        "ok": not failed,
+        "profile": profile,
+        "checks": checks,
+        "failed_checks": [check["name"] for check in failed],
+        "acceptance_command": acceptance_command,
+        "acceptance_source": acceptance_item,
+        "git": git_state_summary(status),
+        "git_status": status,
+        "ready_work": {
+            "ready_count": len(ready.get("ready", [])),
+            "blocked_count": len(ready.get("blocked", [])),
+            "human_required_count": len(ready.get("human_required", [])),
+            "source": ready.get("source"),
+        },
+        "review_gate": next((check["data"] for check in checks if check["name"] == "review-gate"), {}),
+        "next_action": verify_next_action(profile, checks, ready),
+    }
+    if write:
+        artifact = {
+            "ok": data["ok"],
+            "profile": profile,
+            "failed_checks": data["failed_checks"],
+            "acceptance_command": acceptance_command,
+            "acceptance_source": compact_acceptance_source(acceptance_item),
+            "git": data["git"],
+            "ready_work": data["ready_work"],
+            "review_gate_ok": data["review_gate"].get("ok"),
+            "next_action": data["next_action"],
+            "checks": [compact_check_result(check) for check in checks],
+        }
+        data["path"] = write_json_artifact("verifications", f"verify-{profile}", artifact)
+    return data
+
+
+def parse_spec_phase_tasks(spec_id: str, phase: str) -> list[dict[str, Any]]:
+    tasks_path = ROOT / "specs" / spec_id / "tasks.md"
+    if not tasks_path.exists():
+        return []
+    capture = False
+    tasks = []
+    for line in read_text(tasks_path).splitlines():
+        if line.startswith("## "):
+            capture = phase.lower() in line.lower()
+            continue
+        if not capture:
+            continue
+        match = TASK_RE.match(line)
+        if match:
+            item = match.groupdict()
+            item["spec_id"] = spec_id
+            item["done"] = item["done"].lower() == "x"
+            item["parallel"] = item["parallel"] == "P"
+            item["story"] = item["story"] or "shared"
+            item["acceptance"] = "uv run awf workflow-fixture-test"
+            tasks.append(item)
+    return tasks
+
+
+def default_increment_id(spec_id: str, phase: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", f"{spec_id}-{phase}".lower()).strip("-")
+    return slug
+
+
+def increment_path(increment_id: str) -> Path:
+    safe_id = re.sub(r"[^A-Za-z0-9_.-]", "-", increment_id)
+    return ROOT / ".agent-runs" / "increments" / f"{safe_id}.json"
+
+
+def existing_increment_epic(increment_id: str) -> dict[str, Any] | None:
+    external_ref = f".agent-runs/increments/{increment_id}.json"
+    for issue in beads_issues():
+        if issue.get("external_ref") == external_ref:
+            return issue
+    return None
+
+
+def child_ticket_for_task(task: dict[str, Any], issues: list[dict[str, Any]]) -> dict[str, Any] | None:
+    external_ref = task_external_ref(task)
+    for issue in issues:
+        if issue.get("external_ref") == external_ref:
+            return issue
+    return None
+
+
+def stale_claims_for_increment(claims: list[dict[str, Any]], stale_hours: int = 2) -> list[dict[str, Any]]:
+    now = datetime.now(timezone.utc)
+    stale = []
+    for claim in claims:
+        claimed_at = str(claim.get("claimed_at", ""))
+        try:
+            timestamp = datetime.fromisoformat(claimed_at)
+        except ValueError:
+            continue
+        age_hours = (now - timestamp).total_seconds() / 3600
+        if age_hours >= stale_hours:
+            stale.append({"id": claim.get("id"), "path": claim.get("path"), "age_hours": round(age_hours, 2)})
+    return stale
+
+
+def increment_status_data(increment_id: str | None, spec_id: str, phase: str) -> dict[str, Any]:
+    resolved_id = increment_id or default_increment_id(spec_id, phase)
+    path = increment_path(resolved_id)
+    existing = read_json(path)
+    state = existing or {}
+    tasks = parse_spec_phase_tasks(spec_id, phase)
+    issues = beads_issues()
+    child_tickets = []
+    for task in tasks:
+        ticket = child_ticket_for_task(task, issues)
+        child_tickets.append(
+            {
+                "task_id": task["id"],
+                "title": task["title"],
+                "done": task["done"],
+                "ticket_id": ticket.get("id") if ticket else None,
+                "ticket_status": ticket.get("status") if ticket else "missing",
+                "external_ref": task_external_ref(task),
+            }
+        )
+    ready = ready_work_data()
+    claims = active_claims()
+    all_children_closed = child_tickets and all(
+        item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
+    )
+    if ready.get("human_required"):
+        review_status = "human-review-required"
+        next_action = "pm-review-loop should present the human gate"
+    elif ready.get("blocked") and not ready.get("ready"):
+        review_status = "blocked"
+        next_action = "pm-review-loop should triage blockers or decompose follow-up work"
+    elif ready.get("ready"):
+        review_status = "executing"
+        next_action = "orchestrator-loop should assign unclaimed unblocked work"
+    elif all_children_closed:
+        review_status = "ready-for-increment-review"
+        next_action = "integrator-loop should prepare the phase review PR"
+    else:
+        review_status = "planning"
+        next_action = "pm-review-loop should refresh backlog from the approved spec phase"
+    return {
+        "ok": True,
+        "increment_id": resolved_id,
+        "path": rel(path),
+        "exists": path.exists(),
+        "state": state,
+        "objective_id": current_objective_id(),
+        "spec_id": spec_id,
+        "phase": phase,
+        "base_branch": "main",
+        "feature_branch": f"codex/{resolved_id}",
+        "child_tickets": child_tickets,
+        "active_claims": claims,
+        "active_worker_branches": [
+            claim.get("worker_branch") for claim in claims if claim.get("worker_branch")
+        ],
+        "stale_claims": stale_claims_for_increment(claims),
+        "blocked": ready.get("blocked", []),
+        "validation_evidence": state.get("validation_evidence", []),
+        "learning_proposals": state.get("learning_proposals", []),
+        "ready_count": len(ready.get("ready", [])),
+        "human_required": ready.get("human_required", []),
+        "review_status": review_status,
+        "next_action": next_action,
+    }
+
+
+def ensure_increment_epic(status: dict[str, Any], write: bool) -> dict[str, Any] | None:
+    if not write:
+        return existing_increment_epic(status["increment_id"])
+    br = find_br()
+    if not br:
+        return None
+    existing = existing_increment_epic(status["increment_id"])
+    if existing:
+        return existing
+    desc = (
+        f"Objective: {status['objective_id']}\n"
+        f"Spec: {status['spec_id']}\n"
+        f"Increment: {status['increment_id']}\n"
+        f"Phase: {status['phase']}\n"
+        "Acceptance: uv run awf verify --profile increment"
+    )
+    proc = run(
+        [
+            br,
+            "create",
+            f"Increment {status['increment_id']}",
+            "--type",
+            "epic",
+            "--priority",
+            "1",
+            "--description",
+            desc,
+            "--external-ref",
+            f".agent-runs/increments/{status['increment_id']}.json",
+            "--labels",
+            f"increment:{status['increment_id']},role:pm-review,role:orchestrator",
+            "--json",
+        ]
+    )
+    try:
+        created = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return None
+    if isinstance(created, dict):
+        return created
+    if isinstance(created, list) and created:
+        return created[0]
+    return None
+
+
+def increment_plan_data(increment_id: str | None, spec_id: str, phase: str, write: bool) -> dict[str, Any]:
+    status = increment_status_data(increment_id, spec_id, phase)
+    epic = ensure_increment_epic(status, write)
+    status["beads_epic_id"] = epic.get("id") if epic else None
+    if write:
+        path = increment_path(status["increment_id"])
+        path.parent.mkdir(parents=True, exist_ok=True)
+        status["updated_at"] = datetime.now(timezone.utc).isoformat()
+        status["exists"] = True
+        artifact = dict(status)
+        artifact.pop("state", None)
+        path.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        br = find_br()
+        if br and epic:
+            for item in status["child_tickets"]:
+                ticket_id = item.get("ticket_id")
+                if not ticket_id:
+                    continue
+                run([br, "update", ticket_id, "--add-label", f"increment:{status['increment_id']}", "--json"])
+                run([br, "update", ticket_id, "--add-label", "role:worker", "--json"])
+                run([br, "dep", "add", ticket_id, epic["id"], "--type", "parent-child", "--json"])
+            run([br, "sync", "--flush-only"])
+    return status
+
+
+def automation_loop_data(
+    role: str,
+    write: bool,
+    worker_id: str | None,
+    increment_id: str | None,
+    spec_id: str,
+    phase: str,
+) -> dict[str, Any]:
+    if role not in {"pm-review", "orchestrator", "worker", "integrator", "health"}:
+        return {
+            "ok": False,
+            "role": role,
+            "error": "role must be pm-review, orchestrator, worker, integrator, or health",
+        }
+    status = increment_status_data(increment_id, spec_id, phase)
+    if role == "health":
+        verify = verify_data("health", write=write)
+        return {
+            "ok": verify["ok"],
+            "role": role,
+            "increment": status,
+            "verify": verify,
+            "next_action": verify["next_action"],
+        }
+    health = verify_data("health", write=False)
+    if not health["ok"]:
+        return {
+            "ok": False,
+            "role": role,
+            "increment": status,
+            "verify": health,
+            "next_action": "health-loop should repair or log failures first",
+        }
+    if role == "pm-review":
+        planned = increment_plan_data(status["increment_id"], spec_id, phase, write=write)
+        ticket_sync = (
+            ticket_sync_data(write=write)
+            if planned["ready_count"] == 0
+            else {"write": write, "proposals": [], "created": []}
+        )
+        return {
+            "ok": True,
+            "role": role,
+            "increment": planned,
+            "ticket_sync": ticket_sync,
+            "next_action": planned["next_action"],
+        }
+    if role == "orchestrator":
+        ready = ready_work_data()
+        if not ready.get("ready"):
+            return {"ok": True, "role": role, "increment": status, "next_action": status["next_action"], "claim": None}
+        chosen = ready["ready"][0]
+        worker = worker_id or f"worker-{chosen.get('id', 'unassigned')}"
+        claim = claim_work_data(worker_id=worker, write=write)
+        worker_slug = re.sub(r"[^a-z0-9]+", "-", chosen.get("title", "work").lower()).strip("-")[:40]
+        worker_branch = f"codex/{chosen.get('id', 'work')}-{worker_slug}"
+        if write and claim.get("ok") and claim.get("claimed", {}).get("path"):
+            claim_path_obj = ROOT / claim["claimed"]["path"]
+            claim_data = read_json(claim_path_obj) or {}
+            claim_data.update(
+                {
+                    "increment_id": status["increment_id"],
+                    "feature_branch": status["feature_branch"],
+                    "worker_branch": worker_branch,
+                    "assigned_by": "automation-loop:orchestrator",
+                }
+            )
+            claim_path_obj.write_text(json.dumps(claim_data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return {
+            "ok": bool(claim.get("ok")),
+            "role": role,
+            "increment": status,
+            "claim": claim,
+            "worker_branch": worker_branch,
+            "next_action": "worker-loop should implement the claimed ticket on its worker branch",
+        }
+    if role == "worker":
+        claim = active_claims()
+        if claim:
+            claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
+        elif write:
+            claim_result = claim_work_data(worker_id=worker_id or "worker", write=True)
+        else:
+            ready = ready_work_data().get("ready", [])
+            claim_result = {
+                "ok": bool(ready),
+                "claimed": {"work": ready[0], "worker_id": worker_id or "worker"} if ready else None,
+                "dry_run": True,
+                "ready_count": len(ready),
+            }
+        return {
+            "ok": bool(claim_result.get("ok")),
+            "role": role,
+            "increment": status,
+            "claim": claim_result,
+            "next_action": (
+                "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
+                "record evidence, and push the worker branch"
+            ),
+        }
+    verify = verify_data("increment", write=write)
+    if status["review_status"] == "ready-for-increment-review" and verify["ok"]:
+        next_action = "prepare the feature branch for human review against main"
+    elif status["blocked"]:
+        next_action = "route blockers to pm-review-loop before integrating"
+    else:
+        next_action = "wait for workers or continue orchestrating ready work"
+    return {"ok": verify["ok"], "role": role, "increment": status, "verify": verify, "next_action": next_action}
+
+
 def health_issue_path(issue_id: str) -> Path:
     return ROOT / ".agent-runs" / "health" / f"{issue_id}.json"
 
@@ -1290,7 +1847,7 @@ def workflow_fixture_test(args: argparse.Namespace) -> int:
     return code
 
 
-def workflow_fixture_test_result(write: bool) -> tuple[int, dict[str, Any]]:
+def workflow_fixture_test_result(write: bool, include_orchestration: bool = True) -> tuple[int, dict[str, Any]]:
     args = argparse.Namespace(json=False)
     fixture = ROOT / "tests" / "workflow" / "fixtures" / "sample-project"
     results = []
@@ -1371,6 +1928,93 @@ def workflow_fixture_test_result(write: bool) -> tuple[int, dict[str, Any]]:
             "data": {"errors": issue_metadata_errors([synthetic_issue])},
         }
     )
+    if include_orchestration:
+        verify_health = verify_data("health", write=False)
+        results.append(
+            {
+                "name": "verify health profile returns a next action",
+                "ok": verify_health["ok"] and bool(verify_health.get("next_action")),
+                "data": verify_health,
+            }
+        )
+        verify_increment = verify_data("increment", write=False)
+        results.append(
+            {
+                "name": "verify increment profile runs the full workflow gate",
+                "ok": verify_increment["ok"]
+                and "workflow-fixture-test" in {check["name"] for check in verify_increment["checks"]}
+                and bool(verify_increment.get("next_action")),
+                "data": verify_increment,
+            }
+        )
+        increment_status = increment_status_data(None, "002-solution-comparison-roadmap", "Phase 3")
+        results.append(
+            {
+                "name": "increment status exposes child work and next action",
+                "ok": bool(increment_status["child_tickets"]) and bool(increment_status["next_action"]),
+                "data": increment_status,
+            }
+        )
+        pm_loop = automation_loop_data(
+            role="pm-review",
+            write=False,
+            worker_id=None,
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 3",
+        )
+        results.append(
+            {
+                "name": "pm-review loop returns a bounded planning action",
+                "ok": pm_loop["ok"] and bool(pm_loop["next_action"]),
+                "data": pm_loop,
+            }
+        )
+        orchestrator = automation_loop_data(
+            role="orchestrator",
+            write=False,
+            worker_id="fixture-worker",
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 3",
+        )
+        results.append(
+            {
+                "name": "orchestrator loop selects a safe next action",
+                "ok": orchestrator["ok"] and bool(orchestrator["next_action"]),
+                "data": orchestrator,
+            }
+        )
+        worker = automation_loop_data(
+            role="worker",
+            write=False,
+            worker_id="fixture-worker",
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 3",
+        )
+        results.append(
+            {
+                "name": "worker loop previews one claim without closing work",
+                "ok": worker["ok"] and worker["claim"].get("dry_run") is True,
+                "data": worker,
+            }
+        )
+        integrator = automation_loop_data(
+            role="integrator",
+            write=False,
+            worker_id=None,
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 3",
+        )
+        results.append(
+            {
+                "name": "integrator loop verifies increment without merging to main",
+                "ok": integrator["ok"] and "merge to main" not in integrator["next_action"].lower(),
+                "data": integrator,
+            }
+        )
 
     ok = all(item["ok"] for item in results)
     if write:
@@ -1472,6 +2116,29 @@ def main() -> int:
     sub.add_parser("run-report")
     sub.add_parser("workflow-fixture-test")
 
+    verify_p = sub.add_parser("verify")
+    verify_p.add_argument("--profile", choices=sorted(VERIFY_PROFILES), required=True)
+    verify_p.add_argument("--write", action="store_true")
+
+    increment_status_p = sub.add_parser("increment-status")
+    increment_status_p.add_argument("--increment-id")
+    increment_status_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
+    increment_status_p.add_argument("--phase", default="Phase 3")
+
+    increment_plan_p = sub.add_parser("increment-plan")
+    increment_plan_p.add_argument("--increment-id")
+    increment_plan_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
+    increment_plan_p.add_argument("--phase", default="Phase 3")
+    increment_plan_p.add_argument("--write", action="store_true")
+
+    automation_p = sub.add_parser("automation-loop")
+    automation_p.add_argument("--role", choices=["pm-review", "orchestrator", "worker", "integrator", "health"], required=True)
+    automation_p.add_argument("--worker-id")
+    automation_p.add_argument("--increment-id")
+    automation_p.add_argument("--spec-id", default="002-solution-comparison-roadmap")
+    automation_p.add_argument("--phase", default="Phase 3")
+    automation_p.add_argument("--write", action="store_true")
+
     spec_new_p = sub.add_parser("spec-new")
     spec_new_p.add_argument("slug")
     spec_new_p.add_argument("--objective", default="agentic-development-foundation")
@@ -1531,6 +2198,32 @@ def main() -> int:
         return learning_capture(args)
     if args.command == "workflow-fixture-test":
         return workflow_fixture_test(args)
+    if args.command == "verify":
+        data = verify_data(profile=args.profile, write=args.write)
+        emit(data, args.json)
+        return 0 if data["ok"] else 1
+    if args.command == "increment-status":
+        data = increment_status_data(increment_id=args.increment_id, spec_id=args.spec_id, phase=args.phase)
+        return emit(data, args.json)
+    if args.command == "increment-plan":
+        data = increment_plan_data(
+            increment_id=args.increment_id,
+            spec_id=args.spec_id,
+            phase=args.phase,
+            write=args.write,
+        )
+        return emit(data, args.json)
+    if args.command == "automation-loop":
+        data = automation_loop_data(
+            role=args.role,
+            write=args.write,
+            worker_id=args.worker_id,
+            increment_id=args.increment_id,
+            spec_id=args.spec_id,
+            phase=args.phase,
+        )
+        emit(data, args.json)
+        return 0 if data["ok"] else 1
     if args.command == "spec-new":
         return spec_new(args)
     return 2
