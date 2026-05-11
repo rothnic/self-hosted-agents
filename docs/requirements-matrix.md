@@ -110,9 +110,19 @@ These questions should be asked during the next CEO-level roadmap review:
 
 ### Slice Scope
 
-1. Build a minimal runnable agent workflow that satisfies the shared comparable workflow contract under `tests/workflow/features/comparable_agent_workflow.feature`.
+1. Build a minimal runnable agent workflow in `apps/langgraph-python/` that satisfies the shared contract in `tests/workflow/features/comparable_agent_workflow.feature`.
 2. Instrument traces through a local/self-hostable Langfuse path and persist artifacts required by `docs/comparison-evidence.md`.
-3. Provide one local run command and one verification command that can be reused by later candidate apps.
+3. Define one candidate run command and one candidate verification command so later apps can mirror the same operator flow.
+
+### Contract + Evidence Targets
+
+- **Contract target**: satisfy scenario assertions in
+  `tests/workflow/features/comparable_agent_workflow.feature`
+  (recommendation, alternatives, explicit questions, acceptance check, durable run evidence).
+- **Run artifact destination**: record run metadata and pass/fail outcome in `.agent-runs/reports/` with links to trace/eval artifacts.
+- **Trace artifact destination**: store export path or retrievable trace reference under a candidate-owned folder in `artifacts/comparison/langgraph-python/`.
+- **Evaluation artifact destination**: store repeatable eval outputs under `artifacts/comparison/langgraph-python/evals/`.
+- **Operating notes destination**: capture setup commands, required services, and env vars in `apps/langgraph-python/README.md`.
 
 ### Explicit Non-Goals For This Slice
 
@@ -132,3 +142,73 @@ These questions should be asked during the next CEO-level roadmap review:
 - [ ] Proposal approved during roadmap review (T010) and captured as a human decision (T011).
 - [ ] Matching Beads issue state reflects completion evidence for the same task id.
 - [ ] Shared-contract acceptance and evidence location are unchanged or explicitly updated together.
+
+## Second Comparison Candidate Proposal (T008)
+
+### Candidate
+
+- **Name**: `mastra-ts-slice-01`
+- **App location**: `apps/mastra-ts/`
+- **Why this contrast is useful**: it provides a deliberate cross-language counterpoint against the Python-first lane,
+  testing whether TypeScript-native workflow ergonomics or framework defaults outperform the Python path enough to
+  justify ecosystem switching cost.
+
+### Contrast Hypothesis
+
+If `mastra-ts-slice-01` can satisfy the same shared contract with materially better observability/eval ergonomics or
+lower operating burden than the first Python slice, the roadmap should revisit the Python-first default before deeper
+implementation lock-in.
+
+### Scope
+
+1. Implement the same comparable workflow contract used by `langgraph-python-langfuse-slice-01`.
+2. Capture equivalent run, trace, evaluation, and setup evidence groups defined in `docs/comparison-evidence.md`.
+3. Document cross-language friction explicitly (tooling, dependency management, onboarding, and maintenance burden).
+
+### Explicit Non-Goals
+
+- No attempt to prove feature-complete parity with all Python integrations.
+- No expansion into production deployment architecture.
+- No replacement decision for the primary lane without the CEO-level roadmap review gate.
+
+### Exit Evidence For T008
+
+- Shared-contract parity claim is backed by runnable evidence artifacts.
+- Cross-language tradeoffs are explicit enough to compare against R1, R6, and R9.
+- A reviewer can determine whether contrast value is high enough to justify continued TypeScript investment.
+
+## Minimum Comparable Demo Definition (T009)
+
+### Demo Goal
+
+Provide the smallest end-to-end demonstration that allows apples-to-apples scoring across candidate apps while
+producing contract, trace, evaluation, and operating evidence.
+
+### Required Demo Flow
+
+1. **Input**: objective + constraints + project context supplied through the contract driver.
+2. **Behavior**: candidate proposes a next implementation slice.
+3. **Output**: concise recommendation, alternatives, explicit questions, and a named acceptance check.
+4. **Operational evidence**: durable run artifact, trace artifact, eval artifact, and setup notes.
+
+### Demo Pass Criteria
+
+A candidate demo is comparable only if all of the following are true:
+
+- Shared BDD contract scenario passes for the candidate implementation.
+- Trace evidence is inspectable and tied to the same run artifact.
+- Evaluation output is repeatable and tied to the same scenario/run.
+- Setup notes allow another engineer/agent to rerun the slice locally.
+- Gaps and custom-critical-infrastructure warnings are explicitly recorded.
+
+### Demo Evidence Checklist Template
+
+Use this checklist for each candidate run:
+
+- [ ] Candidate id, commit, run timestamp, and commands recorded.
+- [ ] Shared contract scenario and result recorded.
+- [ ] Trace provider, trace link/export path, and coverage notes recorded.
+- [ ] Eval dataset/cases, scorer type, score result, and rerun command recorded.
+- [ ] Setup prerequisites, env vars, and required services recorded.
+- [ ] Known gaps, risks, and follow-up tickets/spec tasks recorded.
+
