@@ -43,15 +43,15 @@ fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 
 ## Example Schedules
 
-Set `UV_NO_CACHE=1` before invoking `uv run`; Codex and other hosted runners may not be able to use persistent uv
-cache paths.
+Local cron can use `uv run awf`. Codex app automations should use `.venv/bin/awf` directly because `uv` can need cache
+or temp filesystem access before `awf` starts.
 
 ```cron
-0 */4 * * * cd /repo && UV_NO_CACHE=1 uv run awf automation-loop --role pm-review --write
-*/15 * * * * cd /repo && UV_NO_CACHE=1 uv run awf automation-loop --role orchestrator --write
-*/30 * * * * cd /repo && UV_NO_CACHE=1 uv run awf automation-loop --role worker --worker-id worker-1 --write
-10 * * * * cd /repo && UV_NO_CACHE=1 uv run awf automation-loop --role integrator --write
-*/20 * * * * cd /repo && UV_NO_CACHE=1 uv run awf automation-loop --role health --write
+0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review --write
+*/15 * * * * cd /repo && uv run awf automation-loop --role orchestrator --write
+*/30 * * * * cd /repo && uv run awf automation-loop --role worker --worker-id worker-1 --write
+10 * * * * cd /repo && uv run awf automation-loop --role integrator --write
+*/20 * * * * cd /repo && uv run awf automation-loop --role health --write
 ```
 
 Codex app automation prompts for these roles live in

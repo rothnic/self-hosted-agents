@@ -215,6 +215,10 @@ Cron-like runners use the same CLI and repo artifacts as humans:
 - Integrator cadence: `uv run awf automation-loop --role integrator --write`
 - Health cadence: `uv run awf automation-loop --role health --write`
 
+For Codex app automations, use the bootstrapped `.venv/bin/awf` entrypoint for these scheduled role commands instead
+of `uv run awf`. The `uv` launcher can fail before `awf` starts when the automation sandbox blocks uv cache or temp
+filesystem paths. Local shells and normal cron can continue using `uv run awf`.
+
 The PM/review loop reviews health, objectives, specs, tickets, run reports, and learnings.
 It refreshes backlog when ready work runs low and opens phase review gates when needed.
 The orchestrator reads increment state, claims unblocked work, and assigns worker branches.
