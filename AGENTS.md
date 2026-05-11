@@ -217,7 +217,9 @@ Cron-like runners use the same CLI and repo artifacts as humans:
 
 For Codex app automations, use the bootstrapped `.venv/bin/awf` entrypoint for these scheduled role commands instead
 of `uv run awf`. The `uv` launcher can fail before `awf` starts when the automation sandbox blocks uv cache or temp
-filesystem paths. Local shells and normal cron can continue using `uv run awf`.
+filesystem paths. Configure Codex cron automations with the `worktree` execution environment; `local` automation
+sessions may be read-only and fail when `awf --write` creates claim, verification, or evidence files. Local shells and
+normal cron can continue using `uv run awf`.
 
 The PM/review loop reviews health, objectives, specs, tickets, run reports, and learnings.
 It refreshes backlog when ready work runs low and opens phase review gates when needed.

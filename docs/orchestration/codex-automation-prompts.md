@@ -5,6 +5,8 @@ or a worktree for the target branch, then let the command output drive the next 
 
 Codex automations should call the bootstrapped `.venv/bin/awf` entrypoint directly. Some Codex automation sandboxes
 reject `uv` cache or temp paths before `awf` can start, even when persistent uv caching is disabled.
+Configure Codex cron automations with the `worktree` execution environment; `local` automation sessions may be
+read-only and fail when `awf --write` creates claim, verification, or evidence files.
 
 ```bash
 .venv/bin/awf bootstrap --json
