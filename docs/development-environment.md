@@ -40,7 +40,14 @@ evidence summary, and next action for the current context. Use `--write` to crea
 
 Use `uv run awf automation-loop --role <pm-review|orchestrator|worker|integrator|health> --write` for scheduled
 Codex or cron-like runs. Each role reads repo state, mutates only its owned workflow artifacts, and returns one
-`next_action`.
+`next_action`. Scheduled runners should set `UV_CACHE_DIR` to a writable path outside the repo before invoking
+`uv run`, for example:
+
+```bash
+export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents"
+mkdir -p "$UV_CACHE_DIR"
+uv run awf automation-loop --role health --write --json
+```
 
 If a command fails, first run:
 

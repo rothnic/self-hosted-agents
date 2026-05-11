@@ -43,12 +43,15 @@ fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 
 ## Example Schedules
 
+Set `UV_CACHE_DIR` to a writable path outside the repo before invoking `uv run`; Codex and other hosted runners may not
+be able to use the default shared user cache.
+
 ```cron
-0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review --write
-*/15 * * * * cd /repo && uv run awf automation-loop --role orchestrator --write
-*/30 * * * * cd /repo && uv run awf automation-loop --role worker --worker-id worker-1 --write
-10 * * * * cd /repo && uv run awf automation-loop --role integrator --write
-*/20 * * * * cd /repo && uv run awf automation-loop --role health --write
+0 */4 * * * cd /repo && export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents" && mkdir -p "$UV_CACHE_DIR" && uv run awf automation-loop --role pm-review --write
+*/15 * * * * cd /repo && export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents" && mkdir -p "$UV_CACHE_DIR" && uv run awf automation-loop --role orchestrator --write
+*/30 * * * * cd /repo && export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents" && mkdir -p "$UV_CACHE_DIR" && uv run awf automation-loop --role worker --worker-id worker-1 --write
+10 * * * * cd /repo && export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents" && mkdir -p "$UV_CACHE_DIR" && uv run awf automation-loop --role integrator --write
+*/20 * * * * cd /repo && export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents" && mkdir -p "$UV_CACHE_DIR" && uv run awf automation-loop --role health --write
 ```
 
 Codex app automation prompts for these roles live in
