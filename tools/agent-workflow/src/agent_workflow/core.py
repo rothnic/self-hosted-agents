@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import importlib.util
+import tempfile
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -91,10 +92,10 @@ def emit(data: Any, as_json: bool) -> int:
     return 0
 
 
-def run(cmd: list[str], check: bool = False) -> subprocess.CompletedProcess[str]:
+def run(cmd: list[str], check: bool = False, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.setdefault("RUST_LOG", "error")
-    return subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True, check=check, env=env)
+    return subprocess.run(cmd, cwd=cwd or ROOT, text=True, capture_output=True, check=check, env=env)
 
 
 def find_br() -> str | None:
@@ -115,6 +116,19 @@ def now_id(prefix: str) -> str:
     return f"{prefix}-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
 
 
+def configured_hooks_path(root: Path = ROOT) -> str | None:
+    if not (root / ".git").exists():
+        return None
+    proc = run(["git", "-C", str(root), "config", "--get", "core.hooksPath"])
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip() or None
+
+
+def hooks_installed(root: Path = ROOT) -> bool:
+    return configured_hooks_path(root) == ".githooks"
+
+
 def bootstrap(args: argparse.Namespace) -> int:
     data = bootstrap_data()
     return emit(data, args.json)
@@ -122,11 +136,7 @@ def bootstrap(args: argparse.Namespace) -> int:
 
 def bootstrap_data() -> dict[str, Any]:
     br = find_br()
-    hook_path = ROOT / ".git" / "config"
-    hooks_installed = False
-    if hook_path.exists():
-        proc = run(["git", "config", "--get", "core.hooksPath"])
-        hooks_installed = proc.returncode == 0 and proc.stdout.strip() == ".githooks"
+    has_hooks = hooks_installed(ROOT)
     checks = [
         CheckResult("python3", shutil.which("python3") is not None, shutil.which("python3") or "missing"),
         CheckResult("git", shutil.which("git") is not None, shutil.which("git") or "missing"),
@@ -137,7 +147,7 @@ def bootstrap_data() -> dict[str, Any]:
         CheckResult("specify", (ROOT / ".specify").exists(), ".specify"),
         CheckResult("specs", True, "Spec Kit creates specs/ when feature artifacts exist"),
         CheckResult("bdd", (ROOT / "tests" / "workflow" / "features").exists(), "tests/workflow/features"),
-        CheckResult("hooks", hooks_installed, ".githooks" if hooks_installed else "run awf install-hooks"),
+        CheckResult("hooks", has_hooks, ".githooks" if has_hooks else "run awf install-hooks"),
     ]
     policy = load_policy()
     data = {
@@ -1863,6 +1873,55 @@ def workflow_fixture_test(args: argparse.Namespace) -> int:
     return code
 
 
+def linked_worktree_hook_detection_result() -> dict[str, Any]:
+    git = shutil.which("git")
+    if not git:
+        return {"ok": False, "error": "git missing"}
+
+    with tempfile.TemporaryDirectory(prefix="awf-linked-worktree-") as temp_dir:
+        root = Path(temp_dir)
+        repo = root / "repo"
+        worktree = root / "linked"
+        commands = [
+            [git, "init", str(repo)],
+            [git, "-C", str(repo), "config", "core.hooksPath", ".githooks"],
+        ]
+        for command in commands:
+            proc = subprocess.run(command, text=True, capture_output=True)
+            if proc.returncode != 0:
+                return {"ok": False, "command": command, "stderr": proc.stderr.strip()}
+
+        (repo / "README.md").write_text("fixture\n", encoding="utf-8")
+        commit_commands = [
+            [git, "-C", str(repo), "add", "README.md"],
+            [
+                git,
+                "-C",
+                str(repo),
+                "-c",
+                "user.email=fixture@example.com",
+                "-c",
+                "user.name=Fixture",
+                "commit",
+                "-m",
+                "fixture",
+            ],
+            [git, "-C", str(repo), "worktree", "add", "--detach", str(worktree), "HEAD"],
+        ]
+        for command in commit_commands:
+            proc = subprocess.run(command, text=True, capture_output=True)
+            if proc.returncode != 0:
+                return {"ok": False, "command": command, "stderr": proc.stderr.strip()}
+
+        git_marker = worktree / ".git"
+        detected_path = configured_hooks_path(worktree)
+        return {
+            "ok": git_marker.is_file() and detected_path == ".githooks",
+            "git_marker_is_file": git_marker.is_file(),
+            "hooksPath": detected_path,
+        }
+
+
 def workflow_fixture_test_result(write: bool, include_orchestration: bool = True) -> tuple[int, dict[str, Any]]:
     args = argparse.Namespace(json=False)
     fixture = ROOT / "tests" / "workflow" / "fixtures" / "sample-project"
@@ -1893,6 +1952,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()
     results.append({"name": "root workflow state lint passes", "ok": code == 0, "data": data})
+    linked_worktree_hooks = linked_worktree_hook_detection_result()
+    results.append(
+        {
+            "name": "linked worktree bootstrap detects hooks from git config",
+            "ok": linked_worktree_hooks["ok"],
+            "data": linked_worktree_hooks,
+        }
+    )
     ready = ready_work_data()
     results.append(
         {

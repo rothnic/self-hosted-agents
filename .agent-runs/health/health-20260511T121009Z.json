@@ -1,0 +1,9 @@
+{
+  "beads": null,
+  "created_at": "2026-05-11T12:10:09.890748+00:00",
+  "details": "Codex workers in linked worktrees can have core.hooksPath configured while ROOT/.git is a file, not a directory. bootstrap_data currently checks ROOT/.git/config before git config, so awf bootstrap reports hooks missing before workers can claim work. Acceptance: uv run awf bootstrap; uv run awf health-status --deep --json; uv run awf verify --profile health --json; uv run awf workflow-fixture-test; uv run awf repo-hygiene; plus bootstrap --json in worktrees 86d7 and f5d6.",
+  "id": "health-20260511T121009Z",
+  "severity": "blocker",
+  "source": "codex-worktree-bootstrap",
+  "title": "Fix bootstrap hook detection in linked worktrees"
+}

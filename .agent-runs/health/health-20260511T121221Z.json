@@ -1,0 +1,9 @@
+{
+  "beads": null,
+  "created_at": "2026-05-11T12:12:21.646020+00:00",
+  "details": "Codex automation can fail before awf starts when uv opens a restricted shared cache path such as /Users/nroth/.cache/uv/sdists-v9/.git. Decide whether scheduled prompts/docs should export UV_CACHE_DIR to a repo- or worktree-local writable path before uv run, then update docs/prompts/bootstrap validation together. Kept out of awf-fne because the current blocker is linked-worktree hook detection.",
+  "id": "health-20260511T121221Z",
+  "severity": "follow-up",
+  "source": "codex-worktree-bootstrap",
+  "title": "Define writable UV cache strategy for Codex automations"
+}
