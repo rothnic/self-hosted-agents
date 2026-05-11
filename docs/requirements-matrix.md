@@ -93,3 +93,42 @@ These questions should be asked during the next CEO-level roadmap review:
 - Score candidates against `docs/evaluation-criteria.md`; custom critical infrastructure warnings require roadmap review.
 - When implementation exposes a new requirement, update this matrix before creating deeper implementation tickets.
 - Roadmap decisions should update this file, the active spec, and Beads tickets together.
+
+## First Python-First Candidate Slice Proposal (T007)
+
+### Proposal Governance (to prevent state drift)
+
+- **Proposal status**: `draft` (planning artifact only; not an approved roadmap decision).
+- **Approval gate**: decision must be recorded through T010/T011 before any spec task is marked complete.
+- **Backlog alignment rule**: keep `tasks.md`, Beads status, and this matrix in sync in the same change.
+
+### Candidate
+
+- **Name**: `langgraph-python-langfuse-slice-01`
+- **App location**: `apps/langgraph-python/`
+- **Why first**: Highest immediate fit for R1/R2/R4 while preserving a clean path for shared comparison contracts.
+
+### Slice Scope
+
+1. Build a minimal runnable agent workflow that satisfies the shared comparable workflow contract under `tests/workflow/features/comparable_agent_workflow.feature`.
+2. Instrument traces through a local/self-hostable Langfuse path and persist artifacts required by `docs/comparison-evidence.md`.
+3. Provide one local run command and one verification command that can be reused by later candidate apps.
+
+### Explicit Non-Goals For This Slice
+
+- No multi-agent orchestration depth beyond the minimum contract flow.
+- No production deployment topology or scale tuning.
+- No cross-candidate scoring update until evidence artifacts are recorded from a successful run.
+
+### Exit Evidence For T007
+
+- A proposed app path and contract target are documented (this section).
+- The candidate is traceable back to requirement matrix priorities (R1, R2, R4, R5).
+- Follow-on tasks can implement the second candidate (T008) and minimum demo definition (T009) without reopening selection ambiguity.
+
+
+### Required Completion Checklist (before closing T007)
+
+- [ ] Proposal approved during roadmap review (T010) and captured as a human decision (T011).
+- [ ] Matching Beads issue state reflects completion evidence for the same task id.
+- [ ] Shared-contract acceptance and evidence location are unchanged or explicitly updated together.
