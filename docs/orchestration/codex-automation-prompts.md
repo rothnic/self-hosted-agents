@@ -6,7 +6,7 @@ or a worktree for the target branch, then let the command output drive the next 
 Before running any `uv run` command in a Codex automation, set a writable cache outside the repo:
 
 ```bash
-export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents"
+export UV_CACHE_DIR="/tmp/codex-uv-cache/self-hosted-agents"
 mkdir -p "$UV_CACHE_DIR"
 ```
 

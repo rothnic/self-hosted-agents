@@ -44,7 +44,7 @@ Codex or cron-like runs. Each role reads repo state, mutates only its owned work
 `uv run`, for example:
 
 ```bash
-export UV_CACHE_DIR="${TMPDIR:-/tmp}/codex-uv-cache/self-hosted-agents"
+export UV_CACHE_DIR="/tmp/codex-uv-cache/self-hosted-agents"
 mkdir -p "$UV_CACHE_DIR"
 uv run awf automation-loop --role health --write --json
 ```
