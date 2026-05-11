@@ -17,12 +17,12 @@
 
 ## Phase 3: Candidate App Planning
 
-- [ ] T007 [US3] Propose the first Python-first candidate app slice based on the requirement matrix
-- [ ] T008 [US3] Propose the second comparison candidate and explain why it provides useful contrast
-- [ ] T009 [US3] Define the minimum demo needed to compare candidate implementations
+- [X] T007 [US3] Propose the first Python-first candidate app slice based on the requirement matrix
+- [X] T008 [US3] Propose the second comparison candidate and explain why it provides useful contrast
+- [X] T009 [US3] Define the minimum demo needed to compare candidate implementations
 
 ## Phase 4: Roadmap Review
 
-- [ ] T010 [US1] Produce a CEO-level roadmap review with recommendation, options, and targeted questions
+- [X] T010 [US1] Produce a CEO-level roadmap review with recommendation, options, and targeted questions
 - [ ] T011 [US1] Record the human roadmap decision in the objective, spec, and Beads backlog
 - [ ] T012 [US1] Sync approved implementation tasks into Beads only after roadmap approval
