@@ -1163,6 +1163,55 @@ def workflow_check(name: str) -> dict[str, Any]:
     return {"name": name, "command": command, "ok": code == 0, "data": data}
 
 
+def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
+    fixture = ROOT / "packages" / "comparison" / "fixtures" / "langgraph-python-decision-slice.json"
+    runner = ROOT / "apps" / "langgraph-python" / "run.py"
+    if not fixture.exists() or not runner.exists():
+        return {
+            "ok": False,
+            "command": f"{sys.executable} {rel(runner)} --fixture {rel(fixture)}",
+            "error": "missing runner or fixture",
+            "fixture": rel(fixture),
+            "runner": rel(runner),
+        }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_path = Path(tmpdir) / "langgraph-python-run.json"
+        command = [
+            sys.executable,
+            str(runner),
+            "--fixture",
+            str(fixture),
+            "--output",
+            str(output_path),
+            "--pretty",
+        ]
+        proc = run(command)
+        try:
+            artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            artifact = {"decode_error": str(exc)}
+        required = {
+            "candidate_app_id": artifact.get("candidate_app_id") == "langgraph-python",
+            "recommendation": bool(artifact.get("recommendation", {}).get("next_slice")),
+            "alternatives": bool(artifact.get("alternatives")),
+            "questions": bool(artifact.get("questions")),
+            "acceptance_check": artifact.get("acceptance_check") == "uv run awf workflow-fixture-test",
+            "evidence_paths": bool(artifact.get("evidence_paths")),
+            "graph_transitions": bool(artifact.get("graph", {}).get("transitions")),
+        }
+        return {
+            "ok": proc.returncode == 0 and all(required.values()),
+            "command": " ".join(shlex.quote(item) for item in command),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout.strip(),
+            "stderr": proc.stderr.strip(),
+            "fixture": rel(fixture),
+            "output": str(output_path),
+            "required": required,
+            "artifact": artifact,
+        }
+
+
 def extract_acceptance_command(item: dict[str, Any] | None) -> str | None:
     if not item:
         return None
@@ -2141,6 +2190,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     results.append({"name": "root BDD lint passes", "ok": code == 0, "data": data})
     code, data = bdd_run_result("fixture")
     results.append({"name": "root fixture BDD driver run passes", "ok": code == 0, "data": data})
+    data = langgraph_python_candidate_smoke_result()
+    results.append(
+        {
+            "name": "langgraph python deterministic fixture app runs",
+            "ok": data["ok"],
+            "data": data,
+        }
+    )
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()

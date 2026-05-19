@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T19:36:28.004511+00:00",
+  "id": "awf-n9r",
+  "work": {
+    "created_at": "2026-05-19T16:58:01.408034Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T014\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-n9r",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Scaffold the runnable `apps/langgraph-python/` comparable workflow with deterministic fixture support",
+    "updated_at": "2026-05-19T16:58:01.408034Z"
+  },
+  "worker_id": "codex"
+}

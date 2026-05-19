@@ -11,8 +11,8 @@ Candidate id: `langgraph-python`.
 
 Stack: LangGraph Python plus Langfuse.
 
-The first slice should implement the shared comparable-agent workflow, not a full production agent system. It should
-accept a product objective, constraints, and project context, then return:
+The current scaffold implements the shared comparable-agent workflow in deterministic fixture mode, not a full
+production agent system. It accepts a product objective, constraints, and project context, then returns:
 
 - a concise recommended next implementation slice;
 - meaningful alternatives and tradeoffs;
@@ -20,9 +20,21 @@ accept a product objective, constraints, and project context, then return:
 - an acceptance check for the proposed implementation work;
 - durable run evidence that can be compared with later candidate apps.
 
+Run it from the repo root:
+
+```bash
+python3 apps/langgraph-python/run.py \
+  --fixture packages/comparison/fixtures/langgraph-python-decision-slice.json \
+  --output /tmp/langgraph-python-run.json \
+  --pretty
+```
+
+The scaffold is deliberately deterministic. T015 adds Langfuse or OpenTelemetry trace evidence, and T016 adds
+evaluation output and run artifact capture tied to the same candidate run.
+
 ## Evidence Required
 
-The first implementation ticket should produce:
+The implementation sequence should produce:
 
 - a runnable command for the candidate demo;
 - a passing shared behavior-contract or fixture check;

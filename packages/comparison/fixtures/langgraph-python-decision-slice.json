@@ -1,0 +1,22 @@
+{
+  "candidate": {
+    "id": "langgraph-python",
+    "stack": [
+      "LangGraph Python",
+      "Langfuse"
+    ]
+  },
+  "constraints": [
+    "Python-first implementation is preferred but comparison evidence is required.",
+    "Self-hosted LangSmith approval cannot be assumed.",
+    "Deterministic validation must run without hosted credentials.",
+    "Human approval gates remain responsible for roadmap direction."
+  ],
+  "objective": "Compare self-hostable agent application stacks through runnable candidate implementations.",
+  "project_context": {
+    "active_spec": "002-solution-comparison-roadmap",
+    "comparison_contract": "tests/workflow/features/comparable_agent_workflow.feature",
+    "current_slice": "T014",
+    "next_expected_slice": "T015"
+  }
+}
