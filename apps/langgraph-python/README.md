@@ -29,8 +29,10 @@ python3 apps/langgraph-python/run.py \
   --pretty
 ```
 
-The scaffold is deliberately deterministic. T015 adds Langfuse or OpenTelemetry trace evidence, and T016 adds
-evaluation output and run artifact capture tied to the same candidate run.
+When `--output` is set, the command also writes a local OpenTelemetry-style trace export next to the run artifact, for
+example `/tmp/langgraph-python-run.trace.json`. Use `--trace-output` to choose a different trace path. The trace export
+is deterministic and records Langfuse ingestion as a gap when credentials are absent. T016 adds evaluation output and
+run artifact capture tied to the same candidate run.
 
 ## Evidence Required
 

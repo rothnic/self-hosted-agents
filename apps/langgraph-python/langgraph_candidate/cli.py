@@ -22,14 +22,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the deterministic LangGraph Python comparison workflow.")
     parser.add_argument("--fixture", required=True, type=Path, help="Shared comparison fixture JSON path.")
     parser.add_argument("--output", type=Path, help="Optional run artifact output path.")
+    parser.add_argument("--trace-output", type=Path, help="Optional trace export output path.")
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    result = run_candidate_workflow(read_fixture(args.fixture))
+    fixture = read_fixture(args.fixture)
+    result = run_candidate_workflow(fixture)
     output = result.to_dict()
+    trace_output = args.trace_output
+    if trace_output is None and args.output is not None:
+        trace_output = args.output.with_suffix(".trace.json")
+    if trace_output is not None:
+        write_output(trace_output, result.trace_export, args.pretty)
+        output["evidence_paths"]["trace_evidence"] = str(trace_output)
+        output["trace_evidence"] = result.trace_evidence
     if args.output:
         write_output(args.output, output, args.pretty)
     print(json.dumps(output, indent=2 if args.pretty else None, sort_keys=True))
