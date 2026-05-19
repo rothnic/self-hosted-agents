@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T16:57:31.151413+00:00",
+  "id": "awf-t8o",
+  "work": {
+    "created_at": "2026-05-10T20:05:55.777634Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T012\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-t8o",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Sync approved implementation tasks into Beads only after roadmap approval",
+    "updated_at": "2026-05-10T20:05:55.777634Z"
+  },
+  "worker_id": "codex"
+}
