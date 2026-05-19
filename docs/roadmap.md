@@ -86,3 +86,7 @@ before the project invests in deeper product behavior.
 
 Keep the second candidate available for contrast, but choose it after the first slice exposes real implementation
 evidence.
+
+The proposed contrast candidate is `apps/mastra-ts/` using Mastra TypeScript plus the same shared comparison contract.
+It should test whether framework-integrated TypeScript workflow and observability capabilities offset the language and
+maintenance cost for a Python-preferring owner.

@@ -116,6 +116,45 @@ Promotion questions for the next roadmap review:
 3. Does local setup stay reasonable for one engineer, or does service count become the main risk?
 4. Which evidence gaps must be closed before building the second comparison candidate?
 
+## Second Candidate Slice Proposal
+
+Candidate app id: `mastra-ts`.
+
+Stack under evaluation: Mastra TypeScript plus the shared comparison contract.
+
+Primary purpose: provide a cross-language contrast to the Python-first LangGraph slice. This candidate should test
+whether a TypeScript-native agent framework reduces orchestration, observability, evaluation, or workflow glue enough
+to justify the language and maintenance cost for a Python-preferring owner.
+
+Useful contrast against `langgraph-python`:
+
+- Framework-integrated agent and workflow primitives versus Python LangGraph orchestration.
+- Built-in or framework-native observability/export paths versus explicit Langfuse instrumentation in Python.
+- TypeScript package and runtime operations versus Python app setup and local service expectations.
+- Different tradeoffs for future web UI, deployment, and service composition.
+
+Second-slice demo boundary:
+
+- Implement the same comparable-agent workflow after the first Python slice has produced reviewable evidence.
+- Use the same objective, constraints, project-context input shape, and decision-ready output expectations.
+- Capture trace, evaluation, setup, and gap evidence in the same format as `langgraph-python`.
+- Record any cross-language friction that affects maintenance, test ergonomics, or shared-contract reuse.
+
+Out of scope for the second candidate:
+
+- Replacing the Python-first preference before implementation evidence exists.
+- Building a broader TypeScript product surface or web UI.
+- Using Mastra-specific behavior that cannot be compared through the shared contract.
+- Treating easier demo setup as sufficient if observability, evaluation, or operating evidence is weaker.
+
+Promotion questions for the roadmap review after both slices:
+
+1. Does Mastra reduce custom glue enough to offset TypeScript ownership cost?
+2. Are its traces and evaluation outputs comparable to the LangGraph plus Langfuse evidence?
+3. Does the shared contract remain clean across Python and TypeScript without app-internal coupling?
+4. Should the third candidate stay Python-first, such as MLflow or Phoenix, or should the roadmap deepen the stronger
+   of the first two slices?
+
 ## Roadmap Review Questions
 
 These questions should be asked during the next CEO-level roadmap review:

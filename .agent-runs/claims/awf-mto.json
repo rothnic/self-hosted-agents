@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T14:28:10.567308+00:00",
+  "id": "awf-mto",
+  "work": {
+    "created_at": "2026-05-10T20:05:54.935075Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T008\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-mto",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Propose the second comparison candidate and explain why it provides useful contrast",
+    "updated_at": "2026-05-10T22:33:23.282890Z"
+  },
+  "worker_id": "codex-t008"
+}
