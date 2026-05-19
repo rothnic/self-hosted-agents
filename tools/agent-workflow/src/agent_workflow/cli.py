@@ -58,6 +58,31 @@ def print_envelope(envelope: CommandEnvelope, json_output: bool) -> None:
             console.print("[green]No errors[/green]")
         for warning in data.get("warnings", []):
             console.print(f"[yellow]- warning: {warning}[/yellow]")
+    elif "results" in data:
+        summary = data.get("summary", {})
+        if summary:
+            console.print(
+                f"[bold]Results:[/bold] {summary.get('passed', 0)}/{summary.get('total', 0)} passed"
+            )
+        failure_details = {
+            item.get("name"): item.get("detail", "")
+            for item in summary.get("failed_results", [])
+            if isinstance(item, dict)
+        }
+        table = Table(title="Fixture Results")
+        table.add_column("Name")
+        table.add_column("OK")
+        table.add_column("Detail")
+        for item in data["results"]:
+            ok = bool(item.get("ok"))
+            detail = failure_details.get(item.get("name"), "")
+            table.add_row(str(item.get("name", "")), "yes" if ok else "no", detail)
+        console.print(table)
+        if failure_details:
+            console.print("[red]Failed checks:[/red]")
+            for name, detail in failure_details.items():
+                suffix = f": {detail}" if detail else ""
+                console.print(f"[red]- {name}{suffix}[/red]")
 
 
 def run_core_tuple(command: str, fn: Any, *, json_output: bool) -> int:

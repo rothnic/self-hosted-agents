@@ -1876,6 +1876,63 @@ def complete_work_data(issue_id: str | None, evidence: str, worker_id: str | Non
     }
 
 
+def workflow_fixture_result_detail(result: dict[str, Any]) -> str:
+    data = result.get("data")
+    if not isinstance(data, dict):
+        return ""
+    if data.get("error"):
+        return str(data["error"])
+    if data.get("errors"):
+        return "; ".join(str(error) for error in data["errors"][:3])
+    if data.get("spec_errors"):
+        return "; ".join(str(error) for error in data["spec_errors"][:3])
+    claim = data.get("claim")
+    if isinstance(claim, dict):
+        if claim.get("reason"):
+            return str(claim["reason"])
+        if claim.get("dry_run") is False and claim.get("claimed", {}).get("path"):
+            return f"using active claim {claim['claimed']['path']}"
+        if claim.get("dry_run") is True:
+            return "previewed a dry-run claim"
+    if data.get("next_action"):
+        return str(data["next_action"])
+    if "ok" in data:
+        return f"nested ok={data['ok']}"
+    return ""
+
+
+def workflow_fixture_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    failed = [
+        {
+            "name": str(result.get("name", "<unnamed>")),
+            "detail": workflow_fixture_result_detail(result),
+        }
+        for result in results
+        if not result.get("ok")
+    ]
+    return {
+        "total": len(results),
+        "passed": len(results) - len(failed),
+        "failed": len(failed),
+        "failed_results": failed,
+    }
+
+
+def worker_loop_non_mutating(worker: dict[str, Any], claim_paths_before: set[str], claim_paths_after: set[str]) -> bool:
+    if claim_paths_before != claim_paths_after:
+        return False
+    claim = worker.get("claim")
+    if not isinstance(claim, dict) or not claim.get("ok"):
+        return False
+    if claim.get("dry_run") is True:
+        return True
+    claimed = claim.get("claimed")
+    if not isinstance(claimed, dict):
+        return False
+    path = claimed.get("path")
+    return claim.get("dry_run") is False and isinstance(path, str) and path in claim_paths_before
+
+
 def cron_tick_data(role: str, worker_id: str | None, write: bool) -> dict[str, Any]:
     health = health_status_data(deep=False)
     logged = []
@@ -2166,6 +2223,16 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": {"changed": changed, "text": marked},
         }
     )
+    synthetic_summary = workflow_fixture_summary(
+        [{"name": "synthetic failure", "ok": False, "data": {"errors": ["clear failure detail"]}}]
+    )
+    results.append(
+        {
+            "name": "workflow fixture summary exposes failed check detail",
+            "ok": synthetic_summary["failed_results"][0]["detail"] == "clear failure detail",
+            "data": synthetic_summary,
+        }
+    )
     if include_orchestration:
         verify_health = verify_data("health", write=False)
         results.append(
@@ -2223,6 +2290,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "data": orchestrator,
             }
         )
+        claim_paths_before = {rel(path) for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))}
         worker = automation_loop_data(
             role="worker",
             write=False,
@@ -2231,11 +2299,16 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             spec_id="002-solution-comparison-roadmap",
             phase="Phase 3",
         )
+        claim_paths_after = {rel(path) for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))}
         results.append(
             {
-                "name": "worker loop previews one claim without closing work",
-                "ok": worker["ok"] and worker["claim"].get("dry_run") is True,
-                "data": worker,
+                "name": "worker loop reports claim state without mutating claims",
+                "ok": worker["ok"] and worker_loop_non_mutating(worker, claim_paths_before, claim_paths_after),
+                "data": {
+                    **worker,
+                    "claim_paths_before": sorted(claim_paths_before),
+                    "claim_paths_after": sorted(claim_paths_after),
+                },
             }
         )
         integrator = automation_loop_data(
@@ -2270,7 +2343,8 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             + "\n",
             encoding="utf-8",
         )
-    data = {"ok": ok, "results": results}
+    summary = workflow_fixture_summary(results)
+    data = {"ok": ok, "summary": summary, "results": results}
     return (0 if ok else 1), data
 
 
