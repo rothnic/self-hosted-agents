@@ -80,6 +80,8 @@ repo state, research any new solution-space questions, and return:
 
 ## Current Recommendation
 
+Latest CEO-level review: `docs/roadmap-review-2026-05-19.md`.
+
 Proceed with the first Python-first candidate slice: `apps/langgraph-python/` using LangGraph Python plus Langfuse.
 The slice should prove the shared comparable-agent workflow and capture trace, evaluation, setup, and gap evidence
 before the project invests in deeper product behavior.
