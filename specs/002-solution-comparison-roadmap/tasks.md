@@ -24,5 +24,5 @@
 ## Phase 4: Roadmap Review
 
 - [X] T010 [US1] Produce a CEO-level roadmap review with recommendation, options, and targeted questions
-- [ ] T011 [US1] Record the human roadmap decision in the objective, spec, and Beads backlog
+- [X] T011 [US1] Record the human roadmap decision in the objective, spec, and Beads backlog
 - [ ] T012 [US1] Sync approved implementation tasks into Beads only after roadmap approval

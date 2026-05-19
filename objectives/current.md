@@ -17,6 +17,9 @@ evaluation, orchestration, scalability, and operating effort.
 - Planning, ticketing, review-gate, BDD contract, and retrospective flows can run without product-specific implementation.
 - Workflow validation passes against an isolated fixture.
 - The product roadmap maps high-level system requirements into comparable implementation options.
+- The product roadmap keeps a functional needs map that lists the minimum functional areas every candidate must cover,
+  identifies which solution components provide each function, and records useful extra capabilities that should affect
+  scoring when a candidate provides them without custom infrastructure.
 - Each candidate solution is tested as a separate runnable app while sharing common contracts, fixtures, and evaluation
   assets where useful.
 - Roadmap reviews can be initiated by the human and should produce refreshed objectives, specs, tasks, tickets, and

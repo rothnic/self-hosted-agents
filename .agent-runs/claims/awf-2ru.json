@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T16:50:06.612070+00:00",
+  "id": "awf-2ru",
+  "work": {
+    "created_at": "2026-05-10T20:05:55.574693Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T011\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-2ru",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Record the human roadmap decision in the objective, spec, and Beads backlog",
+    "updated_at": "2026-05-10T20:05:55.574693Z"
+  },
+  "worker_id": "codex"
+}
