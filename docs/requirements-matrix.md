@@ -66,16 +66,55 @@ Start by comparing Python-first options before investing deeply in TypeScript or
 
 Recommended first implementation slice:
 
-1. Define one shared agent workflow contract.
-2. Implement it in `apps/langgraph-python/`.
-3. Instrument it with one local/self-hostable observability path.
-4. Capture setup effort, trace quality, eval support, and gaps in this matrix.
+1. Build `apps/langgraph-python/` as the first candidate app.
+2. Use LangGraph Python for orchestration and Langfuse as the first self-hostable observability target.
+3. Prove the shared comparable-agent workflow before adding broader product behavior.
+4. Capture setup effort, trace quality, evaluation support, operating burden, and gaps in this matrix.
 
 Recommended first observability comparison:
 
 1. Start with Langfuse integration depth for LangGraph Python.
 2. Keep Phoenix deferred until developer experience is better understood.
 3. Keep MLflow tracing as a second Python option if lifecycle/evaluation needs dominate.
+
+## First Candidate Slice Proposal
+
+Candidate app id: `langgraph-python`.
+
+Stack under evaluation: LangGraph Python plus Langfuse.
+
+Primary purpose: prove whether a Python-first agent workflow can produce decision-ready implementation-slice output
+with inspectable local or self-hostable run evidence, without assuming LangSmith approval.
+
+Shared behavior to prove: the comparable-agent workflow in
+`tests/workflow/features/comparable_agent_workflow.feature`. The demo should accept a product objective, constraints,
+and project context, then return a concise recommendation with alternatives, explicit questions, and an acceptance
+check.
+
+First-slice demo boundary:
+
+- One LangGraph workflow that turns structured project context into a next-slice recommendation.
+- One deterministic or fixture-backed test path so the comparison harness can run without hidden hosted dependencies.
+- Langfuse instrumentation for the workflow run, including model/tool or node-level spans where available.
+- One evaluation output tied to the same run, even if the first scorer is deterministic and limited.
+- One run artifact that links the command, trace evidence, evaluation output, setup notes, and known gaps.
+
+This boundary scopes only the first `langgraph-python` candidate slice. The cross-candidate minimum demo remains a
+separate roadmap task.
+
+Out of scope for the first slice:
+
+- A full self-hosted production Langfuse deployment.
+- Multi-agent scheduling, durable workers, or background orchestration beyond the single comparable workflow.
+- Declaring LangGraph plus Langfuse as the final platform winner.
+- Implementing Phoenix, MLflow, Mastra, or LangSmith comparison code in the same slice.
+
+Promotion questions for the next roadmap review:
+
+1. Is the Langfuse trace readable enough to debug node decisions and failure context?
+2. Does the evaluation output attach cleanly to the same run evidence reviewers inspect?
+3. Does local setup stay reasonable for one engineer, or does service count become the main risk?
+4. Which evidence gaps must be closed before building the second comparison candidate?
 
 ## Roadmap Review Questions
 
