@@ -29,7 +29,7 @@
 
 ## Phase 5: Approved First Candidate Implementation
 
-- [ ] T013 [US3] Define the `langgraph-python` functional-needs mapping and implementation slice plan
+- [X] T013 [US3] Define the `langgraph-python` functional-needs mapping and implementation slice plan
 - [ ] T014 [US3] Scaffold the runnable `apps/langgraph-python/` comparable workflow with deterministic fixture support
 - [ ] T015 [US3] Add Langfuse or OpenTelemetry trace evidence capture for the LangGraph Python slice
 - [ ] T016 [US3] Add evaluation output and run artifact capture for the LangGraph Python slice

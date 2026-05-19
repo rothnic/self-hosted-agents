@@ -3,6 +3,8 @@
 First Python-first candidate app for the solution comparison roadmap. Keep this independent from the TypeScript Mastra
 app except for shared contracts and comparison assets.
 
+Detailed slice plan: `apps/langgraph-python/implementation-plan.md`.
+
 ## First Slice
 
 Candidate id: `langgraph-python`.

@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T19:33:14.503194+00:00",
+  "id": "awf-o3p",
+  "work": {
+    "created_at": "2026-05-19T16:58:01.104496Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T013\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-o3p",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Define the `langgraph-python` functional-needs mapping and implementation slice plan",
+    "updated_at": "2026-05-19T16:58:01.104496Z"
+  },
+  "worker_id": "codex"
+}
