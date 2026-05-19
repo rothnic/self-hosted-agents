@@ -99,8 +99,8 @@ First-slice demo boundary:
 - One evaluation output tied to the same run, even if the first scorer is deterministic and limited.
 - One run artifact that links the command, trace evidence, evaluation output, setup notes, and known gaps.
 
-This boundary scopes only the first `langgraph-python` candidate slice. The cross-candidate minimum demo remains a
-separate roadmap task.
+This boundary scopes only the first `langgraph-python` candidate slice. The cross-candidate minimum demo is defined in
+`docs/comparison-evidence.md`.
 
 Out of scope for the first slice:
 
@@ -162,7 +162,7 @@ These questions should be asked during the next CEO-level roadmap review:
 1. Should the first prototype optimize for fastest local demo or best long-term observability architecture?
 2. Is LangGraph Python the right first orchestration candidate, or should a simpler Python app establish the harness?
 3. What evidence would justify reopening Phoenix as an immediate observability implementation?
-4. What minimum demo would convince us the comparison is producing useful evidence?
+4. Does the minimum comparable demo in `docs/comparison-evidence.md` produce enough evidence for a roadmap decision?
 
 ## Update Rules
 

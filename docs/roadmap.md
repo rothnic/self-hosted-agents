@@ -90,3 +90,6 @@ evidence.
 The proposed contrast candidate is `apps/mastra-ts/` using Mastra TypeScript plus the same shared comparison contract.
 It should test whether framework-integrated TypeScript workflow and observability capabilities offset the language and
 maintenance cost for a Python-preferring owner.
+
+The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should implement that same
+decision-ready workflow before roadmap review compares platform quality.
