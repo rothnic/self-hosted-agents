@@ -289,6 +289,13 @@ def task_source_path(task: dict[str, Any]) -> str:
     return f"specs/{task['spec_id']}/tasks.md"
 
 
+def task_by_external_ref(external_ref: str) -> dict[str, Any] | None:
+    for task in collect_tasks():
+        if task_external_ref(task) == external_ref:
+            return task
+    return None
+
+
 def task_has_beads_evidence(task: dict[str, Any], issues: list[dict[str, Any]]) -> bool:
     task_id = task["id"]
     external_ref = task_external_ref(task)
@@ -1740,6 +1747,135 @@ def claim_work_data(worker_id: str, write: bool) -> dict[str, Any]:
     return {"ok": False, "claimed": None, "ready_count": len(ready), "reason": "no unclaimed ready work"}
 
 
+def mark_task_done_text(text: str, task_id: str) -> tuple[str, bool]:
+    changed = False
+    lines = []
+    task_pattern = re.compile(rf"^- \[(?P<done>[ xX])\] {re.escape(task_id)}(?P<rest>.*)$")
+    for line in text.splitlines(keepends=True):
+        line_body = line[:-1] if line.endswith("\n") else line
+        newline = "\n" if line.endswith("\n") else ""
+        match = task_pattern.match(line_body)
+        if match and match.group("done").lower() != "x":
+            line = f"- [X] {task_id}{match.group('rest')}{newline}"
+            changed = True
+        lines.append(line)
+    return "".join(lines), changed
+
+
+def mark_task_done(task: dict[str, Any], write: bool) -> dict[str, Any]:
+    path = ROOT / task_source_path(task)
+    original = read_text(path)
+    updated, changed = mark_task_done_text(original, task["id"])
+    if changed and write:
+        path.write_text(updated, encoding="utf-8")
+    return {"path": rel(path), "task_id": task["id"], "changed": changed}
+
+
+def complete_work_data(issue_id: str | None, evidence: str, worker_id: str | None, write: bool) -> dict[str, Any]:
+    br = find_br()
+    if not br:
+        return {"ok": False, "error": "Beads Rust br is unavailable"}
+
+    item = issue_by_id(issue_id) if issue_id else current_acceptance_item()
+    if not item:
+        return {"ok": False, "error": "no issue id supplied and no active claim or ready work found"}
+
+    work = item.get("work") if isinstance(item.get("work"), dict) else item
+    target_issue_id = str(work.get("id", ""))
+    issue = issue_by_id(target_issue_id)
+    if not issue:
+        return {"ok": False, "error": f"issue {target_issue_id or '<unknown>'} not found"}
+
+    external_ref = issue.get("external_ref") or work.get("external_ref")
+    if not external_ref:
+        return {"ok": False, "issue_id": target_issue_id, "error": "issue has no external_ref"}
+    task = task_by_external_ref(str(external_ref))
+    if not task:
+        return {"ok": False, "issue_id": target_issue_id, "external_ref": external_ref, "error": "linked task not found"}
+
+    acceptance_command = extract_acceptance_command(issue) or extract_acceptance_command(work)
+    acceptance = run_acceptance_command(acceptance_command)
+    if not acceptance["ok"]:
+        return {
+            "ok": False,
+            "issue_id": target_issue_id,
+            "external_ref": external_ref,
+            "acceptance": acceptance,
+            "error": "acceptance check failed; no completion state was written",
+        }
+
+    comment_text = evidence.strip() or (
+        f"Completion evidence recorded {datetime.now(timezone.utc).date().isoformat()}. "
+        f"Acceptance passed: {acceptance_command}."
+    )
+    comment = None
+    close = None
+    task_update = mark_task_done(task, write=False)
+    state_lint = {"ok": True, "skipped": True}
+    sync = None
+
+    if write:
+        comment_proc = run(
+            [br, "comments", "add", target_issue_id, "--author", worker_id or "awf", "--message", comment_text, "--json"]
+        )
+        comment = {
+            "returncode": comment_proc.returncode,
+            "stdout": comment_proc.stdout.strip(),
+            "stderr": comment_proc.stderr.strip(),
+        }
+        if comment_proc.returncode != 0:
+            return {
+                "ok": False,
+                "issue_id": target_issue_id,
+                "acceptance": acceptance,
+                "comment": comment,
+                "error": "failed to record Beads evidence; task and issue were left unchanged",
+            }
+
+        close_reason = f"Completed {task['id']} through awf complete-work. Acceptance passed: {acceptance_command}."
+        close_proc = run([br, "close", target_issue_id, "--reason", close_reason, "--json"])
+        close = {
+            "returncode": close_proc.returncode,
+            "stdout": close_proc.stdout.strip(),
+            "stderr": close_proc.stderr.strip(),
+        }
+        if close_proc.returncode != 0:
+            return {
+                "ok": False,
+                "issue_id": target_issue_id,
+                "acceptance": acceptance,
+                "comment": comment,
+                "close": close,
+                "error": "failed to close Beads issue; task was left unchanged",
+            }
+
+        task_update = mark_task_done(task, write=True)
+        sync_proc = run([br, "sync", "--flush-only"])
+        sync = {
+            "returncode": sync_proc.returncode,
+            "stdout": sync_proc.stdout.strip(),
+            "stderr": sync_proc.stderr.strip(),
+        }
+        code, state_lint_data = workflow_state_lint_result()
+        state_lint = {"ok": code == 0, "data": state_lint_data}
+
+    ok = acceptance["ok"] and state_lint.get("ok", False)
+    return {
+        "ok": ok,
+        "write": write,
+        "issue_id": target_issue_id,
+        "external_ref": external_ref,
+        "task_id": task["id"],
+        "acceptance": acceptance,
+        "comment": comment,
+        "close": close,
+        "task_update": task_update,
+        "sync": sync,
+        "state_lint": state_lint,
+        "next_action": "commit completion checkpoint" if write and ok else "rerun with --write to complete work",
+    }
+
+
 def cron_tick_data(role: str, worker_id: str | None, write: bool) -> dict[str, Any]:
     health = health_status_data(deep=False)
     logged = []
@@ -2020,6 +2156,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "name": "workflow state lint detects missing Beads metadata",
             "ok": bool(issue_metadata_errors([synthetic_issue])),
             "data": {"errors": issue_metadata_errors([synthetic_issue])},
+        }
+    )
+    marked, changed = mark_task_done_text("- [ ] T123 [US1] Synthetic task\n", "T123")
+    results.append(
+        {
+            "name": "complete-work can mark one linked task complete",
+            "ok": changed and marked == "- [X] T123 [US1] Synthetic task\n",
+            "data": {"changed": changed, "text": marked},
         }
     )
     if include_orchestration:

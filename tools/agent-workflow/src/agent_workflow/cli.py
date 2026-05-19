@@ -307,6 +307,28 @@ def claim_work(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("complete-work")
+def complete_work(
+    issue_id: str | None = typer.Option(None, "--issue-id", help="Beads issue id. Defaults to active claim."),
+    evidence: str = typer.Option("", "--evidence", help="Evidence text to add before closing the issue."),
+    worker_id: str | None = typer.Option(None, "--worker-id", help="Evidence author. Defaults to awf."),
+    write: bool = typer.Option(False, "--write", help="Write Beads evidence, close issue, and mark the task complete."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Complete one claimed work item without task/Beads drift."""
+    data = core.complete_work_data(issue_id=issue_id, evidence=evidence, worker_id=worker_id, write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="complete-work",
+            summary=data.get("next_action", "completion failed"),
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("cron-tick")
 def cron_tick(
     role: str = typer.Option(..., "--role", help="planner or worker."),
