@@ -1,3 +1,53 @@
 # LangGraph Python App
 
-Future LangChain/LangGraph implementation. Keep this independent from the TypeScript Mastra app except for shared contracts.
+First Python-first candidate app for the solution comparison roadmap. Keep this independent from the TypeScript Mastra
+app except for shared contracts and comparison assets.
+
+Detailed slice plan: `apps/langgraph-python/implementation-plan.md`.
+
+## First Slice
+
+Candidate id: `langgraph-python`.
+
+Stack: LangGraph Python plus Langfuse.
+
+The current scaffold implements the shared comparable-agent workflow in deterministic fixture mode, not a full
+production agent system. It accepts a product objective, constraints, and project context, then returns:
+
+- a concise recommended next implementation slice;
+- meaningful alternatives and tradeoffs;
+- explicit human questions when direction is not safe to assume;
+- an acceptance check for the proposed implementation work;
+- durable run evidence that can be compared with later candidate apps.
+
+Run it from the repo root:
+
+```bash
+python3 apps/langgraph-python/run.py \
+  --fixture packages/comparison/fixtures/langgraph-python-decision-slice.json \
+  --output /tmp/langgraph-python-run.json \
+  --pretty
+```
+
+When `--output` is set, the command also writes a local OpenTelemetry-style trace export next to the run artifact, for
+example `/tmp/langgraph-python-run.trace.json`. Use `--trace-output` to choose a different trace path. The trace export
+is deterministic and records Langfuse ingestion as a gap when credentials are absent. T016 adds evaluation output and
+run artifact capture tied to the same candidate run.
+
+## Evidence Required
+
+The implementation sequence should produce:
+
+- a runnable command for the candidate demo;
+- a passing shared behavior-contract or fixture check;
+- Langfuse trace evidence for the workflow run;
+- evaluation output tied to the same run;
+- setup notes covering required services, environment variables, and local startup;
+- explicit gaps and custom critical infrastructure risks.
+
+Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation-criteria.md` as the scoring rubric.
+
+## Non-Goals
+
+Do not build the Phoenix, MLflow, Mastra, or LangSmith comparison paths in this app. Do not declare LangGraph plus
+Langfuse as the final architecture until comparable implementation evidence exists.

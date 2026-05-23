@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T14:14:06.690060+00:00",
+  "id": "awf-3w1",
+  "work": {
+    "created_at": "2026-05-10T20:05:54.732759Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T007\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-3w1",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Propose the first Python-first candidate app slice based on the requirement matrix",
+    "updated_at": "2026-05-10T22:33:22.296575Z"
+  },
+  "worker_id": "codex-t007"
+}

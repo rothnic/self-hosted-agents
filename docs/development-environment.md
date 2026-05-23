@@ -38,9 +38,15 @@ Use `uv run awf verify --profile <ticket|increment|health|pre-merge> --json` whe
 evidence summary, and next action for the current context. Use `--write` to create a durable handoff artifact under
 `.agent-runs/verifications/`.
 
-Use `uv run awf automation-loop --role <pm-review|orchestrator|worker|integrator|health> --write` for scheduled
-Codex or cron-like runs. Each role reads repo state, mutates only its owned workflow artifacts, and returns one
-`next_action`.
+Use `uv run awf automation-loop --role <pm-review|orchestrator|worker|integrator|health> --write` for local or cron-like
+runs. Codex app automations should use the bootstrapped `.venv/bin/awf` entrypoint directly because `uv` can need cache
+or temp filesystem access before `awf` starts. Each role reads repo state, mutates only its owned workflow artifacts,
+and returns one `next_action`. Configure Codex cron automations with the `worktree` execution environment so `awf
+--write` can create claim, verification, and evidence files.
+
+```bash
+.venv/bin/awf automation-loop --role health --write --json
+```
 
 If a command fails, first run:
 

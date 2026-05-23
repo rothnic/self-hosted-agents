@@ -24,5 +24,14 @@
 ## Phase 4: Roadmap Review
 
 - [X] T010 [US1] Produce a CEO-level roadmap review with recommendation, options, and targeted questions
-- [ ] T011 [US1] Record the human roadmap decision in the objective, spec, and Beads backlog
-- [ ] T012 [US1] Sync approved implementation tasks into Beads only after roadmap approval
+- [X] T011 [US1] Record the human roadmap decision in the objective, spec, and Beads backlog
+- [X] T012 [US1] Sync approved implementation tasks into Beads only after roadmap approval
+
+## Phase 5: Approved First Candidate Implementation
+
+- [X] T013 [US3] Define the `langgraph-python` functional-needs mapping and implementation slice plan
+- [X] T014 [US3] Scaffold the runnable `apps/langgraph-python/` comparable workflow with deterministic fixture support
+- [X] T015 [US3] Add Langfuse or OpenTelemetry trace evidence capture for the LangGraph Python slice
+- [ ] T016 [US3] Add evaluation output and run artifact capture for the LangGraph Python slice
+- [ ] T017 [US3] Update the requirements matrix with LangGraph Python evidence, scores, and gaps
+- [ ] T018 [US3] Research Pydantic AI plus Logfire/OpenTelemetry against the functional needs map

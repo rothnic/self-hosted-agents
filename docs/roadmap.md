@@ -29,6 +29,10 @@ roadmap and approval level:
 Capture the high-level system requirements and map them to candidate implementation choices. Requirements are expected
 to evolve as implementation reveals hidden constraints.
 
+Maintain a functional needs map as part of the requirements matrix. For each required functional area, name the
+solution-space component or components that provide the function, then record significant extra features that should
+affect scoring when they are useful and arrive with the solution rather than custom project infrastructure.
+
 Initial requirement areas:
 
 - Python-first engineering workflow.
@@ -52,13 +56,15 @@ Each candidate solution gets a separate runnable app under `apps/`. Existing app
 - `apps/langgraph-python/`: Python LangGraph/LangChain candidate.
 - `apps/mastra-ts/`: TypeScript Mastra candidate used as a cross-language comparison point.
 
-Likely additional Python-first candidates should be researched before creation, such as a Pydantic AI or custom
-FastAPI/OpenTelemetry app if they map better to the requirement matrix.
+Likely additional Python-first candidates should be researched before creation. Current next research target:
+Pydantic AI plus Logfire or OpenTelemetry. LlamaIndex remains a strong fallback if data/RAG workflows become the
+dominant functional area.
 
 ### Phase 4: Evidence Review
 
 After each implementation slice, agents update the comparison matrix with actual evidence:
 
+- Functional needs coverage and the solution components providing each function.
 - Feature coverage.
 - Observability and evaluation quality.
 - Integration effort.
@@ -80,5 +86,23 @@ repo state, research any new solution-space questions, and return:
 
 ## Current Recommendation
 
-Start with Phase 1 and Phase 2: define the requirement matrix and shared comparison harness before building the first
-product slice. Then implement the Python-first candidate first, while keeping a second candidate available for contrast.
+Latest CEO-level review: `docs/roadmap-review-2026-05-19.md`.
+
+Proceed with the first Python-first candidate slice: `apps/langgraph-python/` using LangGraph Python plus Langfuse.
+The slice should prove the shared comparable-agent workflow and capture trace, evaluation, setup, and gap evidence
+before the project invests in deeper product behavior. This path is approved as the first implementation slice, not as
+the final platform choice.
+
+Keep the second candidate available for contrast, but choose it after the first slice exposes real implementation
+evidence.
+
+The proposed contrast candidate is `apps/mastra-ts/` using Mastra TypeScript plus the same shared comparison contract.
+It should test whether framework-integrated TypeScript workflow and observability capabilities offset the language and
+maintenance cost for a Python-preferring owner.
+
+The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should implement that same
+decision-ready workflow before roadmap review compares platform quality.
+
+The next Python-first candidate to research is Pydantic AI plus Logfire or OpenTelemetry. If the first slice shows that
+data ingestion, retrieval, or document-heavy workflows are the dominant risk, compare LlamaIndex before committing to a
+third app lane.

@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T14:33:27.510197+00:00",
+  "id": "awf-ude",
+  "work": {
+    "created_at": "2026-05-10T20:05:55.146248Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T009\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-ude",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Define the minimum demo needed to compare candidate implementations",
+    "updated_at": "2026-05-10T22:33:24.303057Z"
+  },
+  "worker_id": "codex-t009"
+}

@@ -43,6 +43,9 @@ fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 
 ## Example Schedules
 
+Local cron can use `uv run awf`. Codex app automations should use `.venv/bin/awf` directly because `uv` can need cache
+or temp filesystem access before `awf` starts.
+
 ```cron
 0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review --write
 */15 * * * * cd /repo && uv run awf automation-loop --role orchestrator --write

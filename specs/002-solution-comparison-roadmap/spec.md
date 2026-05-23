@@ -76,10 +76,19 @@ trace, and evaluation evidence.
   change.
 - **FR-009**: Agents MUST translate workflow state into recommendations and targeted questions for the human.
 - **FR-010**: The human MUST remain responsible for roadmap direction, priority tradeoffs, and approval gates.
+- **FR-011**: The comparison MUST maintain a functional needs map that identifies the minimum functional areas every
+  candidate solution must satisfy.
+- **FR-012**: For each functional area, the comparison MUST map which solution-space component or components provide
+  that function and record significant extra features that should affect scoring when they are useful and come with the
+  selected solution.
+- **FR-013**: The next Python-first comparison candidate MUST be selected through bounded research before creating its
+  runnable app lane.
 
 ### Key Entities
 
 - **Requirement Matrix**: A durable mapping from needs to candidate solution fit, evidence, and gaps.
+- **Functional Needs Map**: A high-level inventory of required functional areas, provider components by candidate, and
+  extra useful capabilities that should influence scoring.
 - **Candidate App**: A runnable implementation path under `apps/`.
 - **Shared Comparison Harness**: Contracts, fixtures, traces, evaluations, and demo checks shared across candidates.
 - **Roadmap Review**: Human-facing decision cycle that updates direction based on implementation evidence.
@@ -90,9 +99,13 @@ trace, and evaluation evidence.
 - **SC-002**: At least three candidate solution paths are mapped against the same requirement areas.
 - **SC-003**: The first candidate implementation spec is selected based on the matrix and human approval.
 - **SC-004**: Shared contracts define the evidence needed for candidate comparison before implementation depth grows.
+- **SC-005**: The approved roadmap decision identifies both the first implementation slice and the next Python-first
+  candidate research target.
 
 ## Assumptions
 
 - Requirements are intentionally incomplete and will evolve after initial implementations.
 - LangSmith may remain a comparison baseline but cannot be assumed available.
 - Python-first candidates should be explored before deeper TypeScript implementation unless evidence says otherwise.
+- The approved first slice is `apps/langgraph-python/` using LangGraph Python plus Langfuse; this is a first evidence
+  target, not a final platform selection.

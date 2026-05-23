@@ -45,7 +45,9 @@ Use this loop to keep the project ratcheting forward:
 9. **Change**: make the smallest coherent change for that task.
 10. **Verify**: test steward runs the task acceptance command plus relevant workflow checks.
 11. **Review**: reviewer validates code, specs, tickets, BDD contracts, and repo hygiene.
-12. **Close Or Add Work**: close only when acceptance evidence exists; otherwise add follow-up tasks and return to planning.
+12. **Close Or Add Work**: complete claimed work with
+    `uv run awf complete-work --issue-id <id> --evidence "<summary>" --write` after acceptance evidence exists;
+    otherwise add follow-up tasks and return to planning.
 13. **Learn**: retrospector records useful process learnings before the next run.
 
 The loop pauses whenever the next transition would require guessing about scope, architecture, priority, acceptance, or behavior.
@@ -202,8 +204,9 @@ Backlog population is spec driven:
 4. With explicit write approval, ticket planner runs `uv run awf ticket-sync --write`.
 5. Implementers work only from `uv run awf ready-work`, not by scanning `tasks.md`.
 
-Completion is proven when the Beads issue has passing acceptance evidence, the linked task/spec state is updated when
-needed, relevant workflow checks pass, and reviewer/human gates are resolved.
+Completion is proven when `uv run awf complete-work --issue-id <id> --evidence "<summary>" --write` records passing
+acceptance evidence, closes the Beads issue, marks the linked task complete, and reruns workflow-state lint. Do not
+manually mark a task complete before the linked issue has completion evidence.
 
 ## Scheduled Orchestration
 
@@ -214,6 +217,12 @@ Cron-like runners use the same CLI and repo artifacts as humans:
 - Worker cadence: `uv run awf automation-loop --role worker --worker-id <id> --write`
 - Integrator cadence: `uv run awf automation-loop --role integrator --write`
 - Health cadence: `uv run awf automation-loop --role health --write`
+
+For Codex app automations, use the bootstrapped `.venv/bin/awf` entrypoint for these scheduled role commands instead
+of `uv run awf`. The `uv` launcher can fail before `awf` starts when the automation sandbox blocks uv cache or temp
+filesystem paths. Configure Codex cron automations with the `worktree` execution environment; `local` automation
+sessions may be read-only and fail when `awf --write` creates claim, verification, or evidence files. Local shells and
+normal cron can continue using `uv run awf`.
 
 The PM/review loop reviews health, objectives, specs, tickets, run reports, and learnings.
 It refreshes backlog when ready work runs low and opens phase review gates when needed.
@@ -304,6 +313,7 @@ uv run awf spec-lint
 uv run awf review-gate
 uv run awf repo-hygiene
 uv run awf workflow-state-lint
+uv run awf complete-work --issue-id <id> --evidence "<summary>" --write
 uv run awf bdd-lint
 uv run awf bdd-run --driver fixture
 uv run awf workflow-fixture-test

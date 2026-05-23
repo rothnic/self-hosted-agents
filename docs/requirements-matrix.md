@@ -34,6 +34,27 @@ The first user is the project owner as an engineer. The working assumptions are:
 | R8 | Roadmap learning loop | Requirements should evolve as prototypes reveal issues | Review notes update specs and backlog |
 | R9 | Low custom critical infrastructure | Avoid rebuilding platform capabilities mature tools normally provide | Platform capabilities are provided or intentionally owned |
 
+## Functional Needs Map
+
+Every candidate must be evaluated against a high-level functional representation of the system needs before scoring
+or promotion. A functional area may be provided by one framework feature, an observability product, a separate service,
+or a small amount of app-local glue. The comparison should name those provider components explicitly.
+
+| Functional Area | Minimum Need | Provider Mapping Evidence | Extra Features To Score |
+| --- | --- | --- | --- |
+| Agent orchestration | Represent the workflow as inspectable steps | Framework graph, runtime, or app-local pipeline | Branching, retries, persistence, skills, or approval hooks |
+| Tool and context access | Safely call tools over project context | Tool APIs, DI, MCP, retrieval connectors, or typed adapters | Connectors, approval policy, schemas, or capability bundles |
+| Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, traces, or framework tracing | Cost tracking, failure views, eval dashboards, OTel export, or local UI |
+| Evaluation | Rerun and score comparable behavior | Deterministic checks, eval datasets, framework evals, or custom scorer | Regression history, trace-linked scores, judges, or annotation workflows |
+| Evidence storage | Preserve run, trace, eval, setup, and gaps | Repo artifacts, observability backend, eval store, or exports | Cross-run comparison UI, searchable evidence, or reports |
+| Durable execution | Recover or resume long-running workflows | Persistence, Temporal, DBOS, Prefect, Restate, queues, or local state | Retries, human waits, distributed workers, or hosted workers |
+| Operator experience | Keep setup and debugging manageable | Bootstrap scripts, service topology, local UI, documented recovery | Single-command local stack, low service count, or diagnostics |
+| Scalability path | Show how the slice becomes a durable service | Deployment target, storage model, runtime model, and boundaries | Microservice deployment, tenancy controls, or supported hosting |
+
+Scoring rule: if a candidate provides significant useful features inside a functional area without adding custom
+critical infrastructure, record them as positive scoring evidence. If a candidate requires the project to build a
+missing provider component, record that as a custom critical infrastructure warning.
+
 ## Candidate Solution Paths
 
 | Candidate | Fit Today | Primary Evidence To Gather | Current Risk |
@@ -41,6 +62,7 @@ The first user is the project owner as an engineer. The working assumptions are:
 | LangGraph Python plus Langfuse | Strong Python orchestration plus self-hostable LLM observability | Trace quality, eval workflow, setup effort | Integration depth must be proven |
 | LangGraph Python plus Phoenix | Strong Python and OpenInference-style observability path | Local tracing, eval quality, app instrumentation | Deferred until dev experience is better understood |
 | Python app plus MLflow tracing | Strong Python lifecycle and broader experiment tracking | Trace/eval ergonomics for agent workflows | Less specialized LLM observability UX |
+| Pydantic AI plus Logfire/OTel | Python-native typed agents with evals and durability | Typed ergonomics, evals, OTel evidence, runtime fit | Newer framework; fit needs demo proof |
 | Mastra TypeScript plus shared contracts | Useful contrast with a TypeScript-native agent framework | Cross-language cost and feature parity | Lower fit with Python preference |
 | LangSmith baseline | Best-known LangChain/LangGraph comparison point | Feature expectations and integration baseline | Self-hosted access may require Enterprise |
 
@@ -48,17 +70,17 @@ The first user is the project owner as an engineer. The working assumptions are:
 
 Legend: `High` means likely strong fit; `Medium` means plausible but needs proof; `Low` means weak fit or non-primary.
 
-| Requirement | LangGraph + Langfuse | LangGraph + Phoenix | Python + MLflow | Mastra TS | LangSmith Baseline |
-| --- | --- | --- | --- | --- | --- |
-| R1 Python-first path | High | High | High | Low | High |
-| R2 Local/self-hostable observability | High | High | Medium | Medium | Low for this project |
-| R3 Evaluation/regression support | Medium | High | Medium | Medium | High |
-| R4 Inspectable orchestration | High | High | Medium | Medium | High |
-| R5 Shared comparison harness | High | High | High | High | Medium |
-| R6 Low operator burden | Medium | Medium | Medium | Medium | Low for self-hosted |
-| R7 Scalable architecture path | Medium | Medium | Medium | Medium | High |
-| R8 Roadmap learning loop | High | High | High | High | Medium |
-| R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | High if approved |
+| Requirement | LangGraph + Langfuse | LangGraph + Phoenix | Python + MLflow | Pydantic AI + Logfire/OTel | Mastra TS | LangSmith Baseline |
+| --- | --- | --- | --- | --- | --- | --- |
+| R1 Python-first path | High | High | High | High | Low | High |
+| R2 Local/self-hostable observability | High | High | Medium | Medium | Medium | Low for this project |
+| R3 Evaluation/regression support | Medium | High | Medium | High | Medium | High |
+| R4 Inspectable orchestration | High | High | Medium | Medium | Medium | High |
+| R5 Shared comparison harness | High | High | High | High | High | Medium |
+| R6 Low operator burden | Medium | Medium | Medium | Medium | Medium | Low for self-hosted |
+| R7 Scalable architecture path | Medium | Medium | Medium | High | Medium | High |
+| R8 Roadmap learning loop | High | High | High | High | High | Medium |
+| R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | Medium | High if approved |
 
 ## Initial Recommendation
 
@@ -66,16 +88,108 @@ Start by comparing Python-first options before investing deeply in TypeScript or
 
 Recommended first implementation slice:
 
-1. Define one shared agent workflow contract.
-2. Implement it in `apps/langgraph-python/`.
-3. Instrument it with one local/self-hostable observability path.
-4. Capture setup effort, trace quality, eval support, and gaps in this matrix.
+1. Build `apps/langgraph-python/` as the first candidate app.
+2. Use LangGraph Python for orchestration and Langfuse as the first self-hostable observability target.
+3. Prove the shared comparable-agent workflow before adding broader product behavior.
+4. Capture the functional needs map, setup effort, trace quality, evaluation support, operating burden, and gaps in this
+   matrix.
 
 Recommended first observability comparison:
 
 1. Start with Langfuse integration depth for LangGraph Python.
 2. Keep Phoenix deferred until developer experience is better understood.
 3. Keep MLflow tracing as a second Python option if lifecycle/evaluation needs dominate.
+4. Research Pydantic AI plus Logfire/OpenTelemetry as the next Python-first candidate before creating the third
+   candidate app lane.
+
+## First Candidate Slice Proposal
+
+Candidate app id: `langgraph-python`.
+
+Stack under evaluation: LangGraph Python plus Langfuse.
+
+Primary purpose: prove whether a Python-first agent workflow can produce decision-ready implementation-slice output
+with inspectable local or self-hostable run evidence, without assuming LangSmith approval.
+
+Shared behavior to prove: the comparable-agent workflow in
+`tests/workflow/features/comparable_agent_workflow.feature`. The demo should accept a product objective, constraints,
+and project context, then return a concise recommendation with alternatives, explicit questions, and an acceptance
+check.
+
+First-slice demo boundary:
+
+- One LangGraph workflow that turns structured project context into a next-slice recommendation.
+- One deterministic or fixture-backed test path so the comparison harness can run without hidden hosted dependencies.
+- Langfuse instrumentation for the workflow run, including model/tool or node-level spans where available.
+- One evaluation output tied to the same run, even if the first scorer is deterministic and limited.
+- One run artifact that links the command, trace evidence, evaluation output, setup notes, and known gaps.
+
+This boundary scopes only the first `langgraph-python` candidate slice. The cross-candidate minimum demo is defined in
+`docs/comparison-evidence.md`.
+
+The first slice must also fill the functional needs map for `langgraph-python`, naming which parts of LangGraph,
+Langfuse, shared test assets, and app-local code provide each required function.
+
+Out of scope for the first slice:
+
+- A full self-hosted production Langfuse deployment.
+- Multi-agent scheduling, durable workers, or background orchestration beyond the single comparable workflow.
+- Declaring LangGraph plus Langfuse as the final platform winner.
+- Implementing Phoenix, MLflow, Mastra, or LangSmith comparison code in the same slice.
+
+Promotion questions for the next roadmap review:
+
+1. Is the Langfuse trace readable enough to debug node decisions and failure context?
+2. Does the evaluation output attach cleanly to the same run evidence reviewers inspect?
+3. Does local setup stay reasonable for one engineer, or does service count become the main risk?
+4. Which evidence gaps must be closed before building the second comparison candidate?
+
+## Second Candidate Slice Proposal
+
+Candidate app id: `mastra-ts`.
+
+Stack under evaluation: Mastra TypeScript plus the shared comparison contract.
+
+Primary purpose: provide a cross-language contrast to the Python-first LangGraph slice. This candidate should test
+whether a TypeScript-native agent framework reduces orchestration, observability, evaluation, or workflow glue enough
+to justify the language and maintenance cost for a Python-preferring owner.
+
+Useful contrast against `langgraph-python`:
+
+- Framework-integrated agent and workflow primitives versus Python LangGraph orchestration.
+- Built-in or framework-native observability/export paths versus explicit Langfuse instrumentation in Python.
+- TypeScript package and runtime operations versus Python app setup and local service expectations.
+- Different tradeoffs for future web UI, deployment, and service composition.
+
+Second-slice demo boundary:
+
+- Implement the same comparable-agent workflow after the first Python slice has produced reviewable evidence.
+- Use the same objective, constraints, project-context input shape, and decision-ready output expectations.
+- Capture trace, evaluation, setup, and gap evidence in the same format as `langgraph-python`.
+- Record any cross-language friction that affects maintenance, test ergonomics, or shared-contract reuse.
+
+Out of scope for the second candidate:
+
+- Replacing the Python-first preference before implementation evidence exists.
+- Building a broader TypeScript product surface or web UI.
+- Using Mastra-specific behavior that cannot be compared through the shared contract.
+- Treating easier demo setup as sufficient if observability, evaluation, or operating evidence is weaker.
+
+Promotion questions for the roadmap review after both slices:
+
+1. Does Mastra reduce custom glue enough to offset TypeScript ownership cost?
+2. Are its traces and evaluation outputs comparable to the LangGraph plus Langfuse evidence?
+3. Does the shared contract remain clean across Python and TypeScript without app-internal coupling?
+4. Should the third candidate stay Python-first, such as MLflow or Phoenix, or should the roadmap deepen the stronger
+   of the first two slices?
+
+## Next Python Candidate Research
+
+Initial bounded research on 2026-05-19 points to Pydantic AI plus Logfire or OpenTelemetry as the next Python-first
+candidate to evaluate after the approved LangGraph Python slice. It appears more aligned than AutoGen for new work
+because AutoGen is in maintenance mode, and more directly agent-runtime-focused than LlamaIndex unless the next product
+decision centers on data/RAG-heavy workflows. LlamaIndex remains a strong fallback candidate if document and retrieval
+capabilities become the dominant functional area.
 
 ## Roadmap Review Questions
 
@@ -84,7 +198,7 @@ These questions should be asked during the next CEO-level roadmap review:
 1. Should the first prototype optimize for fastest local demo or best long-term observability architecture?
 2. Is LangGraph Python the right first orchestration candidate, or should a simpler Python app establish the harness?
 3. What evidence would justify reopening Phoenix as an immediate observability implementation?
-4. What minimum demo would convince us the comparison is producing useful evidence?
+4. Does the minimum comparable demo in `docs/comparison-evidence.md` produce enough evidence for a roadmap decision?
 
 ## Update Rules
 

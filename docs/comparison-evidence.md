@@ -11,6 +11,43 @@ evaluations, setup, and known gaps.
 Do not treat research notes or framework claims as implementation evidence. A candidate app only has comparable evidence
 after the shared behavior contract runs and the artifacts below can be reviewed from repo state or linked run outputs.
 
+## Minimum Comparable Demo
+
+The minimum demo for candidate comparison is a single decision-ready agent workflow implemented by each candidate app.
+It is intentionally smaller than a product prototype and must stay comparable across stacks.
+
+The demo scenario is the shared behavior contract in
+`tests/workflow/features/comparable_agent_workflow.feature`: a project owner acting as an engineer provides a product
+objective, constraints, and project context, then receives a recommended next implementation slice.
+
+Each candidate demo must accept the same input categories:
+
+- product objective or roadmap goal;
+- constraints such as language preference, hosting limits, observability needs, and approval gates;
+- current project context such as active spec, ready work, and existing comparison evidence;
+- candidate app id and stack under evaluation.
+
+Each candidate demo must return the same output categories:
+
+- recommended next implementation slice;
+- alternatives and tradeoffs;
+- explicit human questions when direction is not safe to assume;
+- acceptance check for the proposed work;
+- links or paths to run, trace, evaluation, setup, and gap evidence.
+
+Minimum evidence for a comparable demo run:
+
+- one runnable command for the candidate demo;
+- one shared behavior-contract or fixture check proving the scenario;
+- one trace or trace export that makes the workflow inspectable;
+- one evaluation result tied to the same run;
+- setup and operating notes sufficient for another agent to rerun the demo;
+- gap notes for missing trace, evaluation, scalability, or operating evidence.
+
+The minimum demo does not include a production deployment, user-facing UI, multi-agent scheduling, durable background
+workers, a full observability cluster, or a final platform recommendation. Those are follow-up work after the roadmap
+review compares implementation evidence.
+
 ## Required Evidence
 
 Each candidate implementation slice must produce these evidence groups.

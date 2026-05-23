@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-19T14:57:37.543412+00:00",
+  "id": "awf-io2",
+  "work": {
+    "created_at": "2026-05-10T20:05:55.352934Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T010\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-io2",
+    "issue_type": "task",
+    "priority": 2,
+    "status": "open",
+    "title": "Produce a CEO-level roadmap review with recommendation, options, and targeted questions",
+    "updated_at": "2026-05-10T20:05:55.352934Z"
+  },
+  "worker_id": "codex"
+}

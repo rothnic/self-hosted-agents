@@ -289,6 +289,13 @@ def task_source_path(task: dict[str, Any]) -> str:
     return f"specs/{task['spec_id']}/tasks.md"
 
 
+def task_by_external_ref(external_ref: str) -> dict[str, Any] | None:
+    for task in collect_tasks():
+        if task_external_ref(task) == external_ref:
+            return task
+    return None
+
+
 def task_has_beads_evidence(task: dict[str, Any], issues: list[dict[str, Any]]) -> bool:
     task_id = task["id"]
     external_ref = task_external_ref(task)
@@ -1156,6 +1163,64 @@ def workflow_check(name: str) -> dict[str, Any]:
     return {"name": name, "command": command, "ok": code == 0, "data": data}
 
 
+def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
+    fixture = ROOT / "packages" / "comparison" / "fixtures" / "langgraph-python-decision-slice.json"
+    runner = ROOT / "apps" / "langgraph-python" / "run.py"
+    if not fixture.exists() or not runner.exists():
+        return {
+            "ok": False,
+            "command": f"{sys.executable} {rel(runner)} --fixture {rel(fixture)}",
+            "error": "missing runner or fixture",
+            "fixture": rel(fixture),
+            "runner": rel(runner),
+        }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_path = Path(tmpdir) / "langgraph-python-run.json"
+        command = [
+            sys.executable,
+            str(runner),
+            "--fixture",
+            str(fixture),
+            "--output",
+            str(output_path),
+            "--pretty",
+        ]
+        proc = run(command)
+        try:
+            artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            artifact = {"decode_error": str(exc)}
+        trace_path = output_path.with_suffix(".trace.json")
+        try:
+            trace = json.loads(trace_path.read_text(encoding="utf-8")) if trace_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            trace = {"decode_error": str(exc)}
+        required = {
+            "candidate_app_id": artifact.get("candidate_app_id") == "langgraph-python",
+            "recommendation": bool(artifact.get("recommendation", {}).get("next_slice")),
+            "alternatives": bool(artifact.get("alternatives")),
+            "questions": bool(artifact.get("questions")),
+            "acceptance_check": artifact.get("acceptance_check") == "uv run awf workflow-fixture-test",
+            "evidence_paths": bool(artifact.get("evidence_paths")),
+            "graph_transitions": bool(artifact.get("graph", {}).get("transitions")),
+            "trace_export": trace.get("provider") == "local-otel-json" and bool(trace.get("spans")),
+            "trace_linked": artifact.get("evidence_paths", {}).get("trace_evidence") == str(trace_path),
+        }
+        return {
+            "ok": proc.returncode == 0 and all(required.values()),
+            "command": " ".join(shlex.quote(item) for item in command),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout.strip(),
+            "stderr": proc.stderr.strip(),
+            "fixture": rel(fixture),
+            "output": str(output_path),
+            "trace_output": str(trace_path),
+            "required": required,
+            "artifact": artifact,
+            "trace": trace,
+        }
+
+
 def extract_acceptance_command(item: dict[str, Any] | None) -> str | None:
     if not item:
         return None
@@ -1740,6 +1805,192 @@ def claim_work_data(worker_id: str, write: bool) -> dict[str, Any]:
     return {"ok": False, "claimed": None, "ready_count": len(ready), "reason": "no unclaimed ready work"}
 
 
+def mark_task_done_text(text: str, task_id: str) -> tuple[str, bool]:
+    changed = False
+    lines = []
+    task_pattern = re.compile(rf"^- \[(?P<done>[ xX])\] {re.escape(task_id)}(?P<rest>.*)$")
+    for line in text.splitlines(keepends=True):
+        line_body = line[:-1] if line.endswith("\n") else line
+        newline = "\n" if line.endswith("\n") else ""
+        match = task_pattern.match(line_body)
+        if match and match.group("done").lower() != "x":
+            line = f"- [X] {task_id}{match.group('rest')}{newline}"
+            changed = True
+        lines.append(line)
+    return "".join(lines), changed
+
+
+def mark_task_done(task: dict[str, Any], write: bool) -> dict[str, Any]:
+    path = ROOT / task_source_path(task)
+    original = read_text(path)
+    updated, changed = mark_task_done_text(original, task["id"])
+    if changed and write:
+        path.write_text(updated, encoding="utf-8")
+    return {"path": rel(path), "task_id": task["id"], "changed": changed}
+
+
+def complete_work_data(issue_id: str | None, evidence: str, worker_id: str | None, write: bool) -> dict[str, Any]:
+    br = find_br()
+    if not br:
+        return {"ok": False, "error": "Beads Rust br is unavailable"}
+
+    item = issue_by_id(issue_id) if issue_id else current_acceptance_item()
+    if not item:
+        return {"ok": False, "error": "no issue id supplied and no active claim or ready work found"}
+
+    work = item.get("work") if isinstance(item.get("work"), dict) else item
+    target_issue_id = str(work.get("id", ""))
+    issue = issue_by_id(target_issue_id)
+    if not issue:
+        return {"ok": False, "error": f"issue {target_issue_id or '<unknown>'} not found"}
+
+    external_ref = issue.get("external_ref") or work.get("external_ref")
+    if not external_ref:
+        return {"ok": False, "issue_id": target_issue_id, "error": "issue has no external_ref"}
+    task = task_by_external_ref(str(external_ref))
+    if not task:
+        return {"ok": False, "issue_id": target_issue_id, "external_ref": external_ref, "error": "linked task not found"}
+
+    acceptance_command = extract_acceptance_command(issue) or extract_acceptance_command(work)
+    acceptance = run_acceptance_command(acceptance_command)
+    if not acceptance["ok"]:
+        return {
+            "ok": False,
+            "issue_id": target_issue_id,
+            "external_ref": external_ref,
+            "acceptance": acceptance,
+            "error": "acceptance check failed; no completion state was written",
+        }
+
+    comment_text = evidence.strip() or (
+        f"Completion evidence recorded {datetime.now(timezone.utc).date().isoformat()}. "
+        f"Acceptance passed: {acceptance_command}."
+    )
+    comment = None
+    close = None
+    task_update = mark_task_done(task, write=False)
+    state_lint = {"ok": True, "skipped": True}
+    sync = None
+
+    if write:
+        comment_proc = run(
+            [br, "comments", "add", target_issue_id, "--author", worker_id or "awf", "--message", comment_text, "--json"]
+        )
+        comment = {
+            "returncode": comment_proc.returncode,
+            "stdout": comment_proc.stdout.strip(),
+            "stderr": comment_proc.stderr.strip(),
+        }
+        if comment_proc.returncode != 0:
+            return {
+                "ok": False,
+                "issue_id": target_issue_id,
+                "acceptance": acceptance,
+                "comment": comment,
+                "error": "failed to record Beads evidence; task and issue were left unchanged",
+            }
+
+        close_reason = f"Completed {task['id']} through awf complete-work. Acceptance passed: {acceptance_command}."
+        close_proc = run([br, "close", target_issue_id, "--reason", close_reason, "--json"])
+        close = {
+            "returncode": close_proc.returncode,
+            "stdout": close_proc.stdout.strip(),
+            "stderr": close_proc.stderr.strip(),
+        }
+        if close_proc.returncode != 0:
+            return {
+                "ok": False,
+                "issue_id": target_issue_id,
+                "acceptance": acceptance,
+                "comment": comment,
+                "close": close,
+                "error": "failed to close Beads issue; task was left unchanged",
+            }
+
+        task_update = mark_task_done(task, write=True)
+        sync_proc = run([br, "sync", "--flush-only"])
+        sync = {
+            "returncode": sync_proc.returncode,
+            "stdout": sync_proc.stdout.strip(),
+            "stderr": sync_proc.stderr.strip(),
+        }
+        code, state_lint_data = workflow_state_lint_result()
+        state_lint = {"ok": code == 0, "data": state_lint_data}
+
+    ok = acceptance["ok"] and state_lint.get("ok", False)
+    return {
+        "ok": ok,
+        "write": write,
+        "issue_id": target_issue_id,
+        "external_ref": external_ref,
+        "task_id": task["id"],
+        "acceptance": acceptance,
+        "comment": comment,
+        "close": close,
+        "task_update": task_update,
+        "sync": sync,
+        "state_lint": state_lint,
+        "next_action": "commit completion checkpoint" if write and ok else "rerun with --write to complete work",
+    }
+
+
+def workflow_fixture_result_detail(result: dict[str, Any]) -> str:
+    data = result.get("data")
+    if not isinstance(data, dict):
+        return ""
+    if data.get("error"):
+        return str(data["error"])
+    if data.get("errors"):
+        return "; ".join(str(error) for error in data["errors"][:3])
+    if data.get("spec_errors"):
+        return "; ".join(str(error) for error in data["spec_errors"][:3])
+    claim = data.get("claim")
+    if isinstance(claim, dict):
+        if claim.get("reason"):
+            return str(claim["reason"])
+        if claim.get("dry_run") is False and claim.get("claimed", {}).get("path"):
+            return f"using active claim {claim['claimed']['path']}"
+        if claim.get("dry_run") is True:
+            return "previewed a dry-run claim"
+    if data.get("next_action"):
+        return str(data["next_action"])
+    if "ok" in data:
+        return f"nested ok={data['ok']}"
+    return ""
+
+
+def workflow_fixture_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    failed = [
+        {
+            "name": str(result.get("name", "<unnamed>")),
+            "detail": workflow_fixture_result_detail(result),
+        }
+        for result in results
+        if not result.get("ok")
+    ]
+    return {
+        "total": len(results),
+        "passed": len(results) - len(failed),
+        "failed": len(failed),
+        "failed_results": failed,
+    }
+
+
+def worker_loop_non_mutating(worker: dict[str, Any], claim_paths_before: set[str], claim_paths_after: set[str]) -> bool:
+    if claim_paths_before != claim_paths_after:
+        return False
+    claim = worker.get("claim")
+    if not isinstance(claim, dict) or not claim.get("ok"):
+        return False
+    if claim.get("dry_run") is True:
+        return True
+    claimed = claim.get("claimed")
+    if not isinstance(claimed, dict):
+        return False
+    path = claimed.get("path")
+    return claim.get("dry_run") is False and isinstance(path, str) and path in claim_paths_before
+
+
 def cron_tick_data(role: str, worker_id: str | None, write: bool) -> dict[str, Any]:
     health = health_status_data(deep=False)
     logged = []
@@ -1948,6 +2199,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     results.append({"name": "root BDD lint passes", "ok": code == 0, "data": data})
     code, data = bdd_run_result("fixture")
     results.append({"name": "root fixture BDD driver run passes", "ok": code == 0, "data": data})
+    data = langgraph_python_candidate_smoke_result()
+    results.append(
+        {
+            "name": "langgraph python deterministic fixture app runs",
+            "ok": data["ok"],
+            "data": data,
+        }
+    )
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()
@@ -2022,6 +2281,24 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": {"errors": issue_metadata_errors([synthetic_issue])},
         }
     )
+    marked, changed = mark_task_done_text("- [ ] T123 [US1] Synthetic task\n", "T123")
+    results.append(
+        {
+            "name": "complete-work can mark one linked task complete",
+            "ok": changed and marked == "- [X] T123 [US1] Synthetic task\n",
+            "data": {"changed": changed, "text": marked},
+        }
+    )
+    synthetic_summary = workflow_fixture_summary(
+        [{"name": "synthetic failure", "ok": False, "data": {"errors": ["clear failure detail"]}}]
+    )
+    results.append(
+        {
+            "name": "workflow fixture summary exposes failed check detail",
+            "ok": synthetic_summary["failed_results"][0]["detail"] == "clear failure detail",
+            "data": synthetic_summary,
+        }
+    )
     if include_orchestration:
         verify_health = verify_data("health", write=False)
         results.append(
@@ -2079,6 +2356,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "data": orchestrator,
             }
         )
+        claim_paths_before = {rel(path) for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))}
         worker = automation_loop_data(
             role="worker",
             write=False,
@@ -2087,11 +2365,16 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             spec_id="002-solution-comparison-roadmap",
             phase="Phase 3",
         )
+        claim_paths_after = {rel(path) for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))}
         results.append(
             {
-                "name": "worker loop previews one claim without closing work",
-                "ok": worker["ok"] and worker["claim"].get("dry_run") is True,
-                "data": worker,
+                "name": "worker loop reports claim state without mutating claims",
+                "ok": worker["ok"] and worker_loop_non_mutating(worker, claim_paths_before, claim_paths_after),
+                "data": {
+                    **worker,
+                    "claim_paths_before": sorted(claim_paths_before),
+                    "claim_paths_after": sorted(claim_paths_after),
+                },
             }
         )
         integrator = automation_loop_data(
@@ -2126,7 +2409,8 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             + "\n",
             encoding="utf-8",
         )
-    data = {"ok": ok, "results": results}
+    summary = workflow_fixture_summary(results)
+    data = {"ok": ok, "summary": summary, "results": results}
     return (0 if ok else 1), data
 
 

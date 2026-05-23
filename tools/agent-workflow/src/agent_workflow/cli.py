@@ -58,6 +58,31 @@ def print_envelope(envelope: CommandEnvelope, json_output: bool) -> None:
             console.print("[green]No errors[/green]")
         for warning in data.get("warnings", []):
             console.print(f"[yellow]- warning: {warning}[/yellow]")
+    elif "results" in data:
+        summary = data.get("summary", {})
+        if summary:
+            console.print(
+                f"[bold]Results:[/bold] {summary.get('passed', 0)}/{summary.get('total', 0)} passed"
+            )
+        failure_details = {
+            item.get("name"): item.get("detail", "")
+            for item in summary.get("failed_results", [])
+            if isinstance(item, dict)
+        }
+        table = Table(title="Fixture Results")
+        table.add_column("Name")
+        table.add_column("OK")
+        table.add_column("Detail")
+        for item in data["results"]:
+            ok = bool(item.get("ok"))
+            detail = failure_details.get(item.get("name"), "")
+            table.add_row(str(item.get("name", "")), "yes" if ok else "no", detail)
+        console.print(table)
+        if failure_details:
+            console.print("[red]Failed checks:[/red]")
+            for name, detail in failure_details.items():
+                suffix = f": {detail}" if detail else ""
+                console.print(f"[red]- {name}{suffix}[/red]")
 
 
 def run_core_tuple(command: str, fn: Any, *, json_output: bool) -> int:
@@ -302,6 +327,28 @@ def claim_work(
     data = core.claim_work_data(worker_id=worker_id, write=write)
     print_envelope(
         CommandEnvelope(ok=data["ok"], command="claim-work", summary=data.get("reason", "Claim result."), data=data),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
+@app.command("complete-work")
+def complete_work(
+    issue_id: str | None = typer.Option(None, "--issue-id", help="Beads issue id. Defaults to active claim."),
+    evidence: str = typer.Option("", "--evidence", help="Evidence text to add before closing the issue."),
+    worker_id: str | None = typer.Option(None, "--worker-id", help="Evidence author. Defaults to awf."),
+    write: bool = typer.Option(False, "--write", help="Write Beads evidence, close issue, and mark the task complete."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Complete one claimed work item without task/Beads drift."""
+    data = core.complete_work_data(issue_id=issue_id, evidence=evidence, worker_id=worker_id, write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="complete-work",
+            summary=data.get("next_action", "completion failed"),
+            data=data,
+        ),
         json_output,
     )
     raise typer.Exit(0 if data["ok"] else 1)
