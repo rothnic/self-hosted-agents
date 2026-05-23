@@ -1258,11 +1258,12 @@ def issue_by_id(issue_id: str) -> dict[str, Any] | None:
 
 def active_claims() -> list[dict[str, Any]]:
     claims = []
+    issues_by_id = {str(issue.get("id")): issue for issue in beads_issues()}
     for path in sorted((ROOT / ".agent-runs" / "claims").glob("*.json")):
         data = read_json(path)
         if not data or data.get("error"):
             continue
-        issue = issue_by_id(str(data.get("id", "")))
+        issue = issues_by_id.get(str(data.get("id", "")))
         if issue and issue.get("status") == "open":
             data["path"] = rel(path)
             data["issue"] = issue
@@ -1279,6 +1280,26 @@ def active_claims_for_status(status: dict[str, Any]) -> list[dict[str, Any]]:
         key=lambda item: str(item.get("claimed_at", "")),
         reverse=True,
     )
+
+
+def claims_for_worker(claims: list[dict[str, Any]], worker_id: str | None) -> list[dict[str, Any]]:
+    worker = worker_id or "worker"
+    return [claim for claim in claims if claim.get("worker_id") == worker]
+
+
+def unclaimed_work_items(items: list[dict[str, Any]], claims: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    claimed_ids = {str(claim.get("id")) for claim in claims}
+    return [
+        item
+        for item in items
+        if str(item.get("id") or item.get("title") or "unknown") not in claimed_ids
+    ]
+
+
+def worker_branch_for_work(work: dict[str, Any]) -> str:
+    work_id = str(work.get("id") or work.get("title") or "work")
+    worker_slug = re.sub(r"[^a-z0-9]+", "-", str(work.get("title") or "work").lower()).strip("-")[:40]
+    return f"codex/{work_id}-{worker_slug}" if worker_slug else f"codex/{work_id}"
 
 
 def current_acceptance_item() -> dict[str, Any] | None:
@@ -1706,11 +1727,13 @@ def automation_loop_data(
         ready = ready_work_data()
         scoped_ready = scoped_issue_items(status, ready.get("ready", []))
         active_scoped_claims = active_claims_for_status(status)
-        if active_scoped_claims:
-            active_claim = active_scoped_claims[0]
+        worker_claims = claims_for_worker(active_scoped_claims, worker_id) if worker_id else []
+        if worker_claims:
+            active_claim = worker_claims[0]
             active_work = active_claim.get("work") if isinstance(active_claim.get("work"), dict) else {}
-            worker_slug = re.sub(r"[^a-z0-9]+", "-", active_work.get("title", "work").lower()).strip("-")[:40]
-            worker_branch = active_claim.get("worker_branch") or f"codex/{active_claim.get('id', 'work')}-{worker_slug}"
+            worker_branch = active_claim.get("worker_branch") or worker_branch_for_work(
+                active_work or {"id": active_claim.get("id"), "title": "work"}
+            )
             claim = {
                 "ok": True,
                 "claimed": active_claim,
@@ -1725,13 +1748,35 @@ def automation_loop_data(
                 "worker_branch": worker_branch,
                 "next_action": "worker-loop should implement the claimed ticket on its worker branch",
             }
+        unclaimed_ready = unclaimed_work_items(scoped_ready, active_scoped_claims)
+        if not unclaimed_ready:
+            claim = {
+                "ok": True,
+                "claimed": None,
+                "dry_run": not write,
+                "ready_count": len(scoped_ready),
+                "active_claim_count": len(active_scoped_claims),
+            }
+            next_action = (
+                "worker-loop should continue active claims"
+                if active_scoped_claims
+                else status["next_action"]
+            )
+            return {
+                "ok": True,
+                "role": role,
+                "increment": status,
+                "claim": claim,
+                "worker_branch": None,
+                "next_action": next_action,
+            }
         if not scoped_ready:
             return {"ok": True, "role": role, "increment": status, "next_action": status["next_action"], "claim": None}
-        chosen = scoped_ready[0]
+        chosen = unclaimed_ready[0]
         worker = worker_id or f"worker-{chosen.get('id', 'unassigned')}"
         claim = claim_work_data(worker_id=worker, write=write, work_item=chosen, ready_items=scoped_ready)
-        worker_slug = re.sub(r"[^a-z0-9]+", "-", chosen.get("title", "work").lower()).strip("-")[:40]
-        worker_branch = f"codex/{chosen.get('id', 'work')}-{worker_slug}"
+        claimed_work = claim.get("claimed", {}).get("work") if isinstance(claim.get("claimed"), dict) else None
+        worker_branch = worker_branch_for_work(claimed_work if isinstance(claimed_work, dict) else chosen)
         if write and claim.get("ok") and claim.get("claimed", {}).get("path"):
             claim_path_obj = ROOT / claim["claimed"]["path"]
             claim_data = read_json(claim_path_obj)
@@ -1764,17 +1809,20 @@ def automation_loop_data(
             "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
             "record evidence, and push the worker branch"
         )
-        claim = active_claims_for_status(status)
+        worker = worker_id or "worker"
+        active_scoped_claims = active_claims_for_status(status)
+        claim = claims_for_worker(active_scoped_claims, worker)
+        scoped_ready = scoped_issue_items(status, ready_work_data().get("ready", []))
+        unclaimed_ready = unclaimed_work_items(scoped_ready, active_scoped_claims)
         if claim:
             claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
             next_action = worker_action
         elif write:
-            scoped_ready = scoped_issue_items(status, ready_work_data().get("ready", []))
-            if scoped_ready:
+            if unclaimed_ready:
                 claim_result = claim_work_data(
-                    worker_id=worker_id or "worker",
+                    worker_id=worker,
                     write=True,
-                    work_item=scoped_ready[0],
+                    work_item=unclaimed_ready[0],
                     ready_items=scoped_ready,
                 )
                 next_action = worker_action
@@ -1782,24 +1830,43 @@ def automation_loop_data(
                 claim_result = None
                 next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
             else:
-                claim_result = {"ok": True, "claimed": None, "dry_run": False, "ready_count": 0}
-                next_action = f"worker idle; {status['next_action']}"
-        else:
-            ready = scoped_issue_items(status, ready_work_data().get("ready", []))
-            if ready:
                 claim_result = {
                     "ok": True,
-                    "claimed": {"work": ready[0], "worker_id": worker_id or "worker"},
+                    "claimed": None,
+                    "dry_run": False,
+                    "ready_count": len(scoped_ready),
+                    "active_claim_count": len(active_scoped_claims),
+                }
+                next_action = (
+                    "worker idle; all ready work is claimed by other workers"
+                    if active_scoped_claims
+                    else f"worker idle; {status['next_action']}"
+                )
+        else:
+            if unclaimed_ready:
+                claim_result = {
+                    "ok": True,
+                    "claimed": {"work": unclaimed_ready[0], "worker_id": worker},
                     "dry_run": True,
-                    "ready_count": len(ready),
+                    "ready_count": len(scoped_ready),
                 }
                 next_action = worker_action
             elif status["review_status"] == "ready-for-increment-review":
                 claim_result = None
                 next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
             else:
-                claim_result = {"ok": True, "claimed": None, "dry_run": True, "ready_count": 0}
-                next_action = f"worker idle; {status['next_action']}"
+                claim_result = {
+                    "ok": True,
+                    "claimed": None,
+                    "dry_run": True,
+                    "ready_count": len(scoped_ready),
+                    "active_claim_count": len(active_scoped_claims),
+                }
+                next_action = (
+                    "worker idle; all ready work is claimed by other workers"
+                    if active_scoped_claims
+                    else f"worker idle; {status['next_action']}"
+                )
         return {
             "ok": claim_result is None or bool(claim_result.get("ok")),
             "role": role,
@@ -2390,6 +2457,24 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "name": "workflow fixture summary exposes failed check detail",
             "ok": synthetic_summary["failed_results"][0]["detail"] == "clear failure detail",
             "data": synthetic_summary,
+        }
+    )
+    synthetic_claims = [
+        {"id": "awf-one", "worker_id": "worker-one", "claimed_at": "2026-05-23T20:00:00+00:00"},
+        {"id": "awf-two", "worker_id": "worker-two", "claimed_at": "2026-05-23T20:01:00+00:00"},
+    ]
+    worker_one_claims = claims_for_worker(synthetic_claims, "worker-one")
+    unclaimed_items = unclaimed_work_items(
+        [{"id": "awf-one", "title": "Already claimed"}, {"id": "awf-three", "title": "Unclaimed"}],
+        synthetic_claims,
+    )
+    results.append(
+        {
+            "name": "claim helpers keep worker ownership and unclaimed work separate",
+            "ok": len(worker_one_claims) == 1
+            and worker_one_claims[0]["id"] == "awf-one"
+            and [item["id"] for item in unclaimed_items] == ["awf-three"],
+            "data": {"worker_one_claims": worker_one_claims, "unclaimed_items": unclaimed_items},
         }
     )
     if include_orchestration:
