@@ -1716,19 +1716,17 @@ def automation_loop_data(
             "next_action": "worker-loop should implement the claimed ticket on its worker branch",
         }
     if role == "worker":
+        worker_action = (
+            "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
+            "record evidence, and push the worker branch"
+        )
         claim = active_claims()
         if claim:
             claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
-            next_action = (
-                "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
-                "record evidence, and push the worker branch"
-            )
+            next_action = worker_action
         elif write:
             claim_result = claim_work_data(worker_id=worker_id or "worker", write=True)
-            next_action = (
-                "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
-                "record evidence, and push the worker branch"
-            )
+            next_action = worker_action
         else:
             ready = ready_work_data().get("ready", [])
             if ready:
@@ -1738,10 +1736,7 @@ def automation_loop_data(
                     "dry_run": True,
                     "ready_count": len(ready),
                 }
-                next_action = (
-                    "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
-                    "record evidence, and push the worker branch"
-                )
+                next_action = worker_action
             elif status["review_status"] == "ready-for-increment-review":
                 claim_result = None
                 next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
