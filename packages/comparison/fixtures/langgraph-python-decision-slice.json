@@ -16,7 +16,7 @@
   "project_context": {
     "active_spec": "002-solution-comparison-roadmap",
     "comparison_contract": "tests/workflow/features/comparable_agent_workflow.feature",
-    "current_slice": "T014",
-    "next_expected_slice": "T015"
+    "current_slice": "T016",
+    "next_expected_slice": "T017"
   }
 }

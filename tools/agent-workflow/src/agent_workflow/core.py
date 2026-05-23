@@ -1191,20 +1191,32 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
         except json.JSONDecodeError as exc:
             artifact = {"decode_error": str(exc)}
         trace_path = output_path.with_suffix(".trace.json")
+        evaluation_path = output_path.with_suffix(".evaluation.json")
         try:
             trace = json.loads(trace_path.read_text(encoding="utf-8")) if trace_path.exists() else {}
         except json.JSONDecodeError as exc:
             trace = {"decode_error": str(exc)}
+        try:
+            evaluation = json.loads(evaluation_path.read_text(encoding="utf-8")) if evaluation_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            evaluation = {"decode_error": str(exc)}
         required = {
             "candidate_app_id": artifact.get("candidate_app_id") == "langgraph-python",
+            "run_id": bool(artifact.get("run_id")),
             "recommendation": bool(artifact.get("recommendation", {}).get("next_slice")),
             "alternatives": bool(artifact.get("alternatives")),
             "questions": bool(artifact.get("questions")),
             "acceptance_check": artifact.get("acceptance_check") == "uv run awf workflow-fixture-test",
             "evidence_paths": bool(artifact.get("evidence_paths")),
+            "command_used": "apps/langgraph-python/run.py" in artifact.get("command_used", ""),
             "graph_transitions": bool(artifact.get("graph", {}).get("transitions")),
             "trace_export": trace.get("provider") == "local-otel-json" and bool(trace.get("spans")),
             "trace_linked": artifact.get("evidence_paths", {}).get("trace_evidence") == str(trace_path),
+            "evaluation_export": evaluation.get("passed") is True and bool(evaluation.get("criteria")),
+            "evaluation_linked": artifact.get("evidence_paths", {}).get("evaluation_evidence") == str(evaluation_path),
+            "evaluation_correlated": evaluation.get("run_id") == artifact.get("run_id")
+            and evaluation.get("trace_id") == trace.get("trace_id"),
+            "gap_notes": bool(artifact.get("gaps")) and bool(artifact.get("evidence_paths", {}).get("gap_notes")),
         }
         return {
             "ok": proc.returncode == 0 and all(required.values()),
@@ -1215,9 +1227,11 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
             "fixture": rel(fixture),
             "output": str(output_path),
             "trace_output": str(trace_path),
+            "evaluation_output": str(evaluation_path),
             "required": required,
             "artifact": artifact,
             "trace": trace,
+            "evaluation": evaluation,
         }
 
 
