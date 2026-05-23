@@ -1516,18 +1516,8 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
             }
         )
     ready = ready_work_data()
-    child_refs = {item["external_ref"] for item in child_tickets if item.get("external_ref")}
-    child_ids = {item["ticket_id"] for item in child_tickets if item.get("ticket_id")}
-    scoped_ready = [
-        item
-        for item in ready.get("ready", [])
-        if item.get("external_ref") in child_refs or item.get("id") in child_ids
-    ]
-    scoped_blocked = [
-        item
-        for item in ready.get("blocked", [])
-        if item.get("external_ref") in child_refs or item.get("id") in child_ids
-    ]
+    scoped_ready = scoped_issue_items({"child_tickets": child_tickets}, ready.get("ready", []))
+    scoped_blocked = scoped_issue_items({"child_tickets": child_tickets}, ready.get("blocked", []))
     claims = active_claims()
     all_children_closed = child_tickets and all(
         item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
@@ -1761,8 +1751,8 @@ def automation_loop_data(
                 claim_result = None
                 next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
             else:
-                claim_result = {"ok": False, "claimed": None, "dry_run": False, "ready_count": 0}
-                next_action = "worker stopped"
+                claim_result = {"ok": True, "claimed": None, "dry_run": False, "ready_count": 0}
+                next_action = f"worker idle; {status['next_action']}"
         else:
             ready = scoped_issue_items(status, ready_work_data().get("ready", []))
             if ready:
@@ -1777,8 +1767,8 @@ def automation_loop_data(
                 claim_result = None
                 next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
             else:
-                claim_result = {"ok": False, "claimed": None, "dry_run": True, "ready_count": 0}
-                next_action = "worker stopped"
+                claim_result = {"ok": True, "claimed": None, "dry_run": True, "ready_count": 0}
+                next_action = f"worker idle; {status['next_action']}"
         return {
             "ok": claim_result is None or bool(claim_result.get("ok")),
             "role": role,
@@ -2418,6 +2408,25 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "name": "active orchestrator scopes claims to Phase 6 child tickets",
                 "ok": active_orchestrator["ok"] and active_claim_work.get("id") in active_child_ticket_ids,
                 "data": active_orchestrator,
+            }
+        )
+        idle_worker = automation_loop_data(
+            role="worker",
+            write=False,
+            worker_id="fixture-worker",
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 999",
+        )
+        idle_claim = idle_worker.get("claim") if isinstance(idle_worker.get("claim"), dict) else {}
+        results.append(
+            {
+                "name": "worker loop treats idle active increments as successful",
+                "ok": idle_worker["ok"]
+                and idle_worker["increment"]["review_status"] == "planning"
+                and idle_claim.get("ok") is True
+                and idle_claim.get("claimed") is None,
+                "data": idle_worker,
             }
         )
         increment_status = increment_status_data(None, "002-solution-comparison-roadmap", "Phase 3")
