@@ -254,6 +254,71 @@ because AutoGen is in maintenance mode, and more directly agent-runtime-focused 
 decision centers on data/RAG-heavy workflows. LlamaIndex remains a strong fallback candidate if document and retrieval
 capabilities become the dominant functional area.
 
+Follow-up bounded research on 2026-05-23 is recorded in
+`docs/research/pydantic-ai-logfire-functional-needs-2026-05-23.md`. It uses current primary docs for Pydantic AI,
+Logfire, Pydantic Evals, durable execution, and OpenTelemetry GenAI semantic conventions. The research does not declare
+a final platform winner and does not create a new candidate app lane.
+
+### Pydantic AI Plus Logfire/OTel Research Update (T018)
+
+Evidence status: research evidence only. Pydantic AI plus Logfire/OpenTelemetry looks like a strong Python-first
+candidate to keep in the comparison set, but it has not produced implementation evidence from this repo's shared
+fixture, trace, evaluation, setup, and gap contract.
+
+Research checked on 2026-05-23:
+
+- **Pydantic AI fit**: current docs describe a Python agent framework for production-grade GenAI applications and
+  workflows, with model-agnostic support, type-safe development, Logfire observability, evals, capabilities, MCP, A2A,
+  human approval, durable execution, streaming outputs, and graph support.
+- **Observability fit**: Pydantic AI instrumentation uses OpenTelemetry and can export to Logfire or another
+  OTel-compatible backend. Logfire adds AI-specific panels for conversations, token and cost monitoring, tool-call
+  inspection, streaming, multi-turn traces, SQL access, and MCP access to telemetry.
+- **Evaluation fit**: Pydantic Evals is code-first, supports datasets, cases, experiments, tasks, evaluators,
+  deterministic/code-based checks, custom evaluators, report serialization, Logfire visualization, and span-based
+  evaluation over OpenTelemetry traces.
+- **Durable execution fit**: Pydantic AI documents official integrations with Temporal, DBOS, Prefect, and Restate for
+  progress preservation, failure recovery, long-running asynchronous workflows, and human-in-the-loop workflows.
+- **Portability caveat**: OpenTelemetry GenAI semantic conventions are still in development. A future implementation
+  slice should record instrumentation format/version and avoid brittle assertions against unstable attribute names.
+
+### Pydantic AI Functional Needs Research
+
+| Functional Area | Pydantic AI Plus Logfire/OTel Research Evidence | Research Fit | Explicit Gaps |
+| --- | --- | --- | --- |
+| Agent orchestration | Agents, capabilities, and graph support are documented first-class features | Strong | Needs runnable shared workflow evidence before implementation scoring |
+| Tool and context access | Tool/dependency injection, capabilities, MCP, A2A, and approval hooks map to typed adapters | Strong | Repo-local tool security and approval boundaries are untested |
+| Observability | Pydantic AI emits OTel instrumentation; Logfire provides first-party AI observability | Strong | Logfire hosting posture and generic local OTel backend quality need proof |
+| Evaluation | Pydantic Evals supports code-first datasets, evaluators, experiments, serialization, and span-based evals | Strong | Needs fixture artifacts tied to run and trace ids |
+| Evidence storage | Evals can serialize reports; Logfire offers UI and SQL access to telemetry | Medium | Repo-local artifacts remain required without hosted credentials |
+| Durable execution | Official Temporal, DBOS, Prefect, and Restate integrations map to recovery needs | Strong | Runtime selection is a separate architecture decision |
+| Operator experience | Python-first typed API and first-party instrumentation may reduce custom glue | Medium | Service count, secrets, local UI, and recovery steps are unmeasured |
+| Scalability path | Durable integrations plus OTel export provide a plausible production route | Strong | Deployment topology and storage model need implementation evidence |
+
+### Pydantic AI Research Rubric View
+
+These are directional research scores only. They are not comparable implementation scores until a candidate app produces
+the evidence required by `docs/comparison-evidence.md`.
+
+| Criterion | Directional Score | Evidence Basis | Gap Or Cap |
+| --- | --- | --- | --- |
+| Infrastructure ownership | 3 | Logfire, OTel, Pydantic Evals, and durable integrations cover several platform needs | Cap to 2 if no local OTel viewer/store is selected |
+| Observability | 3 | First-party Logfire path plus generic OTel export and GenAI semantic conventions | OTel GenAI conventions are still in development; local review path must be proven |
+| Evaluation | 3 | Code-first eval datasets, evaluators, experiments, serialization, and span-based eval support | Must prove trace-linked deterministic fixture evals in repo artifacts |
+| Scalability | 3 | Official durable execution integrations offer clear durable workflow options | Runtime choice and service topology remain unapproved |
+| Operating effort | 2 | Python-first ergonomics are promising | Real bootstrap, secrets, service count, and failure recovery are unknown |
+
+### Pydantic AI Promotion Gaps
+
+- Do not promote Pydantic AI beyond research-candidate status until it runs the same comparable-agent workflow and emits
+  repo-local run, trace, evaluation, setup, and gap artifacts.
+- Preserve deterministic fixture validation without hosted credentials. Logfire or any hosted backend must be additive,
+  not required by `uv run awf workflow-fixture-test`.
+- Verify a generic local OTel backend path before depending on Logfire-specific UI or hosted telemetry.
+- Treat durable execution as follow-up architecture evidence; do not silently choose Temporal, DBOS, Prefect, or Restate
+  as part of the first Pydantic AI slice.
+- Record the exact Pydantic AI instrumentation format/version because OpenTelemetry GenAI conventions are still in
+  development.
+
 ## Roadmap Review Questions
 
 These questions should be asked during the next CEO-level roadmap review:

@@ -34,4 +34,4 @@
 - [X] T015 [US3] Add Langfuse or OpenTelemetry trace evidence capture for the LangGraph Python slice
 - [X] T016 [US3] Add evaluation output and run artifact capture for the LangGraph Python slice
 - [X] T017 [US3] Update the requirements matrix with LangGraph Python evidence, scores, and gaps
-- [ ] T018 [US3] Research Pydantic AI plus Logfire/OpenTelemetry against the functional needs map
+- [X] T018 [US3] Research Pydantic AI plus Logfire/OpenTelemetry against the functional needs map
