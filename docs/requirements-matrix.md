@@ -144,6 +144,69 @@ Promotion questions for the next roadmap review:
 3. Does local setup stay reasonable for one engineer, or does service count become the main risk?
 4. Which evidence gaps must be closed before building the second comparison candidate?
 
+## LangGraph Python Evidence Update (T017)
+
+Evidence status: preliminary implementation evidence exists for `langgraph-python`, but this does not select
+LangGraph plus Langfuse as the final platform. The current evidence proves the first deterministic fixture path and
+identifies the gaps that must be closed before deeper roadmap promotion.
+
+Evidence inspected on 2026-05-23:
+
+- **Run artifact**: the fixture command produced `run-ee283d60c76a866b84bfaa53` in deterministic fixture mode.
+
+  ```bash
+  python3 apps/langgraph-python/run.py \
+    --fixture packages/comparison/fixtures/langgraph-python-decision-slice.json \
+    --output /tmp/langgraph-python-run.json \
+    --pretty
+  ```
+
+- **Trace artifact**: `/tmp/langgraph-python-run.trace.json` used provider `local-otel-json`, trace id
+  `trace-fe8ff3cbf135e5b0e7e81cf3`, and four spans for `load_context`, `map_functional_needs`, `select_slice`, and
+  `format_run`. Langfuse ingestion was not sent because fixture mode runs without hosted or self-hosted credentials.
+- **Evaluation artifact**: `/tmp/langgraph-python-run.evaluation.json` passed deterministic assertion scoring with
+  score `5/5`, evaluation id `eval-c7acb33558860147`, and the same run and trace ids.
+- **Setup notes**: `apps/langgraph-python/README.md` documents the repo-root run command and sibling trace/evaluation
+  artifact behavior.
+- **Gap notes**: `apps/langgraph-python/implementation-plan.md` keeps durable execution, persistence, retries,
+  long-running recovery, hosted Langfuse ingestion, dataset evals, and model-judge evals outside the first slice.
+
+### Functional Needs Evidence
+
+| Functional Area | LangGraph Python Evidence | Preliminary Score | Explicit Gaps |
+| --- | --- | --- | --- |
+| Agent orchestration | Four inspectable graph node spans | 3 | Real model/tool nodes, branching, retries, interrupts, and checkpointing are not proven |
+| Tool and context access | Fixture context adapter maps objective and repo context into graph state | 3 | MCP/tool approval boundaries and reusable schemas remain future work |
+| Observability | Local OTel-style trace is linked from the run artifact | 3 | Langfuse ingestion, trace UI, token/cost spans, model-call spans, and failure views are not proven |
+| Evaluation | Deterministic assertion evaluation ties to the same run and trace ids | 3 | Datasets, model judges, annotations, and trace-linked eval dashboards are not proven |
+| Evidence storage | Run artifact links fixture, trace, evaluation, setup, and gap evidence | 3 | No searchable cross-run store or report UI exists |
+| Durable execution | First slice records durable runtime as an explicit gap | 2 | Persistence, retries, queues, schedulers, and long-running recovery are unimplemented |
+| Operator experience | One local command runs without LangSmith or hosted Langfuse credentials | 3 | Hosted/self-hosted Langfuse setup effort and recovery path are unmeasured |
+| Scalability path | App boundary and gap notes describe future service/storage/worker boundaries | 2 | Deployment topology, storage model, tenancy, and worker operations are unproven |
+
+### Preliminary Rubric Scores
+
+These scores use `docs/evaluation-criteria.md` and are intentionally provisional.
+
+| Criterion | Score | Evidence Basis | Gap Or Cap |
+| --- | --- | --- | --- |
+| Infrastructure ownership | 2 | Fixture mode avoids hosted dependencies and records required artifacts | Workers, eval store, trace UI, and cross-run storage need platform proof |
+| Observability | 3 | Local trace export captures graph state transitions and correlates to the run | Langfuse ingestion and richer model/tool telemetry are not proven |
+| Evaluation | 3 | Deterministic scorer passes and links to run and trace evidence | Datasets, judges, annotations, and regression history are not proven |
+| Scalability | 2 | The app boundary is clean enough for later service extraction | Persistence, storage, deployment topology, and recovery are not implemented |
+| Operating effort | 3 | Fixture validation runs locally with one command and no hosted credentials | Langfuse setup, secrets, service count, and failure recovery remain unmeasured |
+
+### Gaps Blocking Promotion
+
+- Do not promote LangGraph plus Langfuse beyond first-candidate status until hosted or self-hosted Langfuse ingestion is
+  proven against the same run artifact contract.
+- Preserve deterministic fixture validation without hosted credentials; hosted observability must be additive, not a
+  prerequisite for `uv run awf workflow-fixture-test`.
+- Add real model/tool spans or explicit simulated equivalents before claiming trace coverage for production agent
+  behavior.
+- Add dataset, model-judge, annotation, or regression-history evidence before treating evaluation support as strong.
+- Resolve durable execution and persistence strategy before claiming scalable architecture fit.
+
 ## Second Candidate Slice Proposal
 
 Candidate app id: `mastra-ts`.
@@ -325,4 +388,3 @@ Use this checklist for each candidate run:
 - [ ] Eval dataset/cases, scorer type, score result, and rerun command recorded.
 - [ ] Setup prerequisites, env vars, and required services recorded.
 - [ ] Known gaps, risks, and follow-up tickets/spec tasks recorded.
-
