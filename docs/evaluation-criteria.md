@@ -44,15 +44,19 @@ Warning conditions:
 
 ### Observability
 
-Evaluate whether local or self-hostable tracing makes agent behavior inspectable.
+Evaluate whether hosted observability and local or exportable traces make agent behavior inspectable. Hosted
+observability is part of the full stack under evaluation, while repo-local artifacts keep validation repeatable.
 
 Strong evidence:
 
-- Readable traces for model calls, tools, retrieval, state transitions, inputs, outputs, latency, tokens, and failures.
+- Readable hosted traces for model calls, tools, retrieval, state transitions, inputs, outputs, latency, tokens, costs,
+  and failures.
+- Repo-local trace exports that let agents validate behavior without hosted credentials.
 
 Warning conditions:
 
-- Traces are incomplete, hard to correlate, hosted-only, or require extensive custom instrumentation.
+- Traces are incomplete, hard to correlate, local-only, hosted-only without portable exports, or require extensive
+  custom instrumentation.
 
 ### Evaluation
 
@@ -78,6 +82,21 @@ Strong evidence:
 Warning conditions:
 
 - Scaling requires undefined architecture, custom persistence, custom workers, or unproven operational glue.
+
+### Durable Execution
+
+Evaluate whether the candidate can recover or resume long-running agent workflows without duplicated side effects.
+
+Strong evidence:
+
+- A durable runtime captures model calls, tool calls, human waits, retries, and recovery state with understandable
+  semantics.
+- The runtime is easy for one engineer to start locally, inspect, and scale when the workload grows.
+
+Warning conditions:
+
+- Durable execution is deferred, simulated only, tied to a runtime that is too complex to operate, or requires custom
+  retry/state infrastructure owned by this project.
 
 ### Operating Effort
 

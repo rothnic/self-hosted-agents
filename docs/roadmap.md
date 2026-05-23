@@ -56,9 +56,8 @@ Each candidate solution gets a separate runnable app under `apps/`. Existing app
 - `apps/langgraph-python/`: Python LangGraph/LangChain candidate.
 - `apps/mastra-ts/`: TypeScript Mastra candidate used as a cross-language comparison point.
 
-Likely additional Python-first candidates should be researched before creation. Current next research target:
-Pydantic AI plus Logfire or OpenTelemetry. LlamaIndex remains a strong fallback if data/RAG workflows become the
-dominant functional area.
+The active Python-first follow-on lane is Pydantic AI plus Logfire/OpenTelemetry. LlamaIndex remains a strong fallback
+if data/RAG workflows become the dominant functional area.
 
 ### Phase 4: Evidence Review
 
@@ -86,15 +85,20 @@ repo state, research any new solution-space questions, and return:
 
 ## Current Recommendation
 
-Latest CEO-level review: `docs/roadmap-review-2026-05-19.md`.
+Latest CEO-level review: `docs/roadmap-review-2026-05-23.md`.
 
-Proceed with the first Python-first candidate slice: `apps/langgraph-python/` using LangGraph Python plus Langfuse.
-The slice should prove the shared comparable-agent workflow and capture trace, evaluation, setup, and gap evidence
-before the project invests in deeper product behavior. This path is approved as the first implementation slice, not as
-the final platform choice.
+Phase 3 is reviewed and Phase 6 is the active implementation increment. `apps/langgraph-python/` using LangGraph
+Python plus Langfuse has preliminary deterministic fixture evidence, and Pydantic AI plus Logfire/OpenTelemetry is the
+approved next implementation lane. Neither path is a final platform winner.
 
-Keep the second candidate available for contrast, but choose it after the first slice exposes real implementation
-evidence.
+Approved next direction: execute the Pydantic AI plus Logfire/OpenTelemetry implementation backlog while keeping
+LangGraph Python as the first evidence baseline and Mastra TypeScript as a deferred contrast lane. Hosted observability
+is part of the stack being tested, not optional-only evidence.
+
+Durable execution is required for final solutions. The next phase should evaluate framework-specific Pydantic AI
+options first, then compare Hatchet as the primary Python workflow-platform option against Temporal, DBOS, Prefect, and
+Restate. The runtime decision should favor easy startup, understandable recovery behavior, low operating complexity, and
+a credible scale path.
 
 The proposed contrast candidate is `apps/mastra-ts/` using Mastra TypeScript plus the same shared comparison contract.
 It should test whether framework-integrated TypeScript workflow and observability capabilities offset the language and
@@ -103,6 +107,7 @@ maintenance cost for a Python-preferring owner.
 The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should implement that same
 decision-ready workflow before roadmap review compares platform quality.
 
-The next Python-first candidate to research is Pydantic AI plus Logfire or OpenTelemetry. If the first slice shows that
-data ingestion, retrieval, or document-heavy workflows are the dominant risk, compare LlamaIndex before committing to a
-third app lane.
+The active next tickets are Phase 6 tasks T019-T026. Start with T019 / Beads `awf-hrm`, then use the remaining tickets
+to scaffold the Pydantic AI lane, prove hosted Logfire and repo-local trace evidence, capture Pydantic Evals output,
+compare durable execution options, add a lowest-complexity durable smoke path, and update the matrix with implementation
+evidence.

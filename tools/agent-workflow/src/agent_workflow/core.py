@@ -1516,6 +1516,18 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
             }
         )
     ready = ready_work_data()
+    child_refs = {item["external_ref"] for item in child_tickets if item.get("external_ref")}
+    child_ids = {item["ticket_id"] for item in child_tickets if item.get("ticket_id")}
+    scoped_ready = [
+        item
+        for item in ready.get("ready", [])
+        if item.get("external_ref") in child_refs or item.get("id") in child_ids
+    ]
+    scoped_blocked = [
+        item
+        for item in ready.get("blocked", [])
+        if item.get("external_ref") in child_refs or item.get("id") in child_ids
+    ]
     claims = active_claims()
     all_children_closed = child_tickets and all(
         item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
@@ -1523,10 +1535,10 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
     if ready.get("human_required"):
         review_status = "human-review-required"
         next_action = "pm-review-loop should present the human gate"
-    elif ready.get("blocked") and not ready.get("ready"):
+    elif scoped_blocked and not scoped_ready:
         review_status = "blocked"
         next_action = "pm-review-loop should triage blockers or decompose follow-up work"
-    elif ready.get("ready"):
+    elif scoped_ready:
         review_status = "executing"
         next_action = "orchestrator-loop should assign unclaimed unblocked work"
     elif all_children_closed:
@@ -1552,10 +1564,10 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
             claim.get("worker_branch") for claim in claims if claim.get("worker_branch")
         ],
         "stale_claims": stale_claims_for_increment(claims),
-        "blocked": ready.get("blocked", []),
+        "blocked": scoped_blocked,
         "validation_evidence": state.get("validation_evidence", []),
         "learning_proposals": state.get("learning_proposals", []),
-        "ready_count": len(ready.get("ready", [])),
+        "ready_count": len(scoped_ready),
         "human_required": ready.get("human_required", []),
         "review_status": review_status,
         "next_action": next_action,
@@ -1632,6 +1644,16 @@ def increment_plan_data(increment_id: str | None, spec_id: str, phase: str, writ
     return status
 
 
+def scoped_issue_items(status: dict[str, Any], items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    child_refs = {item["external_ref"] for item in status.get("child_tickets", []) if item.get("external_ref")}
+    child_ids = {item["ticket_id"] for item in status.get("child_tickets", []) if item.get("ticket_id")}
+    return [
+        item
+        for item in items
+        if item.get("external_ref") in child_refs or item.get("id") in child_ids
+    ]
+
+
 def automation_loop_data(
     role: str,
     write: bool,
@@ -1681,11 +1703,12 @@ def automation_loop_data(
         }
     if role == "orchestrator":
         ready = ready_work_data()
-        if not ready.get("ready"):
+        scoped_ready = scoped_issue_items(status, ready.get("ready", []))
+        if not scoped_ready:
             return {"ok": True, "role": role, "increment": status, "next_action": status["next_action"], "claim": None}
-        chosen = ready["ready"][0]
+        chosen = scoped_ready[0]
         worker = worker_id or f"worker-{chosen.get('id', 'unassigned')}"
-        claim = claim_work_data(worker_id=worker, write=write)
+        claim = claim_work_data(worker_id=worker, write=write, work_item=chosen, ready_items=scoped_ready)
         worker_slug = re.sub(r"[^a-z0-9]+", "-", chosen.get("title", "work").lower()).strip("-")[:40]
         worker_branch = f"codex/{chosen.get('id', 'work')}-{worker_slug}"
         if write and claim.get("ok") and claim.get("claimed", {}).get("path"):
@@ -1725,10 +1748,23 @@ def automation_loop_data(
             claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
             next_action = worker_action
         elif write:
-            claim_result = claim_work_data(worker_id=worker_id or "worker", write=True)
-            next_action = worker_action
+            scoped_ready = scoped_issue_items(status, ready_work_data().get("ready", []))
+            if scoped_ready:
+                claim_result = claim_work_data(
+                    worker_id=worker_id or "worker",
+                    write=True,
+                    work_item=scoped_ready[0],
+                    ready_items=scoped_ready,
+                )
+                next_action = worker_action
+            elif status["review_status"] == "ready-for-increment-review":
+                claim_result = None
+                next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
+            else:
+                claim_result = {"ok": False, "claimed": None, "dry_run": False, "ready_count": 0}
+                next_action = "worker stopped"
         else:
-            ready = ready_work_data().get("ready", [])
+            ready = scoped_issue_items(status, ready_work_data().get("ready", []))
             if ready:
                 claim_result = {
                     "ok": True,
@@ -1810,9 +1846,15 @@ def claim_path(work_id: str) -> Path:
     return ROOT / ".agent-runs" / "claims" / f"{safe_id}.json"
 
 
-def claim_work_data(worker_id: str, write: bool) -> dict[str, Any]:
-    ready = ready_work_data().get("ready", [])
-    for item in ready:
+def claim_work_data(
+    worker_id: str,
+    write: bool,
+    work_item: dict[str, Any] | None = None,
+    ready_items: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    ready = ready_items if ready_items is not None else ready_work_data().get("ready", [])
+    candidates = [work_item] if work_item is not None else ready
+    for item in candidates:
         work_id = item.get("id") or item.get("title", "unknown")
         path = claim_path(str(work_id))
         if path.exists():
@@ -1827,7 +1869,8 @@ def claim_work_data(worker_id: str, write: bool) -> dict[str, Any]:
             path.write_text(json.dumps(claim, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             claim["path"] = rel(path)
         return {"ok": True, "claimed": claim, "ready_count": len(ready)}
-    return {"ok": False, "claimed": None, "ready_count": len(ready), "reason": "no unclaimed ready work"}
+    reason = "selected ready work is already claimed" if work_item is not None else "no unclaimed ready work"
+    return {"ok": False, "claimed": None, "ready_count": len(ready), "reason": reason}
 
 
 def mark_task_done_text(text: str, task_id: str) -> tuple[str, bool]:
@@ -2344,6 +2387,37 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 and "workflow-fixture-test" in {check["name"] for check in verify_increment["checks"]}
                 and bool(verify_increment.get("next_action")),
                 "data": verify_increment,
+            }
+        )
+        active_increment = increment_status_data(None, "002-solution-comparison-roadmap", "Phase 6")
+        active_child_ticket_ids = {
+            item.get("ticket_id") for item in active_increment.get("child_tickets", []) if item.get("ticket_id")
+        }
+        results.append(
+            {
+                "name": "active increment status routes to Phase 6 ready work",
+                "ok": active_increment["increment_id"] == "002-solution-comparison-roadmap-phase-6"
+                and active_increment["ready_count"] > 0
+                and bool(active_child_ticket_ids)
+                and bool(active_increment["next_action"]),
+                "data": active_increment,
+            }
+        )
+        active_orchestrator = automation_loop_data(
+            role="orchestrator",
+            write=False,
+            worker_id="fixture-worker",
+            increment_id=None,
+            spec_id="002-solution-comparison-roadmap",
+            phase="Phase 6",
+        )
+        active_claim = active_orchestrator.get("claim") if isinstance(active_orchestrator.get("claim"), dict) else {}
+        active_claim_work = active_claim.get("claimed", {}).get("work", {})
+        results.append(
+            {
+                "name": "active orchestrator scopes claims to Phase 6 child tickets",
+                "ok": active_orchestrator["ok"] and active_claim_work.get("id") in active_child_ticket_ids,
+                "data": active_orchestrator,
             }
         )
         increment_status = increment_status_data(None, "002-solution-comparison-roadmap", "Phase 3")

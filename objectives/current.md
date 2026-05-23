@@ -22,6 +22,10 @@ evaluation, orchestration, scalability, and operating effort.
   scoring when a candidate provides them without custom infrastructure.
 - Each candidate solution is tested as a separate runnable app while sharing common contracts, fixtures, and evaluation
   assets where useful.
+- Final candidate solutions include hosted observability evidence as part of the tested stack, while preserving
+  deterministic repo-local artifacts for repeatable validation.
+- Final candidate solutions include durable execution, with candidate runtimes evaluated for low complexity, easy
+  startup, understandable recovery behavior, and a credible scale path.
 - Roadmap reviews can be initiated by the human and should produce refreshed objectives, specs, tasks, tickets, and
   comparison criteria without requiring manual workflow operation.
 
