@@ -35,8 +35,8 @@ claims, blockers, stale claims, validation evidence, and review status.
 
 **Why this priority**: Decentralized workers need shared state that survives session boundaries.
 
-**Independent Test**: Run `uv run awf increment-status --json` and confirm it reports Phase 3 child tickets, claims,
-blockers, review status, and a safe next action.
+**Independent Test**: Run `uv run awf increment-status --json` and confirm it reports active phase child tickets,
+claims, blockers, review status, and a safe next action.
 
 **Acceptance Scenarios**:
 

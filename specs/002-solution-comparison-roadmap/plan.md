@@ -13,14 +13,15 @@ evaluations, and demo evidence.
 
 **Language/Version**: Python preferred for first product implementation; TypeScript remains available for Mastra
 comparison.
-**Primary Dependencies**: To be chosen through requirements mapping. Initial research candidates include LangGraph,
-Langfuse, Phoenix/OpenInference, MLflow tracing, and Mastra.
+**Primary Dependencies**: To be chosen through requirements mapping. Current candidates include LangGraph, Langfuse,
+Pydantic AI, Logfire, Phoenix/OpenInference, MLflow tracing, Mastra, Hatchet, Temporal, DBOS, Prefect, and Restate.
 **Storage**: Repo artifacts, `.beads/issues.jsonl`, docs, specs, app-specific source, shared comparison fixtures.
 **Testing**: Shared BDD contracts, app-specific tests, trace/evaluation evidence checks, `uv run awf workflow-fixture-test`.
 **Target Platform**: Local development first, with self-hosted service path considered during comparison.
 **Project Type**: Multi-app comparison repo.
-**Constraints**: No default dependency on approved self-hosted LangSmith. Requirements and preferences are expected to
-evolve after implementation evidence.
+**Constraints**: No default dependency on approved self-hosted LangSmith. Hosted observability is required evidence for
+full solutions, but deterministic repo-local artifacts must keep validation repeatable. Durable execution is required
+before final promotion, but the runtime must be selected through comparison rather than assumed.
 
 ## Constitution Check
 
@@ -57,6 +58,7 @@ specs/
 4. Implement candidate app slices one at a time.
 5. Review demos and evidence with the human.
 6. Update requirements, matrix, specs, and backlog as implementation learning changes the decision space.
+7. Evaluate hosted observability and durable execution as first-class solution components before promoting a candidate.
 
 ## Complexity Tracking
 
@@ -67,6 +69,7 @@ specs/
 
 ## Open Questions
 
-1. Which first outcome matters most: local demo, framework comparison, automation reliability, or operator dashboard?
-2. What should dominate the first roadmap decision: speed, learning value, reliability, or extensibility?
-3. Which observability/evaluation capability is non-negotiable for the first candidate slice?
+1. Which durable execution option is easiest to start, understand, and scale for the first Python production path?
+2. Does hosted Logfire provide enough full-stack observability for the Pydantic AI candidate without excessive
+   operational burden?
+3. Which durable runtime should be selected after comparing framework-specific Pydantic AI options and Hatchet?

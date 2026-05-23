@@ -1,0 +1,89 @@
+{
+  "active_claims": [],
+  "active_worker_branches": [],
+  "base_branch": "main",
+  "beads_epic_id": "awf-ftu",
+  "blocked": [],
+  "child_tickets": [
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T019",
+      "task_id": "T019",
+      "ticket_id": "awf-hrm",
+      "ticket_status": "open",
+      "title": "Update comparison criteria for hosted observability and durable execution requirements"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T020",
+      "task_id": "T020",
+      "ticket_id": "awf-9im",
+      "ticket_status": "open",
+      "title": "Define the `pydantic-ai` implementation slice plan with Logfire evidence"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T021",
+      "task_id": "T021",
+      "ticket_id": "awf-olx",
+      "ticket_status": "open",
+      "title": "Scaffold the runnable `apps/pydantic-ai/` comparable workflow with deterministic fixture support"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T022",
+      "task_id": "T022",
+      "ticket_id": "awf-52w",
+      "ticket_status": "open",
+      "title": "Add hosted Logfire and OpenTelemetry trace evidence capture for the Pydantic AI slice"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T023",
+      "task_id": "T023",
+      "ticket_id": "awf-ktw",
+      "ticket_status": "open",
+      "title": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T024",
+      "task_id": "T024",
+      "ticket_id": "awf-c4e",
+      "ticket_status": "open",
+      "title": "Compare durable execution options for Pydantic AI and Python workflow candidates"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T025",
+      "task_id": "T025",
+      "ticket_id": "awf-4wg",
+      "ticket_status": "open",
+      "title": "Add a durable execution smoke path for the lowest-complexity selected option"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T026",
+      "task_id": "T026",
+      "ticket_id": "awf-4th",
+      "ticket_status": "open",
+      "title": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps"
+    }
+  ],
+  "exists": true,
+  "feature_branch": "codex/002-solution-comparison-roadmap-phase-6",
+  "human_required": [],
+  "increment_id": "002-solution-comparison-roadmap-phase-6",
+  "learning_proposals": [],
+  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+  "objective_id": "agentic-development-foundation",
+  "ok": true,
+  "path": ".agent-runs/increments/002-solution-comparison-roadmap-phase-6.json",
+  "phase": "Phase 6",
+  "ready_count": 8,
+  "review_status": "executing",
+  "spec_id": "002-solution-comparison-roadmap",
+  "stale_claims": [],
+  "updated_at": "2026-05-23T19:44:42.262762+00:00",
+  "validation_evidence": []
+}

@@ -3,8 +3,8 @@
 The workflow can run from Codex app automations, local cron, or another scheduler because coordination state lives in
 repo artifacts and Beads Rust. The scheduler is replaceable; the repo remains authoritative.
 
-The default increment boundary is one Spec Kit phase. For the solution-comparison roadmap, the first target increment
-is Phase 3 of `002-solution-comparison-roadmap`.
+The default increment boundary is one Spec Kit phase. For the solution-comparison roadmap, the active target increment
+is Phase 6 of `002-solution-comparison-roadmap`.
 
 ## Roles
 

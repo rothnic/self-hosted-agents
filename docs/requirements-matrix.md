@@ -33,6 +33,8 @@ The first user is the project owner as an engineer. The working assumptions are:
 | R7 | Scalable architecture path | The chosen approach should grow beyond a toy demo | Clear path to durable services |
 | R8 | Roadmap learning loop | Requirements should evolve as prototypes reveal issues | Review notes update specs and backlog |
 | R9 | Low custom critical infrastructure | Avoid rebuilding platform capabilities mature tools normally provide | Platform capabilities are provided or intentionally owned |
+| R10 | Hosted observability as part of the stack | Full solutions need real hosted trace review, not only local exports | Hosted trace evidence correlated to run artifacts |
+| R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison plus retry or resume evidence |
 
 ## Functional Needs Map
 
@@ -44,10 +46,10 @@ or a small amount of app-local glue. The comparison should name those provider c
 | --- | --- | --- | --- |
 | Agent orchestration | Represent the workflow as inspectable steps | Framework graph, runtime, or app-local pipeline | Branching, retries, persistence, skills, or approval hooks |
 | Tool and context access | Safely call tools over project context | Tool APIs, DI, MCP, retrieval connectors, or typed adapters | Connectors, approval policy, schemas, or capability bundles |
-| Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, traces, or framework tracing | Cost tracking, failure views, eval dashboards, OTel export, or local UI |
+| Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, or traces | Hosted trace UI, cost tracking, failure views, eval dashboards, or OTel export |
 | Evaluation | Rerun and score comparable behavior | Deterministic checks, eval datasets, framework evals, or custom scorer | Regression history, trace-linked scores, judges, or annotation workflows |
 | Evidence storage | Preserve run, trace, eval, setup, and gaps | Repo artifacts, observability backend, eval store, or exports | Cross-run comparison UI, searchable evidence, or reports |
-| Durable execution | Recover or resume long-running workflows | Persistence, Temporal, DBOS, Prefect, Restate, queues, or local state | Retries, human waits, distributed workers, or hosted workers |
+| Durable execution | Recover or resume long-running workflows | Pydantic integrations, Hatchet, Temporal, DBOS, Prefect, Restate, or queues | Retries, human waits, workers, or replay UI |
 | Operator experience | Keep setup and debugging manageable | Bootstrap scripts, service topology, local UI, documented recovery | Single-command local stack, low service count, or diagnostics |
 | Scalability path | Show how the slice becomes a durable service | Deployment target, storage model, runtime model, and boundaries | Microservice deployment, tenancy controls, or supported hosting |
 
@@ -81,6 +83,30 @@ Legend: `High` means likely strong fit; `Medium` means plausible but needs proof
 | R7 Scalable architecture path | Medium | Medium | Medium | High | Medium | High |
 | R8 Roadmap learning loop | High | High | High | High | High | Medium |
 | R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | Medium | High if approved |
+| R10 Hosted observability evidence | Medium | Medium | Low | High | Medium | High |
+| R11 Durable execution evidence | Low | Low | Medium | High | Medium | High |
+
+## Human Direction Update - 2026-05-23
+
+Hosted observability is part of the stack being tested and evaluated. A deterministic fixture path remains necessary
+for repeatable agent validation, but local-only trace evidence is not enough for a final solution.
+
+Durable execution is required in each final solution. The project must evaluate options before selecting one. For the
+Pydantic AI path, framework-specific options should be considered first, then Hatchet should be compared with Temporal,
+DBOS, Prefect, and Restate.
+
+The next implementation backlog is approved for Pydantic AI plus Logfire/OpenTelemetry. It must evaluate durable
+execution for this project's purpose: easy to start, easy to understand, easy to scale, and not too complex to operate.
+
+### Durable Execution Options To Evaluate
+
+| Option | Why It Belongs In The Evaluation | Main Risk To Measure |
+| --- | --- | --- |
+| Pydantic AI plus DBOS | Official Pydantic AI integration and lightweight Python durable workflow path | Deterministic workflow and step boundaries |
+| Pydantic AI plus Prefect | Official Pydantic AI integration with Python-first task and result persistence model | Whether agent/tool durability stays simple |
+| Pydantic AI plus Restate | Official Pydantic AI integration with service-oriented durable handlers | Extra Restate server/runtime architecture |
+| Pydantic AI plus Temporal | Official Pydantic AI integration and proven durable execution platform | Operator complexity for one engineer |
+| Hatchet | Python-friendly workflow platform with durable tasks, dashboard, replay, and OTel export | Whether non-framework integration adds glue |
 
 ## Initial Recommendation
 

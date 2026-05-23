@@ -48,6 +48,16 @@ The minimum demo does not include a production deployment, user-facing UI, multi
 workers, a full observability cluster, or a final platform recommendation. Those are follow-up work after the roadmap
 review compares implementation evidence.
 
+## Full-Solution Evidence
+
+The minimum demo can be fixture-backed, but final solution promotion requires more evidence:
+
+- Hosted observability must be exercised as part of the candidate stack, including trace visibility for model calls,
+  tool calls, state transitions, failures, tokens or cost where available, and correlation back to run artifacts.
+- Durable execution must be proven for the final solution, including retry, resume, human wait, and side-effect
+  behavior. The durable runtime should be selected through evidence rather than assumed.
+- Local or repo-exported artifacts remain required so agents can validate behavior without hidden hosted state.
+
 ## Required Evidence
 
 Each candidate implementation slice must produce these evidence groups.
@@ -107,9 +117,11 @@ Capture what the implementation does not prove yet:
 A candidate app is not ready for roadmap promotion unless it has:
 
 - A passing shared behavior contract run.
-- Trace evidence that can be inspected by a reviewer.
+- Hosted trace evidence that can be inspected by a reviewer.
+- Repo-local trace and run artifacts that preserve deterministic validation.
 - Evaluation evidence tied to the same behavior run.
 - Setup and operating notes sufficient for another agent or engineer to rerun the slice.
+- Durable execution evidence, or a clear roadmap gate explaining why the candidate is not yet promotable.
 - Explicit gap notes for missing evidence and custom critical infrastructure risk.
 
 Missing evidence should be recorded as a gap, not silently inferred. The next CEO-level roadmap review should receive

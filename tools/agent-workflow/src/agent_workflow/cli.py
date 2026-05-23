@@ -243,7 +243,7 @@ def verify(
 def increment_status(
     increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
     spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
-    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    phase: str = typer.Option("Phase 6", "--phase", help="Spec phase label."),
     json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
 ) -> None:
     """Show phase-level increment state, child tickets, blockers, claims, and next action."""
@@ -258,7 +258,7 @@ def increment_status(
 def increment_plan(
     increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
     spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
-    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    phase: str = typer.Option("Phase 6", "--phase", help="Spec phase label."),
     write: bool = typer.Option(False, "--write", help="Write increment ledger and Beads labels."),
     json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
 ) -> None:
@@ -276,7 +276,7 @@ def automation_loop(
     worker_id: str | None = typer.Option(None, "--worker-id", help="Worker id for worker/orchestrator roles."),
     increment_id: str | None = typer.Option(None, "--increment-id", help="Increment id, defaults from spec and phase."),
     spec_id: str = typer.Option("002-solution-comparison-roadmap", "--spec-id", help="Spec id."),
-    phase: str = typer.Option("Phase 3", "--phase", help="Spec phase label."),
+    phase: str = typer.Option("Phase 6", "--phase", help="Spec phase label."),
     write: bool = typer.Option(False, "--write", help="Mutate claims, ledgers, tickets, or evidence when safe."),
     json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
 ) -> None:

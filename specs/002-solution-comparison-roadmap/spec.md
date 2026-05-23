@@ -83,6 +83,15 @@ trace, and evaluation evidence.
   selected solution.
 - **FR-013**: The next Python-first comparison candidate MUST be selected through bounded research before creating its
   runnable app lane.
+- **FR-014**: Hosted observability MUST be treated as part of the full candidate stack being tested and evaluated, not
+  only as optional future integration.
+- **FR-015**: Deterministic repo-local run, trace, and evaluation artifacts MUST remain available so validation does not
+  depend only on hosted services.
+- **FR-016**: Durable execution MUST be required before any candidate is promoted as a final solution.
+- **FR-017**: Durable execution options MUST be evaluated for low complexity, ease of startup, understandability,
+  recovery behavior, and scale path before one runtime is selected.
+- **FR-018**: The next Python-first durable execution evaluation MUST consider framework-specific Pydantic AI options
+  first, then compare Hatchet with Temporal, DBOS, Prefect, and Restate.
 
 ### Key Entities
 
@@ -101,6 +110,8 @@ trace, and evaluation evidence.
 - **SC-004**: Shared contracts define the evidence needed for candidate comparison before implementation depth grows.
 - **SC-005**: The approved roadmap decision identifies both the first implementation slice and the next Python-first
   candidate research target.
+- **SC-006**: The next approved implementation backlog includes hosted observability evidence and durable execution
+  option comparison before candidate promotion.
 
 ## Assumptions
 
@@ -109,3 +120,5 @@ trace, and evaluation evidence.
 - Python-first candidates should be explored before deeper TypeScript implementation unless evidence says otherwise.
 - The approved first slice is `apps/langgraph-python/` using LangGraph Python plus Langfuse; this is a first evidence
   target, not a final platform selection.
+- The approved next backlog evaluates Pydantic AI plus Logfire/OpenTelemetry with durable execution options; this is a
+  next implementation lane, not a final platform or runtime selection.
