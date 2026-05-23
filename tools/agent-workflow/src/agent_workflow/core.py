@@ -1716,28 +1716,39 @@ def automation_loop_data(
             "next_action": "worker-loop should implement the claimed ticket on its worker branch",
         }
     if role == "worker":
+        worker_action = (
+            "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
+            "record evidence, and push the worker branch"
+        )
         claim = active_claims()
         if claim:
             claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
+            next_action = worker_action
         elif write:
             claim_result = claim_work_data(worker_id=worker_id or "worker", write=True)
+            next_action = worker_action
         else:
             ready = ready_work_data().get("ready", [])
-            claim_result = {
-                "ok": bool(ready),
-                "claimed": {"work": ready[0], "worker_id": worker_id or "worker"} if ready else None,
-                "dry_run": True,
-                "ready_count": len(ready),
-            }
+            if ready:
+                claim_result = {
+                    "ok": True,
+                    "claimed": {"work": ready[0], "worker_id": worker_id or "worker"},
+                    "dry_run": True,
+                    "ready_count": len(ready),
+                }
+                next_action = worker_action
+            elif status["review_status"] == "ready-for-increment-review":
+                claim_result = None
+                next_action = "no worker work remains; integrator-loop should prepare the phase review PR"
+            else:
+                claim_result = {"ok": False, "claimed": None, "dry_run": True, "ready_count": 0}
+                next_action = "worker stopped"
         return {
-            "ok": bool(claim_result.get("ok")),
+            "ok": claim_result is None or bool(claim_result.get("ok")),
             "role": role,
             "increment": status,
             "claim": claim_result,
-            "next_action": (
-                "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
-                "record evidence, and push the worker branch"
-            ),
+            "next_action": next_action,
         }
     verify = verify_data("increment", write=write)
     if status["review_status"] == "ready-for-increment-review" and verify["ok"]:
@@ -1993,6 +2004,9 @@ def workflow_fixture_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
 def worker_loop_non_mutating(worker: dict[str, Any], claim_paths_before: set[str], claim_paths_after: set[str]) -> bool:
     if claim_paths_before != claim_paths_after:
         return False
+    increment = worker.get("increment")
+    if isinstance(increment, dict) and increment.get("review_status") == "ready-for-increment-review":
+        return worker.get("claim") is None
     claim = worker.get("claim")
     if not isinstance(claim, dict) or not claim.get("ok"):
         return False
