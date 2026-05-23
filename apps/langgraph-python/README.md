@@ -29,10 +29,16 @@ python3 apps/langgraph-python/run.py \
   --pretty
 ```
 
-When `--output` is set, the command also writes a local OpenTelemetry-style trace export next to the run artifact, for
-example `/tmp/langgraph-python-run.trace.json`. Use `--trace-output` to choose a different trace path. The trace export
-is deterministic and records Langfuse ingestion as a gap when credentials are absent. T016 adds evaluation output and
-run artifact capture tied to the same candidate run.
+When `--output` is set, the command also writes deterministic sibling artifacts:
+
+- `/tmp/langgraph-python-run.trace.json`: local OpenTelemetry-style trace export. Use `--trace-output` to choose a
+  different trace path.
+- `/tmp/langgraph-python-run.evaluation.json`: deterministic assertion evaluation tied to the same run id and trace id.
+  Use `--evaluation-output` to choose a different evaluation path.
+
+The run artifact links the fixture input, recommendation output, trace evidence, evaluation output, setup notes, gap
+notes, command used, and acceptance check. The trace export records Langfuse ingestion as a gap when credentials are
+absent, so fixture validation remains deterministic without hosted services.
 
 ## Evidence Required
 

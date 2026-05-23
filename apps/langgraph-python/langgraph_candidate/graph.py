@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .trace import TraceRecorder
+from .trace import TraceRecorder, stable_id
 
 
 FUNCTIONAL_NEEDS = [
@@ -20,12 +20,12 @@ FUNCTIONAL_NEEDS = [
     {
         "area": "Observability",
         "provider": "Langfuse or OpenTelemetry trace capture",
-        "first_slice_status": "planned-follow-up",
+        "first_slice_status": "scaffolded",
     },
     {
         "area": "Evaluation",
         "provider": "Deterministic scorer tied to the run artifact",
-        "first_slice_status": "planned-follow-up",
+        "first_slice_status": "scaffolded",
     },
 ]
 
@@ -41,6 +41,7 @@ class WorkflowState:
 
 @dataclass(frozen=True)
 class CandidateRun:
+    run_id: str
     candidate_app_id: str
     stack: list[str]
     run_mode: str
@@ -50,18 +51,25 @@ class CandidateRun:
     questions: list[str]
     acceptance_check: str
     evidence_paths: dict[str, str]
+    gaps: list[str]
     trace_evidence: dict[str, Any]
     trace_export: dict[str, Any]
+    evaluation_output: dict[str, Any] = field(default_factory=dict)
+    command_used: str = "provided by CLI"
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "acceptance_check": self.acceptance_check,
             "alternatives": self.alternatives,
             "candidate_app_id": self.candidate_app_id,
+            "command_used": self.command_used,
             "evidence_paths": self.evidence_paths,
+            "evaluation_output": self.evaluation_output,
+            "gaps": self.gaps,
             "graph": self.graph,
             "questions": self.questions,
             "recommendation": self.recommendation,
+            "run_id": self.run_id,
             "run_mode": self.run_mode,
             "stack": self.stack,
             "trace_evidence": self.trace_evidence,
@@ -95,13 +103,15 @@ def map_functional_needs(state: WorkflowState) -> WorkflowState:
 
 
 def select_slice(state: WorkflowState) -> WorkflowState:
+    project_context = state.context.get("project_context", {})
+    linked_task = str(project_context.get("next_expected_slice") or "T017")
     state.recommendation = {
-        "next_slice": "Add trace evidence capture for the LangGraph Python slice.",
+        "next_slice": "Update the requirements matrix with LangGraph Python evidence, scores, and gaps.",
         "reason": (
-            "The deterministic scaffold proves the comparable workflow can run; trace capture is the next missing "
-            "functional need before evaluation and scoring work can be trusted."
+            "The deterministic run now links recommendation, trace, evaluation, setup, and gap evidence, so the next "
+            "useful slice is to summarize that evidence for roadmap comparison."
         ),
-        "linked_task": "T015",
+        "linked_task": linked_task,
     }
     state.transitions.append("select_slice")
     state.trace.record("select_slice", {"linked_task": state.recommendation["linked_task"]})
@@ -114,7 +124,18 @@ def format_run(state: WorkflowState) -> CandidateRun:
     state.transitions.append("format_run")
     state.trace.record("format_run", {"candidate_app_id": str(candidate.get("id") or "langgraph-python")})
     trace_export = state.trace.export()
+    run_id = stable_id(
+        "run",
+        {
+            "candidate": candidate,
+            "objective": state.context.get("objective"),
+            "recommendation": state.recommendation,
+            "trace_id": trace_export["trace_id"],
+        },
+        length=24,
+    )
     return CandidateRun(
+        run_id=run_id,
         candidate_app_id=str(candidate.get("id") or "langgraph-python"),
         stack=[str(item) for item in stack],
         run_mode="deterministic-fixture",
@@ -127,12 +148,12 @@ def format_run(state: WorkflowState) -> CandidateRun:
         recommendation=state.recommendation,
         alternatives=[
             {
-                "option": "Add evaluation artifact capture first",
-                "tradeoff": "Useful soon, but weaker without a trace identifier to correlate against.",
+                "option": "Research the next Python candidate now",
+                "tradeoff": "Good parallel planning, but it leaves LangGraph evidence unsummarized for comparison.",
             },
             {
-                "option": "Research the next Python candidate now",
-                "tradeoff": "Good parallel planning, but it does not improve evidence for the approved first slice.",
+                "option": "Add hosted Langfuse ingestion before scoring the slice",
+                "tradeoff": "Improves observability depth, but it would make fixture validation depend on service setup.",
             },
         ],
         questions=[
@@ -145,8 +166,13 @@ def format_run(state: WorkflowState) -> CandidateRun:
             "setup_notes": "apps/langgraph-python/README.md",
             "gap_notes": "apps/langgraph-python/implementation-plan.md",
             "trace_evidence": "provided by --trace-output or next to --output",
-            "evaluation_evidence": "T016 follow-up",
+            "evaluation_evidence": "provided by --evaluation-output or next to --output",
         },
+        gaps=[
+            "Langfuse ingestion is optional and not attempted in deterministic fixture mode without credentials.",
+            "Evaluation is deterministic assertion scoring; dataset, model-judge, and annotation workflows are follow-ups.",
+            "Durable runtime, persistence, retries, and long-running recovery are outside this first slice.",
+        ],
         trace_evidence={
             "provider": trace_export["provider"],
             "trace_id": trace_export["trace_id"],

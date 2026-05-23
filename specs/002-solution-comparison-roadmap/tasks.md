@@ -32,6 +32,6 @@
 - [X] T013 [US3] Define the `langgraph-python` functional-needs mapping and implementation slice plan
 - [X] T014 [US3] Scaffold the runnable `apps/langgraph-python/` comparable workflow with deterministic fixture support
 - [X] T015 [US3] Add Langfuse or OpenTelemetry trace evidence capture for the LangGraph Python slice
-- [ ] T016 [US3] Add evaluation output and run artifact capture for the LangGraph Python slice
+- [X] T016 [US3] Add evaluation output and run artifact capture for the LangGraph Python slice
 - [ ] T017 [US3] Update the requirements matrix with LangGraph Python evidence, scores, and gaps
 - [ ] T018 [US3] Research Pydantic AI plus Logfire/OpenTelemetry against the functional needs map
