@@ -1271,12 +1271,15 @@ def active_claims() -> list[dict[str, Any]]:
     return claims
 
 
-def active_claims_for_status(status: dict[str, Any]) -> list[dict[str, Any]]:
+def active_claims_for_status(
+    status: dict[str, Any], claims: list[dict[str, Any]] | None = None
+) -> list[dict[str, Any]]:
     active_child_ticket_ids = {
         item.get("ticket_id") for item in status.get("child_tickets", []) if item.get("ticket_id")
     }
+    all_claims = claims if claims is not None else active_claims()
     return sorted(
-        [claim for claim in active_claims() if claim.get("id") in active_child_ticket_ids],
+        [claim for claim in all_claims if claim.get("id") in active_child_ticket_ids],
         key=lambda item: str(item.get("claimed_at", "")),
         reverse=True,
     )
