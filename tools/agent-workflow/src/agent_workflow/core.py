@@ -1270,6 +1270,17 @@ def active_claims() -> list[dict[str, Any]]:
     return claims
 
 
+def active_claims_for_status(status: dict[str, Any]) -> list[dict[str, Any]]:
+    active_child_ticket_ids = {
+        item.get("ticket_id") for item in status.get("child_tickets", []) if item.get("ticket_id")
+    }
+    return sorted(
+        [claim for claim in active_claims() if claim.get("id") in active_child_ticket_ids],
+        key=lambda item: str(item.get("claimed_at", "")),
+        reverse=True,
+    )
+
+
 def current_acceptance_item() -> dict[str, Any] | None:
     claims = sorted(active_claims(), key=lambda item: str(item.get("claimed_at", "")), reverse=True)
     if claims:
@@ -1694,6 +1705,26 @@ def automation_loop_data(
     if role == "orchestrator":
         ready = ready_work_data()
         scoped_ready = scoped_issue_items(status, ready.get("ready", []))
+        active_scoped_claims = active_claims_for_status(status)
+        if active_scoped_claims:
+            active_claim = active_scoped_claims[0]
+            active_work = active_claim.get("work") if isinstance(active_claim.get("work"), dict) else {}
+            worker_slug = re.sub(r"[^a-z0-9]+", "-", active_work.get("title", "work").lower()).strip("-")[:40]
+            worker_branch = active_claim.get("worker_branch") or f"codex/{active_claim.get('id', 'work')}-{worker_slug}"
+            claim = {
+                "ok": True,
+                "claimed": active_claim,
+                "dry_run": False,
+                "ready_count": len(scoped_ready),
+            }
+            return {
+                "ok": True,
+                "role": role,
+                "increment": status,
+                "claim": claim,
+                "worker_branch": worker_branch,
+                "next_action": "worker-loop should implement the claimed ticket on its worker branch",
+            }
         if not scoped_ready:
             return {"ok": True, "role": role, "increment": status, "next_action": status["next_action"], "claim": None}
         chosen = scoped_ready[0]
@@ -1733,7 +1764,7 @@ def automation_loop_data(
             "implement one claimed ticket, run `uv run awf verify --profile ticket`, "
             "record evidence, and push the worker branch"
         )
-        claim = active_claims()
+        claim = active_claims_for_status(status)
         if claim:
             claim_result = {"ok": True, "claimed": claim[0], "dry_run": False}
             next_action = worker_action
@@ -2006,8 +2037,9 @@ def workflow_fixture_result_detail(result: dict[str, Any]) -> str:
     if isinstance(claim, dict):
         if claim.get("reason"):
             return str(claim["reason"])
-        if claim.get("dry_run") is False and claim.get("claimed", {}).get("path"):
-            return f"using active claim {claim['claimed']['path']}"
+        claimed = claim.get("claimed")
+        if claim.get("dry_run") is False and isinstance(claimed, dict) and claimed.get("path"):
+            return f"using active claim {claimed['path']}"
         if claim.get("dry_run") is True:
             return "previewed a dry-run claim"
     if data.get("next_action"):

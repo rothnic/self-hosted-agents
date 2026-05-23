@@ -1,0 +1,77 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "acceptance_source": {
+    "external_ref": null,
+    "id": "awf-hrm",
+    "status": "open",
+    "title": "Update comparison criteria for hosted observability and durable execution requirements"
+  },
+  "checks": [
+    {
+      "command": "uv run awf spec-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf spec-kit-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-kit-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf bdd-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "bdd-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf review-gate",
+      "detail": "",
+      "name": "review-gate",
+      "ok": true
+    },
+    {
+      "command": "uv run awf repo-hygiene",
+      "detail": "",
+      "error_count": 0,
+      "name": "repo-hygiene",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-state-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "workflow-state-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-fixture-test",
+      "detail": "",
+      "failed_results": [],
+      "name": "acceptance",
+      "ok": true,
+      "result_count": 18
+    }
+  ],
+  "failed_checks": [],
+  "git": {
+    "branch": "codex/t019-awf-hrm-criteria",
+    "changed_files": 5,
+    "clean": false,
+    "summary": "5 changed file(s)"
+  },
+  "next_action": "record evidence and close the ticket if scope is complete",
+  "ok": true,
+  "profile": "ticket",
+  "ready_work": {
+    "blocked_count": 0,
+    "human_required_count": 0,
+    "ready_count": 8,
+    "source": "beads"
+  },
+  "review_gate_ok": true
+}

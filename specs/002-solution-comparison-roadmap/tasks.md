@@ -38,7 +38,7 @@
 
 ## Phase 6: Approved Pydantic AI And Durable Execution Evaluation
 
-- [ ] T019 [US2] Update comparison criteria for hosted observability and durable execution requirements
+- [X] T019 [US2] Update comparison criteria for hosted observability and durable execution requirements
 - [ ] T020 [US3] Define the `pydantic-ai` implementation slice plan with Logfire evidence
 - [ ] T021 [US3] Scaffold the runnable `apps/pydantic-ai/` comparable workflow with deterministic fixture support
 - [ ] T022 [US3] Add hosted Logfire and OpenTelemetry trace evidence capture for the Pydantic AI slice

@@ -10,6 +10,9 @@ high-level needs into evidence that can be checked against runnable apps.
 
 Do not use this rubric to declare a final winner from research alone. A candidate should only be promoted after it has
 implementation evidence from a runnable app, shared contracts, traces, evaluations, and setup notes.
+Final-solution promotion also requires hosted observability exercised as part of the candidate stack and durable
+execution proof. Repo-local artifacts remain required for repeatable validation, but they are not enough by themselves
+for final-solution acceptance.
 
 ## Scoring Scale
 
@@ -24,6 +27,12 @@ Use a qualitative 1-4 score for each criterion.
 
 If a candidate requires custom critical infrastructure, cap the affected criterion at `2` unless the roadmap explicitly
 decides that owning that infrastructure is strategically necessary.
+
+For final-solution review, cap Observability at `2` when hosted observability has not been exercised by the candidate
+app and linked to the same run evidence reviewers inspect. Cap Durable Execution and Scalability at `2` when retry,
+resume, human wait, and side-effect behavior are not proven through a selected or explicitly evaluated durable runtime.
+These caps do not block research or first-slice implementation work; they mean the candidate is not final-solution
+ready.
 
 ## Criteria
 
@@ -51,12 +60,16 @@ Strong evidence:
 
 - Readable hosted traces for model calls, tools, retrieval, state transitions, inputs, outputs, latency, tokens, costs,
   and failures.
+- Hosted trace evidence produced by the candidate app as part of the tested stack, correlated to the run artifact,
+  evaluation output, and candidate revision.
 - Repo-local trace exports that let agents validate behavior without hosted credentials.
 
 Warning conditions:
 
 - Traces are incomplete, hard to correlate, local-only, hosted-only without portable exports, or require extensive
   custom instrumentation.
+- Hosted observability remains a planned integration, disconnected sample, screenshot, or framework claim instead of
+  stack evidence from the tested candidate.
 
 ### Evaluation
 
@@ -97,6 +110,7 @@ Warning conditions:
 
 - Durable execution is deferred, simulated only, tied to a runtime that is too complex to operate, or requires custom
   retry/state infrastructure owned by this project.
+- Durable execution is described as future work while the candidate is being considered for final-solution language.
 
 ### Operating Effort
 
@@ -136,7 +150,8 @@ For each candidate implementation slice:
 2. Capture the evidence groups defined in `docs/comparison-evidence.md`.
 3. Score each criterion from 1-4 and record the evidence behind the score.
 4. Update `docs/requirements-matrix.md` only after implementation or bounded research changes the evidence.
-5. Bring any score of `1` or any custom critical infrastructure warning to the next CEO-level roadmap review.
+5. Apply the final-solution caps before using final-solution language for any candidate.
+6. Bring any score of `1` or any custom critical infrastructure warning to the next CEO-level roadmap review.
 
 The first comparison should favor candidates that minimize custom infrastructure while still meeting the system's
 expected needs for local development, self-hostable evidence, and later durable operation.

@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-23T20:29:10.703372+00:00",
+  "id": "awf-hrm",
+  "work": {
+    "created_at": "2026-05-23T19:44:32.860033Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T019\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "id": "awf-hrm",
+    "issue_type": "task",
+    "priority": 1,
+    "status": "open",
+    "title": "Update comparison criteria for hosted observability and durable execution requirements",
+    "updated_at": "2026-05-23T19:44:43.134488Z"
+  },
+  "worker_id": "codex-t019-awf-hrm"
+}
