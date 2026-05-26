@@ -33,8 +33,8 @@ The first user is the project owner as an engineer. The working assumptions are:
 | R7 | Scalable architecture path | The chosen approach should grow beyond a toy demo | Clear path to durable services |
 | R8 | Roadmap learning loop | Requirements should evolve as prototypes reveal issues | Review notes update specs and backlog |
 | R9 | Low custom critical infrastructure | Avoid rebuilding platform capabilities mature tools normally provide | Platform capabilities are provided or intentionally owned |
-| R10 | Hosted observability as part of the stack | Full solutions need real hosted trace review, not only local exports | Hosted trace evidence correlated to run artifacts |
-| R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison plus retry or resume evidence |
+| R10 | Hosted observability as part of the stack | Full solutions need real hosted trace review, not only local exports | Hosted trace evidence from the tested stack, correlated to run artifacts |
+| R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison with retry/resume/human-wait/side-effect evidence |
 
 ## Functional Needs Map
 
@@ -97,6 +97,21 @@ DBOS, Prefect, and Restate.
 
 The next implementation backlog is approved for Pydantic AI plus Logfire/OpenTelemetry. It must evaluate durable
 execution for this project's purpose: easy to start, easy to understand, easy to scale, and not too complex to operate.
+
+### Acceptance Language For Promotion
+
+Use "candidate slice" language when an implementation proves the shared behavior contract but still has explicit
+hosted observability, evaluation, operating, or durable execution gaps.
+
+Use "final solution" language only when both of these are true:
+
+- Hosted observability is stack evidence from the tested candidate app, correlated to repo-local run and evaluation
+  artifacts.
+- Durable execution is proven for retry, resume, human wait, and side-effect behavior through an evaluated runtime.
+
+Deterministic repo-local artifacts remain mandatory in both cases so agents can rerun validation without hidden hosted
+state. Missing hosted observability or durable execution evidence blocks final-solution acceptance rather than becoming
+an implied follow-up.
 
 ### Durable Execution Options To Evaluate
 

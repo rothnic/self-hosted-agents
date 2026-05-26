@@ -10,6 +10,8 @@ evaluations, setup, and known gaps.
 
 Do not treat research notes or framework claims as implementation evidence. A candidate app only has comparable evidence
 after the shared behavior contract runs and the artifacts below can be reviewed from repo state or linked run outputs.
+For final-solution review, hosted observability and durable execution are required acceptance evidence, not optional
+upgrade paths.
 
 ## Minimum Comparable Demo
 
@@ -46,7 +48,8 @@ Minimum evidence for a comparable demo run:
 
 The minimum demo does not include a production deployment, user-facing UI, multi-agent scheduling, durable background
 workers, a full observability cluster, or a final platform recommendation. Those are follow-up work after the roadmap
-review compares implementation evidence.
+review compares implementation evidence. A candidate with only minimum-demo evidence may continue as a comparison slice,
+but it cannot be accepted as a final solution.
 
 ## Full-Solution Evidence
 
@@ -54,8 +57,12 @@ The minimum demo can be fixture-backed, but final solution promotion requires mo
 
 - Hosted observability must be exercised as part of the candidate stack, including trace visibility for model calls,
   tool calls, state transitions, failures, tokens or cost where available, and correlation back to run artifacts.
+- Hosted trace evidence must come from the tested candidate app, not only provider documentation, screenshots, or a
+  disconnected sample run.
 - Durable execution must be proven for the final solution, including retry, resume, human wait, and side-effect
   behavior. The durable runtime should be selected through evidence rather than assumed.
+- Durable execution evidence must explain the selected runtime or the comparison basis for selecting it, including why
+  it is easy enough to start, understand, recover, and scale for this project.
 - Local or repo-exported artifacts remain required so agents can validate behavior without hidden hosted state.
 
 ## Required Evidence
@@ -81,6 +88,7 @@ Capture enough trace detail to make agent behavior inspectable:
 - Coverage for model calls, tool calls, retrieval, state transitions, inputs, outputs, latency, token usage, and failures.
 - Correlation from the trace back to the run artifact and candidate app revision.
 - Gaps where manual instrumentation, custom storage, or custom visualization would be needed.
+- For final-solution review, hosted trace evidence from the actual candidate stack plus portable repo-local exports.
 
 ### Evaluation Evidence
 
@@ -103,6 +111,17 @@ Capture the operating burden for one engineer:
 - Custom critical infrastructure warning when the stack pushes trace ingestion, eval storage, dashboards, schedulers,
   workers, queues, or run state back onto this project.
 
+### Durable Execution Evidence
+
+Capture whether the candidate can become a final solution for long-running agent work:
+
+- Durable runtime or framework integration evaluated.
+- Scenario covering retry, resume, human wait, and side-effect behavior.
+- Command, run artifact, trace, or log proving the durable behavior.
+- Recovery semantics in terms another agent can inspect and explain.
+- Setup, service, storage, and operator complexity for the durable path.
+- Explicit gap note when durable execution is not yet proven; that gap blocks final-solution promotion.
+
 ### Gaps And Follow-Up
 
 Capture what the implementation does not prove yet:
@@ -114,18 +133,20 @@ Capture what the implementation does not prove yet:
 
 ## Promotion Gate
 
-A candidate app is not ready for roadmap promotion unless it has:
+Implementation slices can be compared with explicit gaps. Final-solution promotion has a stricter gate.
+
+A candidate app is not ready to be described as a final solution unless it has:
 
 - A passing shared behavior contract run.
-- Hosted trace evidence that can be inspected by a reviewer.
+- Hosted trace evidence from the actual candidate stack that can be inspected by a reviewer.
 - Repo-local trace and run artifacts that preserve deterministic validation.
 - Evaluation evidence tied to the same behavior run.
 - Setup and operating notes sufficient for another agent or engineer to rerun the slice.
-- Durable execution evidence, or a clear roadmap gate explaining why the candidate is not yet promotable.
+- Durable execution evidence for retry, resume, human wait, and side-effect behavior.
 - Explicit gap notes for missing evidence and custom critical infrastructure risk.
 
-Missing evidence should be recorded as a gap, not silently inferred. The next CEO-level roadmap review should receive
-candidate options only after these evidence groups exist or the missing groups are clearly called out.
+Missing evidence should be recorded as a gap, not silently inferred. If hosted observability or durable execution is
+missing, the candidate can remain a comparison option, but final-solution language is blocked until the evidence exists.
 
 ## Storage Rule
 
