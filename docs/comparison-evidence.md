@@ -57,8 +57,8 @@ The minimum demo can be fixture-backed, but final solution promotion requires mo
 
 - Hosted observability must be exercised as part of the candidate stack, including trace visibility for model calls,
   tool calls, state transitions, failures, tokens or cost where available, and correlation back to run artifacts.
-- Hosted trace evidence must come from the tested candidate app, not only provider documentation, screenshots, or a
-  disconnected sample run.
+- Hosted trace evidence must come from the tested candidate app running against a live hosted observability system, not
+  only provider documentation, screenshots, fixture-only exports, or a disconnected sample run.
 - Durable execution must be proven for the final solution, including retry, resume, human wait, and side-effect
   behavior. The durable runtime should be selected through evidence rather than assumed.
 - Durable execution evidence must explain the selected runtime or the comparison basis for selecting it, including why

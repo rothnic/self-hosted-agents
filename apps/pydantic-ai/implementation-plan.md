@@ -113,6 +113,21 @@ T026 should update `docs/requirements-matrix.md` only after the Pydantic AI lane
 should score the slice against the functional needs map, keep final-solution language blocked until hosted
 observability and durable execution evidence exist, and record promotion gaps explicitly.
 
+## Dependency And Live Evaluation Gates
+
+The executable Beads queue must preserve the implementation order implied by this plan:
+
+- T022 depends on T021 because hosted Logfire and local OTel evidence require a runnable candidate app.
+- T023 depends on T022 because Pydantic Evals evidence must correlate to the same run and trace ids.
+- T024 depends on T021 because durable execution options should be evaluated against the actual candidate lane.
+- T025 depends on T024 because the durable smoke path must use the selected lowest-complexity option.
+- T026 depends on T023 and T025 because matrix scoring must wait for eval evidence and durable smoke evidence.
+
+Live hosted evaluation means telemetry from the running candidate app reaches a real hosted Logfire project that a
+reviewer can inspect. T022 evidence must include the command used, credential names or setup path, run id, trace id,
+hosted Logfire project or trace link when safe to record, and repo-local export paths. Provider docs, screenshots,
+fixture-only local JSON, or disconnected sample runs do not satisfy the hosted Logfire gate.
+
 ## Non-Goals
 
 - Do not build the runnable Pydantic AI app in T020.
