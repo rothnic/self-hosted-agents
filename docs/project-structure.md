@@ -18,8 +18,11 @@ The repository is organized by purpose so it can grow beyond a single Python app
 
 - `apps/mastra-ts/` will hold the TypeScript Mastra implementation.
 - `apps/langgraph-python/` will hold the Python LangChain/LangGraph implementation.
+- `apps/pydantic-ai/` holds the approved Python Pydantic AI plus Logfire/OpenTelemetry lane. Its T020
+  `implementation-plan.md` is planning-only; runnable scaffolding belongs to T021 and later tickets.
 
-Both apps should prove behavior through shared BDD contracts and future shared packages, not by sharing app internals.
+Candidate apps should prove behavior through shared BDD contracts and future shared packages, not by sharing app
+internals.
 Additional candidate apps may be added when the roadmap comparison identifies a distinct implementation path worth
 testing, such as a Python-first stack using a different orchestration or observability approach.
 
