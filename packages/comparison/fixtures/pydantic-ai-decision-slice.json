@@ -1,0 +1,23 @@
+{
+  "candidate": {
+    "id": "pydantic-ai",
+    "stack": [
+      "Pydantic AI",
+      "Logfire/OpenTelemetry"
+    ]
+  },
+  "constraints": [
+    "Python-first implementation is preferred but comparison evidence is required.",
+    "Hosted Logfire telemetry must be additive to deterministic validation.",
+    "Deterministic validation must run without hosted credentials.",
+    "Durable execution must be selected through later evidence, not assumed."
+  ],
+  "objective": "Compare self-hostable agent application stacks through runnable candidate implementations.",
+  "project_context": {
+    "active_spec": "002-solution-comparison-roadmap",
+    "comparison_contract": "tests/workflow/features/comparable_agent_workflow.feature",
+    "current_slice": "T021",
+    "next_expected_slice": "T022",
+    "previous_candidate": "langgraph-python"
+  }
+}

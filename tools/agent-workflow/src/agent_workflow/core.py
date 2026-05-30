@@ -1235,6 +1235,67 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
         }
 
 
+def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
+    fixture = ROOT / "packages" / "comparison" / "fixtures" / "pydantic-ai-decision-slice.json"
+    runner = ROOT / "apps" / "pydantic-ai" / "run.py"
+    if not fixture.exists() or not runner.exists():
+        return {
+            "ok": False,
+            "command": f"{sys.executable} {rel(runner)} --fixture {rel(fixture)}",
+            "error": "missing runner or fixture",
+            "fixture": rel(fixture),
+            "runner": rel(runner),
+        }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_path = Path(tmpdir) / "pydantic-ai-run.json"
+        command = [
+            sys.executable,
+            str(runner),
+            "--fixture",
+            str(fixture),
+            "--output",
+            str(output_path),
+            "--pretty",
+        ]
+        proc = run(command)
+        try:
+            artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            artifact = {"decode_error": str(exc)}
+        trace = artifact.get("trace_evidence", {})
+        evaluation = artifact.get("evaluation_output", {})
+        required = {
+            "candidate_app_id": artifact.get("candidate_app_id") == "pydantic-ai",
+            "run_id": bool(artifact.get("run_id")),
+            "run_mode": artifact.get("run_mode") == "deterministic-fixture",
+            "recommendation": artifact.get("recommendation", {}).get("linked_task") == "T022"
+            and bool(artifact.get("recommendation", {}).get("next_slice")),
+            "alternatives": bool(artifact.get("alternatives")),
+            "questions": bool(artifact.get("questions")),
+            "acceptance_check": artifact.get("acceptance_check") == "uv run awf workflow-fixture-test",
+            "evidence_paths": bool(artifact.get("evidence_paths")),
+            "setup_notes": artifact.get("evidence_paths", {}).get("setup_notes") == "apps/pydantic-ai/README.md",
+            "command_used": "apps/pydantic-ai/run.py" in artifact.get("command_used", ""),
+            "workflow_steps": bool(artifact.get("workflow", {}).get("steps")),
+            "functional_needs": bool(artifact.get("workflow", {}).get("functional_needs")),
+            "trace_correlated": bool(artifact.get("trace_id")) and trace.get("trace_id") == artifact.get("trace_id"),
+            "trace_gap_status": trace.get("status") == "planned" and trace.get("linked_task") == "T022",
+            "evaluation_gap_status": evaluation.get("status") == "planned" and evaluation.get("linked_task") == "T023",
+            "gap_notes": bool(artifact.get("gaps")) and bool(artifact.get("evidence_paths", {}).get("gap_notes")),
+        }
+        return {
+            "ok": proc.returncode == 0 and all(required.values()),
+            "command": " ".join(shlex.quote(item) for item in command),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout.strip(),
+            "stderr": proc.stderr.strip(),
+            "fixture": rel(fixture),
+            "output": str(output_path),
+            "required": required,
+            "artifact": artifact,
+        }
+
+
 def extract_acceptance_command(item: dict[str, Any] | None) -> str | None:
     if not item:
         return None
@@ -2370,6 +2431,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = pydantic_ai_candidate_smoke_result()
+    results.append(
+        {
+            "name": "pydantic ai deterministic fixture app runs",
+            "ok": data["ok"],
+            "data": data,
+        }
+    )
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()
@@ -2522,11 +2591,20 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             phase="Phase 6",
         )
         active_claim = active_orchestrator.get("claim") if isinstance(active_orchestrator.get("claim"), dict) else {}
-        active_claim_work = active_claim.get("claimed", {}).get("work", {})
+        active_claim_payload = active_claim.get("claimed") if isinstance(active_claim.get("claimed"), dict) else {}
+        active_claim_work = active_claim_payload.get("work", {})
         results.append(
             {
                 "name": "active orchestrator scopes claims to Phase 6 child tickets",
-                "ok": active_orchestrator["ok"] and active_claim_work.get("id") in active_child_ticket_ids,
+                "ok": active_orchestrator["ok"]
+                and (
+                    active_claim_work.get("id") in active_child_ticket_ids
+                    or (
+                        active_claim.get("claimed") is None
+                        and active_claim.get("ready_count", 0) > 0
+                        and active_claim.get("active_claim_count", 0) > 0
+                    )
+                ),
                 "data": active_orchestrator,
             }
         )

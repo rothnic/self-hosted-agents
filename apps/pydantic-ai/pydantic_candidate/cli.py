@@ -1,0 +1,47 @@
+from __future__ import annotations
+
+import argparse
+import json
+import shlex
+import sys
+from pathlib import Path
+from typing import Any
+
+from .workflow import run_candidate_workflow
+
+
+def read_fixture(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def write_output(path: Path, data: dict[str, Any], pretty: bool) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    indent = 2 if pretty else None
+    path.write_text(json.dumps(data, indent=indent, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Run the deterministic Pydantic AI comparison workflow.")
+    parser.add_argument("--fixture", required=True, type=Path, help="Shared comparison fixture JSON path.")
+    parser.add_argument("--output", type=Path, help="Optional run artifact output path.")
+    parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
+    return parser
+
+
+def command_used(argv: list[str] | None) -> str:
+    parts = ["python3", "apps/pydantic-ai/run.py", *(argv if argv is not None else sys.argv[1:])]
+    return " ".join(shlex.quote(part) for part in parts)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    fixture = read_fixture(args.fixture)
+    result = run_candidate_workflow(fixture)
+    output = result.to_dict()
+    output["command_used"] = command_used(argv)
+    output["evidence_paths"]["fixture_input"] = str(args.fixture)
+    if args.output is not None:
+        output["evidence_paths"]["run_artifact"] = str(args.output)
+        write_output(args.output, output, args.pretty)
+    print(json.dumps(output, indent=2 if args.pretty else None, sort_keys=True))
+    return 0
