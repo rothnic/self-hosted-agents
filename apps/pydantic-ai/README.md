@@ -9,12 +9,12 @@ Detailed slice plan: `apps/pydantic-ai/implementation-plan.md`.
 
 Candidate id: `pydantic-ai`.
 
-Stack: Pydantic AI plus Langfuse/OpenTelemetry, with Pydantic Evals and durable execution evaluated by later tickets.
+Stack: Pydantic AI plus Langfuse/OpenTelemetry, Pydantic Evals, and a DBOS durable smoke path.
 
 The current scaffold implements the shared comparable-agent workflow in deterministic fixture mode. It uses
 `pydantic_ai.Agent` with `pydantic_ai.models.test.TestModel` to return structured output without a network model call,
 and it writes a repo-local OpenTelemetry-style trace export that is correlated to the run artifact. It does not call a
-live model, require cloud-hosted Logfire ingestion, run Pydantic Evals, or select a durable runtime.
+live model or require cloud-hosted Logfire ingestion.
 
 Run it from the repo root:
 
@@ -54,6 +54,37 @@ Current T023 evidence:
 - `.agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json`
 - `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json`
 
+## DBOS Durable Smoke
+
+T025 uses Pydantic AI's DBOS integration as the first durable execution proof. The smoke uses local SQLite DBOS state,
+starts a workflow in one child process, kills that process after a completed side-effect step, then starts a second
+child process against the same DBOS database. The resumed workflow completes through `DBOSAgent` and proves the
+side-effect step was not duplicated.
+
+Run it from the repo root:
+
+```bash
+uv run python apps/pydantic-ai/durable_smoke.py \
+  --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
+  --output .agent-runs/verifications/pydantic-ai-durable-smoke.json \
+  --pretty
+```
+
+For durable repo evidence, prefer temporary DBOS state paths and keep only the JSON artifact:
+
+```bash
+uv run python apps/pydantic-ai/durable_smoke.py \
+  --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
+  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json \
+  --db-path /tmp/pydantic-ai-dbos-t025.sqlite \
+  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t025.jsonl \
+  --pretty
+```
+
+Current T025 evidence:
+
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+
 ## Local Setup
 
 Required local tools:
@@ -62,7 +93,8 @@ Required local tools:
 - Repo dependencies installed through the existing `uv` environment.
 
 Fixture-mode service count: `0`. The deterministic fixture path does not require a hosted model provider, Logfire
-project, local OpenTelemetry collector, database, queue, worker, or durable runtime.
+project, local OpenTelemetry collector, queue, worker, or long-running service. The durable smoke uses a local SQLite
+DBOS database file and no hosted credentials.
 
 Environment variable placeholders for later tickets:
 
@@ -126,6 +158,8 @@ Common deterministic-run failures:
 - Missing output directory permission: choose a writable `--output` path under `.agent-runs/verifications/`.
 - Missing Langfuse service or keys: omit `--require-langfuse-ingestion` for deterministic fixture validation, or start
   the self-hosted Langfuse profile and export `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY`.
+- Durable smoke failure before resume: remove the temporary DBOS SQLite file and side-effect log, then rerun the smoke
+  command so it starts with a fresh workflow id and local DBOS state.
 
 ## Evidence Required
 
@@ -143,6 +177,6 @@ Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation
 
 ## Non-Goals
 
-Do not prove cloud-hosted Logfire, live model or model-judge evals, or durable execution in this scaffold. Do not
-declare Pydantic AI plus Langfuse/OpenTelemetry as the final architecture until comparable implementation evidence
-exists.
+Do not prove cloud-hosted Logfire, live model or model-judge evals, production DBOS storage, human-wait workflows, or
+worker scaling in this scaffold. Do not declare Pydantic AI plus Langfuse/OpenTelemetry plus DBOS as the final
+architecture until comparable implementation evidence exists.

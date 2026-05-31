@@ -151,6 +151,19 @@ Runtime positioning after T024:
 | Pydantic AI plus Temporal | Scale fallback | Strong durable semantics, but higher setup and worker complexity |
 | Hatchet | Later platform comparison | Self-hostable workflow product, but not a native Pydantic AI durable wrapper |
 
+### T025 Durable Smoke Evidence
+
+T025 proves the first DBOS durable smoke for `apps/pydantic-ai`. The proof uses local SQLite DBOS state, kills the first
+child process after a completed DBOS side-effect step, resumes the workflow from a second child process, completes the
+Pydantic AI run through `DBOSAgent`, and records a side-effect log with one event.
+
+Evidence:
+
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+
+This upgrades durable execution from selection evidence to candidate smoke evidence, but final-solution language still
+remains blocked until human wait behavior, production DBOS storage, worker topology, and operating recovery are scored.
+
 ## Initial Recommendation
 
 Start by comparing Python-first options before investing deeply in TypeScript or a hosted-first baseline.

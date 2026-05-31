@@ -1417,6 +1417,83 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
         }
 
 
+def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
+    fixture = ROOT / "packages" / "comparison" / "fixtures" / "pydantic-ai-decision-slice.json"
+    runner = ROOT / "apps" / "pydantic-ai" / "durable_smoke.py"
+    if not fixture.exists() or not runner.exists():
+        return {
+            "ok": False,
+            "command": f"{sys.executable} {rel(runner)} --fixture {rel(fixture)}",
+            "error": "missing runner or fixture",
+            "fixture": rel(fixture),
+            "runner": rel(runner),
+        }
+    with tempfile.TemporaryDirectory() as tmpdir:
+        output_path = Path(tmpdir) / "pydantic-ai-durable-smoke.json"
+        db_path = Path(tmpdir) / "pydantic-ai-dbos.sqlite"
+        side_effect_log = Path(tmpdir) / "pydantic-ai-dbos-side-effect.jsonl"
+        command = [
+            sys.executable,
+            str(runner),
+            "--fixture",
+            str(fixture),
+            "--output",
+            str(output_path),
+            "--db-path",
+            str(db_path),
+            "--side-effect-log",
+            str(side_effect_log),
+            "--pretty",
+        ]
+        proc = run(command, timeout=90)
+        try:
+            artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            artifact = {"decode_error": str(exc)}
+        durable = artifact.get("durable_property", {})
+        pydantic_ai = artifact.get("pydantic_ai", {})
+        dbos = artifact.get("dbos", {})
+        first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
+        workflow_step_names = [
+            str(step.get("function_name", ""))
+            for step in dbos.get("workflow_steps", [])
+            if isinstance(step, dict)
+        ]
+        required = {
+            "artifact_passed": artifact.get("passed") is True,
+            "dbos_runtime": artifact.get("runtime", {}).get("selected") == "pydantic_ai_dbos",
+            "dbos_workflow_id": bool(dbos.get("workflow_id")),
+            "dbos_sqlite": str(dbos.get("system_database_url", "")).startswith("sqlite:///"),
+            "controlled_failure": bool(durable.get("controlled_failure")),
+            "first_attempt_killed": first_exit_code is not None and first_exit_code != 0,
+            "step_returned_before_kill": artifact.get("first_attempt", {}).get("side_effect_step_returned_before_kill")
+            is True,
+            "resume_proven": durable.get("resume_proven") is True,
+            "side_effect_not_duplicated": durable.get("completed_step_not_duplicated") is True
+            and artifact.get("side_effect", {}).get("line_count") == 1,
+            "dbos_side_effect_step_once": workflow_step_names.count("record_side_effect_once") == 1,
+            "dbos_agent_step": any(name.endswith("DBOSAgent.run_sync") for name in workflow_step_names),
+            "dbos_agent": pydantic_ai.get("agent_class") == "pydantic_ai.durable_exec.dbos.DBOSAgent",
+            "pydantic_run_id": bool(pydantic_ai.get("run_id")),
+            "trace_id": bool(pydantic_ai.get("trace_id")),
+            "no_external_model": pydantic_ai.get("network_required") is False,
+            "no_hosted_credentials": artifact.get("deterministic_validation", {}).get("hosted_credentials_required")
+            is False,
+            "resume_exit_zero": artifact.get("resume_attempt", {}).get("exit_code") == 0,
+        }
+        return {
+            "ok": proc.returncode == 0 and all(required.values()),
+            "command": " ".join(shlex.quote(item) for item in command),
+            "returncode": proc.returncode,
+            "stdout": proc.stdout.strip(),
+            "stderr": proc.stderr.strip(),
+            "fixture": rel(fixture),
+            "output": str(output_path),
+            "required": required,
+            "artifact": artifact,
+        }
+
+
 def extract_acceptance_command(item: dict[str, Any] | None) -> str | None:
     if not item:
         return None
@@ -2556,6 +2633,14 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     results.append(
         {
             "name": "pydantic ai deterministic fixture app runs",
+            "ok": data["ok"],
+            "data": data,
+        }
+    )
+    data = pydantic_ai_durable_smoke_result()
+    results.append(
+        {
+            "name": "pydantic ai dbos durable smoke proves resume",
             "ok": data["ok"],
             "data": data,
         }

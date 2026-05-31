@@ -39,8 +39,8 @@ FUNCTIONAL_NEEDS = [
     },
     {
         "area": "Durable execution",
-        "provider": "DBOS, Prefect, Restate, Temporal, or Hatchet comparison",
-        "first_slice_status": "planned-for-T024",
+        "provider": "Pydantic AI DBOSAgent plus local SQLite DBOS smoke evidence",
+        "first_slice_status": "completed-through-T025",
     },
 ]
 
@@ -55,8 +55,8 @@ class Candidate:
 class ProjectContext:
     active_spec: str = ""
     comparison_contract: str = ""
-    current_slice: str = "T027"
-    next_expected_slice: str = "T023"
+    current_slice: str = "T025"
+    next_expected_slice: str = "T026"
     previous_candidate: str = "langgraph-python"
 
 
@@ -113,6 +113,28 @@ class DecisionRecommendation(BaseModel):
     linked_task: str
 
 
+def expected_recommendation(linked_task: str) -> dict[str, str]:
+    if linked_task == "T026":
+        return {
+            "next_slice": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps.",
+            "reason": (
+                "The runnable candidate now has deterministic run, trace, self-hosted Langfuse, Pydantic Evals, "
+                "and DBOS durable smoke evidence, so the next useful slice is requirements scoring with final-solution "
+                "gaps kept explicit."
+            ),
+            "linked_task": linked_task,
+        }
+    return {
+        "next_slice": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.",
+        "reason": (
+            "The runnable candidate now has deterministic local trace evidence plus optional self-hosted "
+            "Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run "
+            "and trace identity."
+        ),
+        "linked_task": linked_task,
+    }
+
+
 def serialize_otel_span(span: Any) -> dict[str, Any]:
     context = span.get_span_context()
     parent = span.parent
@@ -152,16 +174,8 @@ class DecisionSliceAgentScaffold:
 
     def select_next_slice(self) -> dict[str, str]:
         self.steps.append("select_next_slice")
-        linked_task = self.payload.project_context.next_expected_slice or "T023"
-        expected = {
-            "next_slice": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.",
-            "reason": (
-                "The runnable candidate now has deterministic local trace evidence plus optional self-hosted "
-                "Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run "
-                "and trace identity."
-            ),
-            "linked_task": linked_task,
-        }
+        linked_task = self.payload.project_context.next_expected_slice or "T026"
+        expected = expected_recommendation(linked_task)
         span_exporter = InMemorySpanExporter()
         tracer_provider = TracerProvider()
         tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))
@@ -258,10 +272,10 @@ class DecisionSliceAgentScaffold:
             },
             gaps=[
                 "External Logfire export is optional diagnostic evidence and is not required for fixture validation.",
-                "Durable runtime selection and smoke proof remain T024 and T025 work.",
+                "DBOS durable smoke is local SQLite proof; production storage, human wait, and worker scaling remain gaps.",
             ],
             questions=[
-                "Which self-hosted OpenTelemetry backend should later receive live Pydantic AI telemetry evidence?",
+                "Which DBOS production storage and worker topology should be evaluated after candidate scoring?",
             ],
             recommendation=recommendation,
             run_id=run_id,

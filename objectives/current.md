@@ -10,6 +10,9 @@ stacks against real implementations. The first target user is the project owner 
 cannot rely on approved self-hosted LangSmith access, and needs evidence-backed choices about observability,
 evaluation, orchestration, scalability, and operating effort.
 
+Current long-horizon goal: execute `docs/goals/000-self-hosted-agent-system-roadmap.md` as the parent goal, working
+through its linked child goals in order.
+
 ## Success Criteria
 
 - A new agent can start from `AGENTS.md`, run bootstrap/context commands, and know the next safe action.

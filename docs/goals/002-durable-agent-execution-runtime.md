@@ -66,6 +66,17 @@ Evidence to inspect:
 Next proof: T025 should implement a DBOS smoke around the existing deterministic Pydantic AI candidate path and prove
 retry or resume behavior without duplicating an explicit side-effect-like step.
 
+## Current Smoke Evidence
+
+T025 adds the first DBOS durable smoke for the Pydantic AI lane. It uses a local SQLite DBOS system database, starts a
+workflow in one child process, kills that process after a completed DBOS side-effect step, then starts a second child
+process against the same DBOS database. The resumed workflow completes through `DBOSAgent` with `TestModel`, records a
+Pydantic AI run id and trace id, and proves the side-effect log still contains exactly one event.
+
+Evidence to inspect:
+
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+
 ## Proof Commands
 
 ```bash

@@ -11,14 +11,14 @@
     "Hosted or self-hosted observability telemetry must be explicit and additive to deterministic validation.",
     "Deterministic validation must run without hosted credentials.",
     "Self-hosted Langfuse is preferred for product-grade agent traces when service-backed proof is needed.",
-    "Durable execution must be selected through later evidence, not assumed."
+    "Durable execution must be proven through local or self-hosted evidence, not assumed."
   ],
   "objective": "Compare self-hostable agent application stacks through runnable candidate implementations.",
   "project_context": {
     "active_spec": "002-solution-comparison-roadmap",
     "comparison_contract": "tests/workflow/features/comparable_agent_workflow.feature",
-    "current_slice": "T027",
-    "next_expected_slice": "T023",
+    "current_slice": "T025",
+    "next_expected_slice": "T026",
     "previous_candidate": "langgraph-python"
   }
 }

@@ -1,0 +1,183 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "candidate_app": "apps/pydantic-ai",
+  "command_used": "uv run python apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json --db-path /tmp/pydantic-ai-dbos-t025.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t025.jsonl --pretty",
+  "dbos": {
+    "db_path": "/tmp/pydantic-ai-dbos-t025.sqlite",
+    "side_effect_step_marker": "/tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json",
+    "system_database_url": "sqlite:////tmp/pydantic-ai-dbos-t025.sqlite",
+    "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd",
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "t025-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780267385332,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/tmp/pydantic-ai-dbos-side-effect-t025.jsonl",
+          300.0,
+          "/tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json"
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_durable_smoke",
+      "output": {
+        "agent": {
+          "class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+          "model": "pydantic_ai.models.test.TestModel",
+          "network_required": false,
+          "recommendation": {
+            "linked_task": "T026",
+            "next_slice": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps.",
+            "reason": "The Pydantic AI candidate now has deterministic run, trace, eval, self-hosted Langfuse, and DBOS durability evidence, so the next useful slice is matrix scoring with final-solution gaps explicit."
+          },
+          "usage": {
+            "input_tokens": 77,
+            "output_tokens": 47,
+            "requests": 1
+          }
+        },
+        "pydantic_ai_run_id": "run-edd1d454973cabc74bc3db51",
+        "side_effect": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/tmp/pydantic-ai-dbos-side-effect-t025.jsonl"
+        },
+        "trace_id": "trace-f3151b45dee1f8dc77c33450",
+        "wait": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 2,
+      "status": "SUCCESS",
+      "updated_at": 1780267389000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780267385337,
+        "error": null,
+        "function_id": 1,
+        "function_name": "record_side_effect_once",
+        "output": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/tmp/pydantic-ai-dbos-side-effect-t025.jsonl"
+        },
+        "started_at_epoch_ms": 1780267385333
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780267389671,
+        "error": null,
+        "function_id": 2,
+        "function_name": "controlled_resume_wait",
+        "output": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "started_at_epoch_ms": 1780267389670
+      },
+      {
+        "child_workflow_id": "dbos-workflow-30331114d6a951a1c65019dd-3",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 3,
+        "function_name": "DecisionSliceDBOSAgent.run_sync",
+        "output": null,
+        "started_at_epoch_ms": null
+      },
+      {
+        "child_workflow_id": "dbos-workflow-30331114d6a951a1c65019dd-3",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 4,
+        "function_name": "DBOS.getResult",
+        "output": "AgentRunResult(output=DecisionRecommendation(next_slice='Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps.', reason='The Pydantic AI candidate now has deterministic run, trace, eval, self-hosted Langfuse, and DBOS durability evidence, so the next useful slice is matrix scoring with final-solution gaps explicit.', linked_task='T026'))",
+        "started_at_epoch_ms": null
+      }
+    ]
+  },
+  "deterministic_validation": {
+    "external_model_required": false,
+    "hosted_credentials_required": false,
+    "service_count": 0
+  },
+  "durable_property": {
+    "completed_step_not_duplicated": true,
+    "controlled_failure": "first child process killed after DBOS side-effect step returned",
+    "resume_proven": true
+  },
+  "first_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /tmp/pydantic-ai-dbos-t025.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t025.jsonl --side-effect-step-marker /tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json --workflow-id dbos-workflow-30331114d6a951a1c65019dd --wait-seconds 300.0 --child-phase start",
+    "exit_code": -9,
+    "side_effect_step_returned_before_kill": true,
+    "stderr_excerpt": "_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 27\n17:43:05 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 28\n17:43:05 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 29\n17:43:05 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 30\n17:43:05 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 31\n17:43:05 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 32\n17:43:05 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version t025-durable-smoke\n17:43:05 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n17:43:05 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n17:43:05 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"start\", \"workflow_id\": \"dbos-workflow-30331114d6a951a1c65019dd\"}\n"
+  },
+  "issue_id": "awf-4wg",
+  "passed": true,
+  "pydantic_ai": {
+    "agent_class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+    "model_class": "pydantic_ai.models.test.TestModel",
+    "network_required": false,
+    "recommendation": {
+      "linked_task": "T026",
+      "next_slice": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps.",
+      "reason": "The Pydantic AI candidate now has deterministic run, trace, eval, self-hosted Langfuse, and DBOS durability evidence, so the next useful slice is matrix scoring with final-solution gaps explicit."
+    },
+    "run_id": "run-edd1d454973cabc74bc3db51",
+    "trace_id": "trace-f3151b45dee1f8dc77c33450"
+  },
+  "resume_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /tmp/pydantic-ai-dbos-t025.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t025.jsonl --side-effect-step-marker /tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json --workflow-id dbos-workflow-30331114d6a951a1c65019dd --wait-seconds 300.0 --child-phase resume --child-result-output /tmp/dbos-workflow-30331114d6a951a1c65019dd.child-result.json",
+    "exit_code": 0,
+    "stderr_excerpt": "17:43:09 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n17:43:09 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n17:43:09 [    INFO] (dbos:_dbos.py:534) Application version: t025-durable-smoke\n17:43:09 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////tmp/pydantic-ai-dbos-t025.sqlite (schema: dbos)\n17:43:09 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n17:43:09 [    INFO] (dbos:_dbos.py:611) Recovering 1 workflows from application version t025-durable-smoke\n17:43:09 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n17:43:09 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n17:43:09 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"resume\", \"workflow_id\": \"dbos-workflow-30331114d6a951a1c65019dd\", \"status\": \"complete\"}\n"
+  },
+  "runtime": {
+    "selected": "pydantic_ai_dbos",
+    "sqlite_development_mode": true
+  },
+  "side_effect": {
+    "events": [
+      {
+        "event": "side-effect",
+        "sequence": 1,
+        "workflow_id": "dbos-workflow-30331114d6a951a1c65019dd"
+      }
+    ],
+    "line_count": 1,
+    "log_path": "/tmp/pydantic-ai-dbos-side-effect-t025.jsonl"
+  }
+}

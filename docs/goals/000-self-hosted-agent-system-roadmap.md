@@ -2,7 +2,10 @@
 
 ## Objective
 
-Build a complete self-hosted agent operating system by executing the major product goals in order.
+Build a complete self-hosted agent operating system by executing the linked product goals in order.
+
+This is the parent goal. Use it as the single long-running `/goal` target when the work should advance the full
+roadmap instead of one focused product iteration.
 
 ## Ordered Goals
 

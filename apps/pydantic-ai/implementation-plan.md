@@ -116,12 +116,12 @@ the first T025 smoke, with the comparison basis in
 `.agent-runs/verifications/verify-durable-options-t024-20260531.json`. The comparison keeps Prefect, Restate, Temporal,
 and Hatchet visible as follow-up or fallback options.
 
-T025 should add a DBOS durable execution smoke path using the lowest-complexity viable option selected by T024. The
-smoke path must prove retry or resume behavior in a way another agent can inspect from command output, run artifacts,
-traces, or logs. It should use local SQLite DBOS state, deterministic fixture mode, and one explicit side-effect-like
-DBOS step so reruns can prove the completed step is not duplicated. T025 must also add and lock the missing DBOS
-dependency because the current package exposes the durable module spec but cannot import `DBOSAgent` until `dbos` is
-installed.
+T025 adds a DBOS durable execution smoke path using the lowest-complexity viable option selected by T024. The smoke
+path proves resume behavior in a way another agent can inspect from command output and a run artifact. It uses local
+SQLite DBOS state, deterministic fixture mode, `DBOSAgent`, and one explicit side-effect-like DBOS step. The first child
+process is killed after that side-effect step completes; the second child process recovers the pending workflow from the
+same SQLite database and proves the completed side-effect step is not duplicated. T025 also adds and locks the DBOS
+dependency required to import `DBOSAgent`.
 
 T026 should update `docs/requirements-matrix.md` only after the Pydantic AI lane produces implementation evidence. It
 should score the slice against the functional needs map, keep final-solution language blocked until hosted
