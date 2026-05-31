@@ -1,0 +1,77 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "candidate_app": "apps/pydantic-ai",
+  "created_at": "2026-05-31T21:45:00Z",
+  "decision_note": "docs/research/durable-execution-selection-2026-05-31.md",
+  "issue_id": "awf-c4e",
+  "notes": [
+    "T024 selects Pydantic AI plus DBOS for the first durable smoke path.",
+    "The selection is scoped to T025 and is not a final platform decision.",
+    "DBOS is a native Pydantic AI durable execution integration.",
+    "DBOS can use local SQLite for the first proof.",
+    "DBOS avoids a separate workflow server for the initial retry or resume smoke.",
+    "The local module spec exists, but DBOSAgent import requires adding the missing dbos dependency in T025.",
+    "Deterministic fixture validation still requires no hosted credentials, no running observability service, and no external model provider.",
+    "Prefect remains the first fallback.",
+    "Temporal remains the scale fallback.",
+    "Restate is deferred until the local package exposes the documented integration.",
+    "Hatchet remains the later workflow-platform comparison option."
+  ],
+  "options": {
+    "dbos": {
+      "position": "selected_for_t025",
+      "reason": "Native Pydantic AI integration with local SQLite proof path and low service count."
+    },
+    "hatchet": {
+      "position": "later_platform_comparison",
+      "reason": "Self-hostable workflow platform, but no native Pydantic AI durable wrapper for the first smoke."
+    },
+    "prefect": {
+      "position": "first_fallback",
+      "reason": "Native Pydantic AI integration, but broader orchestration surface than the first smoke needs."
+    },
+    "restate": {
+      "position": "deferred",
+      "reason": "Current upstream docs list the integration, but the pinned local package does not expose it."
+    },
+    "temporal": {
+      "position": "scale_fallback",
+      "reason": "Strong durable workflow model, but higher setup and worker complexity for one-engineer smoke."
+    }
+  },
+  "pydantic_ai_runtime": {
+    "installed_version": "1.104.0",
+    "dbos_agent_import": {
+      "ok": false,
+      "error": "ModuleNotFoundError: No module named 'dbos'",
+      "required_t025_setup": "Add and lock the DBOS optional dependency before implementing the smoke."
+    },
+    "modules_checked": {
+      "pydantic_ai.durable_exec.dbos": true,
+      "pydantic_ai.durable_exec.prefect": true,
+      "pydantic_ai.durable_exec.restate": false,
+      "pydantic_ai.durable_exec.temporal": true
+    }
+  },
+  "selected_runtime": "pydantic_ai_dbos",
+  "source_docs": [
+    "https://pydantic.dev/docs/ai/integrations/durable_execution/overview/",
+    "https://pydantic.dev/docs/ai/integrations/durable_execution/dbos/",
+    "https://pydantic.dev/docs/ai/integrations/durable_execution/prefect/",
+    "https://pydantic.dev/docs/ai/integrations/durable_execution/restate/",
+    "https://pydantic.dev/docs/ai/integrations/durable_execution/temporal/",
+    "https://docs.dbos.dev/",
+    "https://www.prefect.io/solutions/durable-execution",
+    "https://docs.hatchet.run/v1/durable-execution",
+    "https://docs.hatchet.run/self-hosting"
+  ],
+  "t025_smoke_contract": [
+    "Add the required DBOS dependency through pyproject.toml and uv.lock.",
+    "Run from a deterministic local command without hosted credentials or external model providers.",
+    "Use a local SQLite DBOS system database under a temp or .agent-runs/verifications/ path.",
+    "Wrap the existing deterministic pydantic_ai.Agent path with DBOSAgent.",
+    "Include one explicit DBOS step for non-deterministic or side-effect-like work.",
+    "Force a controlled first-attempt failure and prove rerun resumes without duplicating the completed step.",
+    "Write repo-local durable evidence linking DBOS workflow id, Pydantic AI run id, trace id, command, SQLite path policy, and side-effect counter or log."
+  ]
+}

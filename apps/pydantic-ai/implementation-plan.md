@@ -46,9 +46,10 @@ Evidence storage: repo-local run, trace, eval, setup, and gap artifacts, with ex
 evidence. First evidence is one run artifact linking all evidence groups. Watch cross-run reports and searchable
 self-hosted telemetry.
 
-Durable execution: out of scope for the first runnable slice beyond explicit gap notes. First evidence is a gap note
-naming durable runtime selection as blocked until T024/T025 evidence. Watch DBOS, Prefect, Restate, Temporal, and
-Hatchet.
+Durable execution: out of scope for the first runnable slice beyond explicit gap notes. T024 selected Pydantic AI plus
+DBOS as the first durable smoke path because it is native to Pydantic AI, can run locally with SQLite for the first
+proof, and avoids a separate workflow server for the next slice. Watch Prefect as the closest fallback, Temporal as the
+scale fallback, Restate after the package boundary is resolved, and Hatchet as the broader workflow-platform option.
 
 Operator experience: local deterministic command, README setup notes, and optional export env vars. First evidence is
 one no-credential command plus setup and failure notes. Watch single-command local stack, low service count, and
@@ -109,13 +110,18 @@ T023 adds Pydantic Evals output and run artifact capture tied to the same run id
 assertion path for fixture validation, writes `.evaluation.json` next to the run artifact by default, updates setup
 notes with eval rerun details and artifact locations, and treats Logfire visualization as additive evidence.
 
-T024 should compare durable execution options before choosing a runtime. Evaluate Pydantic AI framework-specific paths
-first: DBOS, Prefect, Restate, and Temporal. Compare Hatchet as the primary non-framework-specific Python workflow
-platform option.
+T024 compares durable execution options before choosing a runtime. The recorded selection is Pydantic AI plus DBOS for
+the first T025 smoke, with the comparison basis in
+`docs/research/durable-execution-selection-2026-05-31.md` and compact evidence in
+`.agent-runs/verifications/verify-durable-options-t024-20260531.json`. The comparison keeps Prefect, Restate, Temporal,
+and Hatchet visible as follow-up or fallback options.
 
-T025 should add a durable execution smoke path only after T024 selects the lowest-complexity viable option. The smoke
-path must prove retry or resume behavior in a way another agent can inspect from command output, run artifacts, traces,
-or logs.
+T025 should add a DBOS durable execution smoke path using the lowest-complexity viable option selected by T024. The
+smoke path must prove retry or resume behavior in a way another agent can inspect from command output, run artifacts,
+traces, or logs. It should use local SQLite DBOS state, deterministic fixture mode, and one explicit side-effect-like
+DBOS step so reruns can prove the completed step is not duplicated. T025 must also add and lock the missing DBOS
+dependency because the current package exposes the durable module spec but cannot import `DBOSAgent` until `dbos` is
+installed.
 
 T026 should update `docs/requirements-matrix.md` only after the Pydantic AI lane produces implementation evidence. It
 should score the slice against the functional needs map, keep final-solution language blocked until hosted
@@ -143,5 +149,5 @@ observability gate.
 - Do not build the runnable Pydantic AI app in T020.
 - Do not add dependencies, fixtures, runtime modules, or generated artifacts before T021.
 - Do not require hosted Logfire credentials for deterministic validation or T022 closure.
-- Do not choose DBOS, Prefect, Restate, Temporal, Hatchet, or another durable runtime in this planning task.
+- Do not treat the T024 DBOS selection as the final platform winner before T025 durable smoke evidence exists.
 - Do not treat Pydantic AI plus Langfuse/OpenTelemetry as the final platform winner before comparable evidence exists.

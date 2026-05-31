@@ -44,6 +44,6 @@
 - [X] T022 [US3] Add self-hosted-compatible OpenTelemetry trace evidence capture for the Pydantic AI slice
 - [X] T027 [US3] Prove self-hosted Langfuse ingestion for the Pydantic AI trace path
 - [X] T023 [US3] Add Pydantic Evals output and run artifact capture for the Pydantic AI slice
-- [ ] T024 [US3] Compare durable execution options for Pydantic AI and Python workflow candidates
+- [X] T024 [US3] Compare durable execution options for Pydantic AI and Python workflow candidates
 - [ ] T025 [US3] Add a durable execution smoke path for the lowest-complexity selected option
 - [ ] T026 [US3] Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps

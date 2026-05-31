@@ -124,6 +124,33 @@ rather than becoming an implied follow-up.
 | Pydantic AI plus Temporal | Official Pydantic AI integration and proven durable execution platform | Operator complexity for one engineer |
 | Hatchet | Python-friendly workflow platform with durable tasks, dashboard, replay, and OTel export | Whether non-framework integration adds glue |
 
+## Durable Selection Update - 2026-05-31
+
+T024 selects **Pydantic AI plus DBOS** as the first durable smoke path for the tested `apps/pydantic-ai` lane. This is
+not a final platform selection; it is the lowest-complexity next proof because DBOS is a native Pydantic AI integration,
+can use local SQLite for deterministic smoke evidence, and avoids adding a separate workflow server before the project
+has retry or resume proof.
+
+Selection evidence:
+
+- Decision note: `docs/research/durable-execution-selection-2026-05-31.md`.
+- Verification artifact: `.agent-runs/verifications/verify-durable-options-t024-20260531.json`.
+- Local package check: the pinned candidate package exposes module specs for `pydantic_ai.durable_exec.dbos`,
+  `pydantic_ai.durable_exec.prefect`, and `pydantic_ai.durable_exec.temporal`; the documented Restate integration is not
+  exposed by the installed package and is deferred until that boundary is resolved.
+- DBOS dependency check: importing `DBOSAgent` currently fails because the optional `dbos` dependency is not installed.
+  T025 must add and lock that dependency before implementing the smoke.
+
+Runtime positioning after T024:
+
+| Runtime | T024 Position | Why |
+| --- | --- | --- |
+| Pydantic AI plus DBOS | Selected for T025 | Native integration, local SQLite proof path, low service count |
+| Pydantic AI plus Prefect | First fallback | Python-first and native, but broader orchestration surface than the smoke needs |
+| Pydantic AI plus Restate | Deferred | Documented upstream, but not available in the installed candidate package |
+| Pydantic AI plus Temporal | Scale fallback | Strong durable semantics, but higher setup and worker complexity |
+| Hatchet | Later platform comparison | Self-hostable workflow product, but not a native Pydantic AI durable wrapper |
+
 ## Initial Recommendation
 
 Start by comparing Python-first options before investing deeply in TypeScript or a hosted-first baseline.
