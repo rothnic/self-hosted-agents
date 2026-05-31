@@ -2778,13 +2778,22 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         active_child_ticket_ids = {
             item.get("ticket_id") for item in active_increment.get("child_tickets", []) if item.get("ticket_id")
         }
+        active_increment_is_executing = (
+            active_increment.get("review_status") == "executing"
+            and active_increment.get("ready_count", 0) > 0
+            and active_increment.get("next_action") == "orchestrator-loop should assign unclaimed unblocked work"
+        )
+        active_increment_is_ready_for_review = (
+            active_increment.get("review_status") == "ready-for-increment-review"
+            and active_increment.get("ready_count") == 0
+            and active_increment.get("next_action") == "integrator-loop should prepare the phase review PR"
+        )
         results.append(
             {
-                "name": "active increment status routes to Phase 6 ready work",
+                "name": "active increment status routes Phase 6 lifecycle",
                 "ok": active_increment["increment_id"] == "002-solution-comparison-roadmap-phase-6"
-                and active_increment["ready_count"] > 0
                 and bool(active_child_ticket_ids)
-                and bool(active_increment["next_action"]),
+                and (active_increment_is_executing or active_increment_is_ready_for_review),
                 "data": active_increment,
             }
         )
@@ -2801,7 +2810,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         active_claim_work = active_claim_payload.get("work", {})
         results.append(
             {
-                "name": "active orchestrator scopes claims to Phase 6 child tickets",
+                "name": "active orchestrator scopes Phase 6 child tickets or review handoff",
                 "ok": active_orchestrator["ok"]
                 and (
                     active_claim_work.get("id") in active_child_ticket_ids
@@ -2809,6 +2818,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                         active_claim.get("claimed") is None
                         and active_claim.get("ready_count", 0) > 0
                         and active_claim.get("active_claim_count", 0) > 0
+                    )
+                    or (
+                        active_claim.get("claimed") is None
+                        and active_claim.get("ready_count") == 0
+                        and active_orchestrator.get("next_action")
+                        == "integrator-loop should prepare the phase review PR"
                     )
                 ),
                 "data": active_orchestrator,

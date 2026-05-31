@@ -48,15 +48,15 @@ FUNCTIONAL_NEEDS = [
 @dataclass(frozen=True)
 class Candidate:
     id: str = "pydantic-ai"
-    stack: list[str] = field(default_factory=lambda: ["Pydantic AI", "Langfuse/OpenTelemetry"])
+    stack: list[str] = field(default_factory=lambda: ["Pydantic AI", "Langfuse/OpenTelemetry", "Pydantic Evals", "DBOS"])
 
 
 @dataclass(frozen=True)
 class ProjectContext:
     active_spec: str = ""
     comparison_contract: str = ""
-    current_slice: str = "T025"
-    next_expected_slice: str = "T026"
+    current_slice: str = "T026"
+    next_expected_slice: str = "roadmap-review"
     previous_candidate: str = "langgraph-python"
 
 
@@ -114,6 +114,17 @@ class DecisionRecommendation(BaseModel):
 
 
 def expected_recommendation(linked_task: str) -> dict[str, str]:
+    if linked_task == "roadmap-review":
+        return {
+            "next_slice": "Run the roadmap review for Pydantic AI promotion and next-goal routing.",
+            "reason": (
+                "The Pydantic AI lane now has deterministic run, trace, self-hosted Langfuse, Pydantic Evals, "
+                "durable selection, DBOS smoke, and requirements scoring evidence. The next useful slice is a "
+                "roadmap review that decides whether to deepen Pydantic AI, compare another stack, or move to the "
+                "next parent goal while keeping final-solution gaps explicit."
+            ),
+            "linked_task": linked_task,
+        }
     if linked_task == "T026":
         return {
             "next_slice": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps.",
@@ -174,7 +185,7 @@ class DecisionSliceAgentScaffold:
 
     def select_next_slice(self) -> dict[str, str]:
         self.steps.append("select_next_slice")
-        linked_task = self.payload.project_context.next_expected_slice or "T026"
+        linked_task = self.payload.project_context.next_expected_slice or "roadmap-review"
         expected = expected_recommendation(linked_task)
         span_exporter = InMemorySpanExporter()
         tracer_provider = TracerProvider()
@@ -247,12 +258,12 @@ class DecisionSliceAgentScaffold:
             acceptance_check="uv run awf workflow-fixture-test",
             alternatives=[
                 {
-                    "option": "Add Pydantic Evals before trace evidence",
-                    "tradeoff": "Useful scoring path, but it would leave the run hard to inspect and correlate.",
+                    "option": "Deepen DBOS production proof immediately",
+                    "tradeoff": "Useful if Pydantic AI is the likely primary path, but it skips a roadmap comparison gate.",
                 },
                 {
-                    "option": "Compare durable runtimes immediately",
-                    "tradeoff": "Useful architecture research, but it should evaluate the actual runnable candidate lane.",
+                    "option": "Start another candidate lane immediately",
+                    "tradeoff": "Useful contrast, but it should be chosen after reviewing the Pydantic AI scores and gaps.",
                 },
             ],
             candidate_app_id=self.payload.candidate.id,
@@ -272,10 +283,11 @@ class DecisionSliceAgentScaffold:
             },
             gaps=[
                 "External Logfire export is optional diagnostic evidence and is not required for fixture validation.",
-                "DBOS durable smoke is local SQLite proof; production storage, human wait, and worker scaling remain gaps.",
+                "DBOS durable smoke is local SQLite proof; retry, human wait, production storage, and workers remain gaps.",
+                "Self-hosted Langfuse proof exists, but production deployment, retention, backup, and recovery remain gaps.",
             ],
             questions=[
-                "Which DBOS production storage and worker topology should be evaluated after candidate scoring?",
+                "Should the next roadmap step deepen Pydantic AI or compare another stack before primary-stack selection?",
             ],
             recommendation=recommendation,
             run_id=run_id,

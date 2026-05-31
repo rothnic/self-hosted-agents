@@ -1,6 +1,7 @@
 # Requirements Matrix
 
 Date: 2026-05-10
+Last updated: 2026-05-31
 
 ## Purpose
 
@@ -64,7 +65,7 @@ missing provider component, record that as a custom critical infrastructure warn
 | LangGraph Python plus Langfuse | Strong Python orchestration plus self-hostable LLM observability | Trace quality, eval workflow, setup effort | Integration depth must be proven |
 | LangGraph Python plus Phoenix | Strong Python and OpenInference-style observability path | Local tracing, eval quality, app instrumentation | Deferred until dev experience is better understood |
 | Python app plus MLflow tracing | Strong Python lifecycle and broader experiment tracking | Trace/eval ergonomics for agent workflows | Less specialized LLM observability UX |
-| Pydantic AI plus Logfire/OTel | Python-native typed agents with evals and durability | Typed ergonomics, evals, OTel evidence, runtime fit | Newer framework; fit needs demo proof |
+| Pydantic AI + Langfuse/DBOS | Tested typed Python slice with evals and durable smoke | OTel, evals, runtime fit | Production DBOS, human wait, and workers are unscored |
 | Mastra TypeScript plus shared contracts | Useful contrast with a TypeScript-native agent framework | Cross-language cost and feature parity | Lower fit with Python preference |
 | LangSmith baseline | Best-known LangChain/LangGraph comparison point | Feature expectations and integration baseline | Self-hosted access may require Enterprise |
 
@@ -72,10 +73,10 @@ missing provider component, record that as a custom critical infrastructure warn
 
 Legend: `High` means likely strong fit; `Medium` means plausible but needs proof; `Low` means weak fit or non-primary.
 
-| Requirement | LangGraph + Langfuse | LangGraph + Phoenix | Python + MLflow | Pydantic AI + Logfire/OTel | Mastra TS | LangSmith Baseline |
+| Requirement | LangGraph + Langfuse | LangGraph + Phoenix | Python + MLflow | Pydantic AI + Langfuse/DBOS | Mastra TS | LangSmith Baseline |
 | --- | --- | --- | --- | --- | --- | --- |
 | R1 Python-first path | High | High | High | High | Low | High |
-| R2 Local/self-hostable observability | High | High | Medium | Medium | Medium | Low for this project |
+| R2 Local/self-hostable observability | High | High | Medium | High | Medium | Low for this project |
 | R3 Evaluation/regression support | Medium | High | Medium | High | Medium | High |
 | R4 Inspectable orchestration | High | High | Medium | Medium | Medium | High |
 | R5 Shared comparison harness | High | High | High | High | High | Medium |
@@ -138,8 +139,7 @@ Selection evidence:
 - Local package check: the pinned candidate package exposes module specs for `pydantic_ai.durable_exec.dbos`,
   `pydantic_ai.durable_exec.prefect`, and `pydantic_ai.durable_exec.temporal`; the documented Restate integration is not
   exposed by the installed package and is deferred until that boundary is resolved.
-- DBOS dependency check: importing `DBOSAgent` currently fails because the optional `dbos` dependency is not installed.
-  T025 must add and lock that dependency before implementing the smoke.
+- DBOS dependency check: T025 added and locked the optional `dbos` dependency required for `DBOSAgent`.
 
 Runtime positioning after T024:
 
@@ -163,6 +163,72 @@ Evidence:
 
 This upgrades durable execution from selection evidence to candidate smoke evidence, but final-solution language still
 remains blocked until human wait behavior, production DBOS storage, worker topology, and operating recovery are scored.
+
+### Pydantic AI Implementation Scoring Update (T026)
+
+Evidence status: `apps/pydantic-ai` is now a tested candidate slice, not only a research candidate. It has deterministic
+repo-local run, trace, evaluation, and durable smoke artifacts, plus one service-backed self-hosted Langfuse proof. This
+does not make it a final solution because durable retry, human wait, production DBOS storage, worker topology, recovery
+operations, live model/tool traces, and broader evaluation workflows remain unproven.
+
+Evidence inspected on 2026-05-31:
+
+- **Run and trace artifacts**: `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json` and
+  `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json` record run
+  `run-e545699517a2885613711cf9`, local trace `trace-573f0157f5d65ccdc1c963d4`, OTLP trace
+  `735c1665d723b965ef77950eeeac36df`, five repo-local workflow spans, and two native Pydantic AI spans.
+- **Self-hosted observability artifact**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json` verifies
+  self-hosted Langfuse OTLP ingestion and trace retrieval through the tested app path.
+- **Evaluation artifacts**: `.agent-runs/verifications/verify-pydantic-evals-t023-20260531.json`,
+  `.agent-runs/verifications/pydantic-ai-evals-run-20260531.json`, and
+  `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json` record Pydantic Evals result
+  `eval-a584886d68bad6f4`, score `5/5`, and correlation to the same run and trace ids.
+- **Durable selection artifact**: `.agent-runs/verifications/verify-durable-options-t024-20260531.json` records DBOS
+  as the lowest-complexity first durable smoke path, with Prefect, Temporal, Restate, and Hatchet kept visible.
+- **Durable smoke artifact**: `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json` records DBOS
+  workflow `dbos-workflow-30331114d6a951a1c65019dd`, Pydantic AI run `run-edd1d454973cabc74bc3db51`, trace
+  `trace-f3151b45dee1f8dc77c33450`, one `record_side_effect_once` DBOS step, a killed first child, successful resume,
+  and one side-effect event.
+
+#### Pydantic AI Functional Needs Evidence
+
+| Functional Area | Pydantic AI Evidence | Slice Score | Promotion Gap |
+| --- | --- | --- | --- |
+| Agent orchestration | Typed agent returns structured recommendations and native OTel spans | 3 | Branching, approval hooks, and production composition are unproven |
+| Tool and context access | Fixture-backed typed context keeps shared input deterministic | 3 | Real tools, MCP approvals, and reusable schemas are not exercised |
+| Observability | Repo-local OTel export and self-hosted Langfuse ingestion are proven | 4 | Live model/tool token, cost, failure, and retrieval traces remain gaps |
+| Evaluation | Pydantic Evals assertions score 5/5 and correlate to run and trace artifacts | 3 | Datasets, judges, annotation, and Langfuse eval UI are not proven |
+| Evidence storage | Run, trace, eval, setup, durable selection, and smoke artifacts are committed | 3 | Cross-run search, reporting UI, and retention policy are not implemented |
+| Durable execution | DBOS SQLite smoke proves resume without duplicating the side-effect step | 3 | Retry, human wait, production storage, workers, and recovery are not proven |
+| Operator experience | Fixture mode is zero-service; Langfuse and DBOS have documented commands | 2 | Langfuse used several services and secrets; production DBOS setup is unknown |
+| Scalability path | Pydantic AI OTel, Pydantic Evals, and DBOS provide a low-glue Python path | 2 | DBOS storage, workers, queues, retention, backups, and deployment are unscored |
+
+#### Pydantic AI Rubric Scores
+
+These are implementation-slice scores. Final-solution promotion caps still apply where the evidence is incomplete.
+
+| Criterion | Slice Score | Evidence Basis | Final-Solution Cap Or Gap |
+| --- | --- | --- | --- |
+| Infrastructure ownership | 3 | Pydantic AI, Evals, Langfuse, and DBOS provide major platform functions | Compare Langfuse and DBOS operations before deeper selection |
+| Observability | 4 | Tested app emits repo-local traces and verifies the same trace in Langfuse | Live model/tool traces, token and cost views, and failure traces remain gaps |
+| Evaluation | 3 | Pydantic Evals produces repeatable 5/5 scoring tied to run and trace ids | Dataset, judge, annotation, regression history, and Langfuse eval UI remain gaps |
+| Durable execution | 3 | DBOS smoke proves resume and side-effect non-duplication with workflow steps | Cap final-solution language until retry, human wait, production DBOS, and workers |
+| Scalability | 2 | Official OTel, eval, and DBOS paths suggest a scale route without custom core infra | Production topology, storage, queues, recovery, and deployment are not implemented |
+| Operating effort | 2 | Fixture mode is simple, but the service-backed proof used services and secrets | Needs deployment docs, backups, reset, and recovery rehearsal |
+
+#### Pydantic AI Promotion Decision
+
+Pydantic AI should be promoted from research candidate to **tested candidate slice**. It should not be described as the
+final solution yet.
+
+Promotion blockers before final-solution language:
+
+- Prove durable retry and human wait behavior, not only resume and side-effect safety.
+- Replace the SQLite DBOS smoke with a scored production storage and worker topology.
+- Document and rehearse recovery for Langfuse, DBOS storage, secrets, retention, and backups.
+- Add live model/tool traces or explicit simulated equivalents covering tokens, cost, failures, and tool-call context.
+- Expand Pydantic Evals beyond deterministic fixture assertions into datasets, judges, annotation, or regression history.
+- Compare the now-tested Pydantic AI slice against the LangGraph Python lane before choosing a primary product stack.
 
 ## Initial Recommendation
 
@@ -389,23 +455,26 @@ the evidence required by `docs/comparison-evidence.md`.
 | Scalability | 3 | Official durable execution integrations offer clear durable workflow options | Runtime choice and service topology remain unapproved |
 | Operating effort | 2 | Python-first ergonomics are promising | Real bootstrap, secrets, service count, and failure recovery are unknown |
 
-### Pydantic AI Promotion Gaps
+### Pydantic AI Research Promotion Gates
 
-- Do not promote Pydantic AI beyond research-candidate status until it runs the same comparable-agent workflow and emits
-  repo-local run, trace, evaluation, setup, and gap artifacts.
+These gates were used before the runnable implementation slice existed. T022, T027, T023, T025, and T026 now provide
+the tested slice evidence summarized above; final-solution blockers remain tracked in the T026 scoring update.
+
+- Do not promote Pydantic AI to the final solution from research evidence alone; use tested run, trace, evaluation,
+  setup, durable, and gap artifacts.
 - Preserve deterministic fixture validation without hosted credentials. Logfire or any hosted backend must be additive,
   not required by `uv run awf workflow-fixture-test`.
-- Verify a generic local OTel backend path before depending on Logfire-specific UI or cloud-hosted telemetry.
-- Treat durable execution as follow-up architecture evidence; do not silently choose Temporal, DBOS, Prefect, or Restate
-  as part of the first Pydantic AI slice.
+- Prefer self-hosted-compatible observability evidence before depending on Logfire-specific UI or cloud-hosted
+  telemetry.
+- Treat DBOS durable smoke evidence as tested slice evidence, not a complete production runtime decision.
 - Record the exact Pydantic AI instrumentation format/version because OpenTelemetry GenAI conventions are still in
   development.
 
 ### Pydantic AI Self-Hosted Langfuse Evidence Update (T027)
 
-Evidence status: Pydantic AI now has implementation evidence for repo-local trace export plus self-hosted Langfuse
-OTLP ingestion. T023 also adds Pydantic Evals output correlated to the same run and trace identity, but durable
-execution remains open.
+Evidence status: Pydantic AI gained implementation evidence for repo-local trace export plus self-hosted Langfuse OTLP
+ingestion. T023 also added Pydantic Evals output correlated to the same run and trace identity. T024, T025, and T026
+later added durable option selection, DBOS durable smoke proof, and current matrix scoring.
 
 Evidence inspected on 2026-05-31:
 
@@ -426,15 +495,15 @@ Evidence inspected on 2026-05-31:
 - **Pydantic Evals proof**: `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json` recorded
   `eval-a584886d68bad6f4`, scored 5/5, rejects placeholder-only artifact paths, and links to the same run id and
   trace id. The evaluated fixture records T023 as the recommended slice to preserve correlation with the T027
-  self-hosted Langfuse proof; Beads ready-work advances to T024 after T023 closure.
-- **Durable evidence record**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
+  self-hosted Langfuse proof; later Beads work advanced through T024, T025, and T026.
+- **Langfuse verification record**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
 - **Setup notes**: `docs/orchestration/self-hosted-langfuse.md` documents services, ports, secrets, reset, and
   troubleshooting. `apps/pydantic-ai/README.md` documents `--require-langfuse-ingestion`.
 
 ### Pydantic AI T027 Rubric View
 
-These scores are still slice-level, not final-solution scores, because durable execution remains open and T026 owns the
-final Pydantic AI matrix scoring update.
+These were T027 slice-level scores before the durable execution and final Pydantic AI matrix scoring updates. The T026
+scoring section above is the current Pydantic AI implementation score.
 
 | Criterion | Slice Score | Evidence Basis | Gap Or Cap |
 | --- | --- | --- | --- |

@@ -3,7 +3,9 @@
     "id": "pydantic-ai",
     "stack": [
       "Pydantic AI",
-      "Langfuse/OpenTelemetry"
+      "Langfuse/OpenTelemetry",
+      "Pydantic Evals",
+      "DBOS"
     ]
   },
   "constraints": [
@@ -17,8 +19,8 @@
   "project_context": {
     "active_spec": "002-solution-comparison-roadmap",
     "comparison_contract": "tests/workflow/features/comparable_agent_workflow.feature",
-    "current_slice": "T025",
-    "next_expected_slice": "T026",
+    "current_slice": "T026",
+    "next_expected_slice": "roadmap-review",
     "previous_candidate": "langgraph-python"
   }
 }
