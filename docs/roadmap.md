@@ -83,6 +83,25 @@ repo state, research any new solution-space questions, and return:
 - Targeted questions for the human.
 - Required updates to objectives, specs, tasks, tickets, and comparison artifacts.
 
+## Long-Horizon Goal Backlog
+
+Major product iterations live in `docs/goals/`. These are the forward-looking goals to use when the project needs a
+long-running `/goal` session rather than one small Beads ticket.
+
+Current goal backlog:
+
+0. `docs/goals/000-self-hosted-agent-system-roadmap.md`
+1. `docs/goals/001-self-hosted-observability-evaluation-control-plane.md`
+2. `docs/goals/002-durable-agent-execution-runtime.md`
+3. `docs/goals/003-autonomous-multi-agent-delivery-loop.md`
+4. `docs/goals/004-candidate-platform-decision-product-baseline.md`
+5. `docs/goals/005-self-hosted-deployment-operations-reference.md`
+6. `docs/goals/006-operator-workbench-review-ux.md`
+
+Start with Goal 001 unless the human explicitly prioritizes durable execution, automation, deployment, or operator UX.
+Goal documents are planning backlogs, not executable worker queues. A selected goal should be decomposed into a focused
+spec, tasks, and Beads tickets before implementation.
+
 ## Current Recommendation
 
 Latest CEO-level review: `docs/roadmap-review-2026-05-23.md`.
@@ -107,7 +126,6 @@ maintenance cost for a Python-preferring owner.
 The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should implement that same
 decision-ready workflow before roadmap review compares platform quality.
 
-The active next tickets are Phase 6 tasks T019-T026. Start with T019 / Beads `awf-hrm`, then use the remaining tickets
-to scaffold the Pydantic AI lane, prove hosted Logfire and repo-local trace evidence, capture Pydantic Evals output,
-compare durable execution options, add a lowest-complexity durable smoke path, and update the matrix with implementation
-evidence.
+The active near-term tickets are Phase 6 tasks T027, T023, T024, T025, and T026. For long-horizon work, use the
+goal backlog instead of selecting isolated tasks. The recommended next long-horizon goal is Goal 001:
+self-hosted observability and evaluation control plane.

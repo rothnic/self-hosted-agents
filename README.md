@@ -51,3 +51,15 @@ uv run awf automation-loop --role integrator --write
 - `.agent-runs/` holds run reports, manifests, blocked states, increments, verifications, and learnings.
 
 Product framework work is intentionally deferred until this foundation validates cleanly.
+
+## Long-Horizon Goals
+
+Major product iterations are tracked in `docs/goals/`. Start there when kicking off work that should take many tickets
+and make major project progress:
+
+```bash
+docs/goals/README.md
+```
+
+The current recommended goal is the self-hosted observability and evaluation control plane. It turns trace/eval evidence
+from generic local artifacts into a self-hosted LLM observability backend, with deterministic repo-local fallback.
