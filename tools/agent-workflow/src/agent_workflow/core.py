@@ -1267,13 +1267,42 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             trace_export = json.loads(trace_path.read_text(encoding="utf-8")) if trace_path.exists() else {}
         except json.JSONDecodeError as exc:
             trace_export = {"decode_error": str(exc)}
+        ambient_output_path = Path(tmpdir) / "pydantic-ai-ambient-run.json"
+        ambient_env = os.environ.copy()
+        ambient_env.update(
+            {
+                "LOGFIRE_TOKEN": "fixture-logfire-token",
+                "LANGFUSE_BASE_URL": "http://127.0.0.1:9",
+                "LANGFUSE_PUBLIC_KEY": "fixture-public-key",
+                "LANGFUSE_SECRET_KEY": "fixture-secret-key",
+            }
+        )
+        ambient_proc = subprocess.run(
+            [
+                sys.executable,
+                str(runner),
+                "--fixture",
+                str(fixture),
+                "--output",
+                str(ambient_output_path),
+                "--pretty",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            env=ambient_env,
+        )
+        try:
+            ambient_trace = json.loads(ambient_output_path.with_suffix(".trace.json").read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            ambient_trace = {"decode_error": str(exc)}
         trace = artifact.get("trace_evidence", {})
         evaluation = artifact.get("evaluation_output", {})
         required = {
             "candidate_app_id": artifact.get("candidate_app_id") == "pydantic-ai",
             "run_id": bool(artifact.get("run_id")),
             "run_mode": artifact.get("run_mode") == "deterministic-fixture",
-            "recommendation": artifact.get("recommendation", {}).get("linked_task") == "T022"
+            "recommendation": artifact.get("recommendation", {}).get("linked_task") == "T023"
             and bool(artifact.get("recommendation", {}).get("next_slice")),
             "alternatives": bool(artifact.get("alternatives")),
             "questions": bool(artifact.get("questions")),
@@ -1283,6 +1312,9 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "command_used": "apps/pydantic-ai/run.py" in artifact.get("command_used", ""),
             "workflow_steps": bool(artifact.get("workflow", {}).get("steps")),
             "functional_needs": bool(artifact.get("workflow", {}).get("functional_needs")),
+            "pydantic_ai_runtime": artifact.get("workflow", {}).get("pydantic_ai_runtime", {}).get("agent_class")
+            == "pydantic_ai.Agent"
+            and artifact.get("workflow", {}).get("pydantic_ai_runtime", {}).get("native_otel_span_count", 0) >= 2,
             "trace_export": trace_export.get("provider") == "local-otel-json" and bool(trace_export.get("spans")),
             "trace_linked": artifact.get("evidence_paths", {}).get("trace_evidence") == str(trace_path),
             "trace_correlated": bool(artifact.get("trace_id"))
@@ -1290,15 +1322,22 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             and trace_export.get("trace_id") == artifact.get("trace_id"),
             "langfuse_otel_trace_id": isinstance(trace_export.get("otel_trace_id"), str)
             and len(trace_export.get("otel_trace_id", "")) == 32,
+            "pydantic_ai_native_otel": trace_export.get("pydantic_ai_otel", {}).get("status") == "captured"
+            and trace_export.get("pydantic_ai_otel", {}).get("span_count", 0) >= 2,
             "trace_capture_status": trace.get("status") == "captured" and trace.get("linked_task") == "T022",
             "trace_instrumentation": trace_export.get("instrumentation", {}).get("target")
-            == "Pydantic AI OpenTelemetry instrumentation",
+            == "Repo-local OTLP export with Pydantic AI native OpenTelemetry spans",
             "langfuse_optional": trace_export.get("langfuse", {}).get("configured") is False
             and trace_export.get("langfuse", {}).get("status") == "missing-langfuse-otel-config",
             "langfuse_not_sent_without_credentials": trace_export.get("langfuse", {}).get("sent") is False,
             "logfire_optional": trace_export.get("logfire", {}).get("configured") is False
             and trace_export.get("logfire", {}).get("status") == "missing-logfire-export-config",
             "logfire_not_sent_without_credentials": trace_export.get("logfire", {}).get("sent") is False,
+            "ambient_credentials_do_not_send": ambient_proc.returncode == 0
+            and ambient_trace.get("langfuse", {}).get("status") == "configured-not-requested"
+            and ambient_trace.get("langfuse", {}).get("sent") is False
+            and ambient_trace.get("logfire", {}).get("status") == "configured-not-requested"
+            and ambient_trace.get("logfire", {}).get("sent") is False,
             "evaluation_gap_status": evaluation.get("status") == "planned" and evaluation.get("linked_task") == "T023",
             "gap_notes": bool(artifact.get("gaps")) and bool(artifact.get("evidence_paths", {}).get("gap_notes")),
         }
@@ -1311,6 +1350,11 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "fixture": rel(fixture),
             "output": str(output_path),
             "trace_output": str(trace_path),
+            "ambient_credential_check": {
+                "returncode": ambient_proc.returncode,
+                "stderr": ambient_proc.stderr.strip(),
+                "trace": ambient_trace,
+            },
             "required": required,
             "artifact": artifact,
             "trace": trace_export,

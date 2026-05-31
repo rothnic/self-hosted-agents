@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from importlib.metadata import version
 from typing import Any
+
+from pydantic import BaseModel
+from pydantic_ai import Agent
+from pydantic_ai.capabilities.instrumentation import Instrumentation
+from pydantic_ai.models.test import TestModel
+from pydantic_ai.models.instrumented import InstrumentationSettings
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from .trace import TraceRecorder, stable_id
 
@@ -19,8 +29,8 @@ FUNCTIONAL_NEEDS = [
     },
     {
         "area": "Observability",
-        "provider": "Portable OpenTelemetry export with optional Logfire export",
-        "first_slice_status": "planned-for-T022",
+        "provider": "Portable OpenTelemetry export with optional self-hosted Langfuse ingestion",
+        "first_slice_status": "completed-through-T027",
     },
     {
         "area": "Evaluation",
@@ -38,15 +48,15 @@ FUNCTIONAL_NEEDS = [
 @dataclass(frozen=True)
 class Candidate:
     id: str = "pydantic-ai"
-    stack: list[str] = field(default_factory=lambda: ["Pydantic AI", "Logfire/OpenTelemetry"])
+    stack: list[str] = field(default_factory=lambda: ["Pydantic AI", "Langfuse/OpenTelemetry"])
 
 
 @dataclass(frozen=True)
 class ProjectContext:
     active_spec: str = ""
     comparison_contract: str = ""
-    current_slice: str = "T021"
-    next_expected_slice: str = "T022"
+    current_slice: str = "T027"
+    next_expected_slice: str = "T023"
     previous_candidate: str = "langgraph-python"
 
 
@@ -97,6 +107,26 @@ class CandidateRun:
         }
 
 
+class DecisionRecommendation(BaseModel):
+    next_slice: str
+    reason: str
+    linked_task: str
+
+
+def serialize_otel_span(span: Any) -> dict[str, Any]:
+    context = span.get_span_context()
+    parent = span.parent
+    return {
+        "attributes": dict(span.attributes or {}),
+        "kind": str(span.kind.name),
+        "name": span.name,
+        "parent_span_id": f"{parent.span_id:016x}" if parent else "",
+        "span_id": f"{context.span_id:016x}",
+        "status_code": str(span.status.status_code.name),
+        "trace_id": f"{context.trace_id:032x}",
+    }
+
+
 class DecisionSliceAgentScaffold:
     def __init__(self, payload: FixturePayload, trace: TraceRecorder) -> None:
         self.payload = payload
@@ -122,17 +152,63 @@ class DecisionSliceAgentScaffold:
 
     def select_next_slice(self) -> dict[str, str]:
         self.steps.append("select_next_slice")
-        linked_task = self.payload.project_context.next_expected_slice or "T022"
-        self.trace.record("select_next_slice", {"linked_task": linked_task})
-        return {
-            "next_slice": "Add self-hosted-compatible OpenTelemetry trace evidence for the Pydantic AI slice.",
+        linked_task = self.payload.project_context.next_expected_slice or "T023"
+        expected = {
+            "next_slice": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.",
             "reason": (
-                "The deterministic scaffold now proves the Pydantic AI lane can accept the shared comparison input "
-                "and return structured decision output, so the next useful slice is inspectable local observability "
-                "evidence with an optional Logfire export path."
+                "The runnable candidate now has deterministic local trace evidence plus optional self-hosted "
+                "Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run "
+                "and trace identity."
             ),
             "linked_task": linked_task,
         }
+        span_exporter = InMemorySpanExporter()
+        tracer_provider = TracerProvider()
+        tracer_provider.add_span_processor(SimpleSpanProcessor(span_exporter))
+        instrumentation = Instrumentation(
+            InstrumentationSettings(
+                tracer_provider=tracer_provider,
+                include_content=True,
+                version=2,
+            )
+        )
+        agent = Agent(
+            TestModel(custom_output_args=expected, model_name="self-hosted-agents-fixture"),
+            output_type=DecisionRecommendation,
+            instructions=(
+                "Return the next implementation slice for the Pydantic AI candidate as structured data. "
+                "Do not call external services."
+            ),
+            name="DecisionSliceAgent",
+            capabilities=[instrumentation],
+        )
+        result = agent.run_sync(
+            (
+                f"Objective: {self.payload.objective}\n"
+                f"Current slice: {self.payload.project_context.current_slice}\n"
+                f"Next expected slice: {linked_task}"
+            )
+        )
+        recommendation = result.output
+        usage = result.usage
+        pydantic_ai_spans = [serialize_otel_span(span) for span in span_exporter.get_finished_spans()]
+        self.trace.record_pydantic_ai_otel_spans(pydantic_ai_spans)
+        self.steps.append("run_pydantic_ai_agent")
+        self.trace.record(
+            "run_pydantic_ai_agent",
+            {
+                "agent": "DecisionSliceAgent",
+                "linked_task": recommendation.linked_task,
+                "model": "TestModel",
+                "native_otel_span_count": len(pydantic_ai_spans),
+                "pydantic_ai_version": version("pydantic-ai"),
+                "requests": usage.requests,
+                "input_tokens": usage.input_tokens,
+                "output_tokens": usage.output_tokens,
+            },
+        )
+        self.trace.record("select_next_slice", {"linked_task": recommendation.linked_task})
+        return recommendation.model_dump()
 
     def format_run(self, recommendation: dict[str, str]) -> CandidateRun:
         self.steps.append("format_structured_run_artifact")
@@ -171,7 +247,7 @@ class DecisionSliceAgentScaffold:
                 "linked_task": "T023",
                 "provider": "Pydantic Evals",
                 "gaps": [
-                    "No Pydantic Evals dataset, scorer, or serialized report is emitted by the T021 scaffold.",
+                    "No Pydantic Evals dataset, scorer, or serialized report is emitted by the T027 candidate.",
                 ],
             },
             evidence_paths={
@@ -210,9 +286,19 @@ class DecisionSliceAgentScaffold:
             trace_export=trace_export,
             trace_id=trace_id,
             workflow={
-                "style": "pydantic-ai-typed-agent-scaffold",
+                "style": "pydantic-ai-typed-agent",
                 "agent": "DecisionSliceAgent",
-                "deterministic_model": "fixture-response",
+                "deterministic_model": "pydantic_ai.models.test.TestModel",
+                "pydantic_ai_runtime": {
+                    "package": "pydantic-ai",
+                    "version": version("pydantic-ai"),
+                    "agent_class": "pydantic_ai.Agent",
+                    "instrumentation": "pydantic_ai.capabilities.instrumentation.Instrumentation",
+                    "model_class": "pydantic_ai.models.test.TestModel",
+                    "native_otel_span_count": len(trace_export["pydantic_ai_otel"]["spans"]),
+                    "output_model": "DecisionRecommendation",
+                    "network_required": False,
+                },
                 "steps": self.steps,
                 "functional_needs": FUNCTIONAL_NEEDS,
                 "input_categories": [

@@ -61,9 +61,9 @@ alternatives if Langfuse proves too operationally heavy.
 uv run awf workflow-fixture-test
 uv run awf repo-hygiene
 uv run awf workflow-state-lint --json
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-run.json \
   --pretty
 ```
 
@@ -74,9 +74,9 @@ LANGFUSE_BASE_URL=http://127.0.0.1:13300 \
 LANGFUSE_PUBLIC_KEY=<project-public-key> \
 LANGFUSE_SECRET_KEY=<project-secret-key> \
 LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai \
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-langfuse-run.json \
+  --output .agent-runs/verifications/pydantic-ai-langfuse-run.json \
   --require-langfuse-ingestion \
   --pretty
 ```

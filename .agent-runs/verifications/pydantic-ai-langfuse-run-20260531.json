@@ -1,0 +1,168 @@
+{
+  "acceptance_check": "uv run awf workflow-fixture-test",
+  "alternatives": [
+    {
+      "option": "Add Pydantic Evals before trace evidence",
+      "tradeoff": "Useful scoring path, but it would leave the run hard to inspect and correlate."
+    },
+    {
+      "option": "Compare durable runtimes immediately",
+      "tradeoff": "Useful architecture research, but it should evaluate the actual runnable candidate lane."
+    }
+  ],
+  "candidate_app_id": "pydantic-ai",
+  "command_used": "uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json --require-langfuse-ingestion --pretty",
+  "evaluation_output": {
+    "gaps": [
+      "No Pydantic Evals dataset, scorer, or serialized report is emitted by the T027 candidate."
+    ],
+    "linked_task": "T023",
+    "provider": "Pydantic Evals",
+    "status": "planned"
+  },
+  "evidence_paths": {
+    "fixture_input": "packages/comparison/fixtures/pydantic-ai-decision-slice.json",
+    "gap_notes": "apps/pydantic-ai/implementation-plan.md",
+    "run_artifact": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json",
+    "setup_notes": "apps/pydantic-ai/README.md",
+    "trace_evidence": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+  },
+  "gaps": [
+    "External Logfire export is optional diagnostic evidence and is not required for fixture validation.",
+    "Pydantic Evals output is planned for T023 and is not represented as passing implementation evidence.",
+    "Durable runtime selection and smoke proof remain T024 and T025 work."
+  ],
+  "questions": [
+    "Which self-hosted OpenTelemetry backend should later receive live Pydantic AI telemetry evidence?"
+  ],
+  "recommendation": {
+    "linked_task": "T023",
+    "next_slice": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.",
+    "reason": "The runnable candidate now has deterministic local trace evidence plus optional self-hosted Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run and trace identity."
+  },
+  "run_id": "run-e545699517a2885613711cf9",
+  "run_mode": "deterministic-fixture",
+  "stack": [
+    "Pydantic AI",
+    "Langfuse/OpenTelemetry"
+  ],
+  "trace_evidence": {
+    "gaps": [
+      "External Logfire telemetry is not sent during deterministic fixture validation.",
+      "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+      "Optional Logfire export requires an operator-provided token and backend.",
+      "Token, cost, and live model-call spans require a later non-fixture model run."
+    ],
+    "instrumentation": {
+      "notes": [
+        "The deterministic agent path captures spans from Pydantic AI's Instrumentation capability.",
+        "Repo-local workflow spans are normalized with Pydantic AI native spans for Langfuse ingestion.",
+        "OpenTelemetry GenAI conventions are experimental and may change."
+      ],
+      "pydantic_ai_format_version": 2,
+      "semantic_conventions": "OpenTelemetry GenAI semantic conventions 1.37.0",
+      "target": "Repo-local OTLP export with Pydantic AI native OpenTelemetry spans"
+    },
+    "langfuse": {
+      "base_url_configured": true,
+      "configured": true,
+      "credential_names": [
+        "LANGFUSE_BASE_URL",
+        "LANGFUSE_PUBLIC_KEY",
+        "LANGFUSE_SECRET_KEY"
+      ],
+      "endpoint": "http://127.0.0.1:13300/api/public/otel/v1/traces",
+      "endpoint_path": "/api/public/otel/v1/traces",
+      "http_status": 200,
+      "ingestion_requested": true,
+      "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+      "project_id_recorded": "self-hosted-agents-pydantic-ai",
+      "response_excerpt": "{\"name\":\"otel-ingestion-job\",\"data\":{\"id\":\"b1c5952e-af6f-4013-aa50-a63ca0af0c48\",\"timestamp\":\"2026-05-31T21:13:56.340Z\",\"name\":\"otel-ingestion-job\",\"payload\":{\"data\":{\"fileKey\":\"events/otel/self-hosted-agents-pydantic-ai/2026/05/31/21/13/39135762-5e54-4485-ac15-c69b905a8f4f.json\",\"publicKey\":\"pk-lf-",
+      "sent": true,
+      "status": "verified-in-langfuse",
+      "trace_api": "http://127.0.0.1:13300/api/public/traces/735c1665d723b965ef77950eeeac36df",
+      "trace_url": "http://127.0.0.1:13300/project/self-hosted-agents-pydantic-ai/traces/735c1665d723b965ef77950eeeac36df",
+      "verification_command": "LANGFUSE_BASE_URL=http://localhost:3000 LANGFUSE_PUBLIC_KEY=<pk-lf-...> LANGFUSE_SECRET_KEY=<sk-lf-...> LANGFUSE_PROJECT_ID=<optional-project-id> uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-langfuse-run.json --require-langfuse-ingestion --pretty",
+      "verified": true,
+      "verify_http_status": 200,
+      "verify_response_excerpt": "{\"id\":\"735c1665d723b965ef77950eeeac36df\",\"projectId\":\"self-hosted-agents-pydantic-ai\",\"name\":\"pydantic-ai decision slice\",\"timestamp\":\"2023-11-14T22:13:20.000Z\",\"environment\":\"self-hosted-agents-fixture\",\"tags\":[\"fixture\",\"pydantic-ai\",\"self-hosted-agents\"],\"bookmarked\":false,\"release\":\"self-hosted-"
+    },
+    "langfuse_configured": true,
+    "linked_task": "T022",
+    "logfire": {
+      "base_url_configured": false,
+      "configured": false,
+      "credential_names": [
+        "LOGFIRE_TOKEN"
+      ],
+      "emission_requested": false,
+      "flush_successful": false,
+      "project_url_recorded": "",
+      "sent": false,
+      "status": "missing-logfire-export-config",
+      "verification_command": "LOGFIRE_TOKEN=<write-token> LOGFIRE_PROJECT_URL=<safe-project-or-trace-url> LOGFIRE_BASE_URL=<optional-self-managed-url> uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-logfire-run.json --require-logfire-export --pretty"
+    },
+    "logfire_configured": false,
+    "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+    "provider": "local-otel-json",
+    "span_count": 5,
+    "status": "captured",
+    "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+  },
+  "trace_id": "trace-573f0157f5d65ccdc1c963d4",
+  "workflow": {
+    "agent": "DecisionSliceAgent",
+    "deterministic_model": "pydantic_ai.models.test.TestModel",
+    "functional_needs": [
+      {
+        "area": "Agent orchestration",
+        "first_slice_status": "scaffolded",
+        "provider": "Pydantic AI typed agent and structured output boundary"
+      },
+      {
+        "area": "Tool and context access",
+        "first_slice_status": "scaffolded",
+        "provider": "Typed fixture-backed dependencies for project context"
+      },
+      {
+        "area": "Observability",
+        "first_slice_status": "completed-through-T027",
+        "provider": "Portable OpenTelemetry export with optional self-hosted Langfuse ingestion"
+      },
+      {
+        "area": "Evaluation",
+        "first_slice_status": "planned-for-T023",
+        "provider": "Pydantic Evals with deterministic assertions"
+      },
+      {
+        "area": "Durable execution",
+        "first_slice_status": "planned-for-T024",
+        "provider": "DBOS, Prefect, Restate, Temporal, or Hatchet comparison"
+      }
+    ],
+    "input_categories": [
+      "candidate",
+      "constraints",
+      "objective",
+      "project_context"
+    ],
+    "pydantic_ai_runtime": {
+      "agent_class": "pydantic_ai.Agent",
+      "instrumentation": "pydantic_ai.capabilities.instrumentation.Instrumentation",
+      "model_class": "pydantic_ai.models.test.TestModel",
+      "native_otel_span_count": 2,
+      "network_required": false,
+      "output_model": "DecisionRecommendation",
+      "package": "pydantic-ai",
+      "version": "1.104.0"
+    },
+    "steps": [
+      "load_typed_fixture_context",
+      "map_pydantic_ai_functional_needs",
+      "select_next_slice",
+      "run_pydantic_ai_agent",
+      "format_structured_run_artifact"
+    ],
+    "style": "pydantic-ai-typed-agent"
+  }
+}

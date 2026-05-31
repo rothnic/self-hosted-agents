@@ -3,7 +3,7 @@
 ## Purpose
 
 Define the approved implementation slice for `apps/pydantic-ai/` before writing candidate app code. This plan maps the
-required functional needs to the Pydantic AI, Logfire/OpenTelemetry, Pydantic Evals, and durable execution components
+required functional needs to the Pydantic AI, Langfuse/OpenTelemetry, Pydantic Evals, and durable execution components
 expected to provide them, then scopes the next implementation tickets so later evidence can be compared against
 `apps/langgraph-python/` and future candidate lanes.
 
@@ -11,7 +11,7 @@ expected to provide them, then scopes the next implementation tickets so later e
 
 Candidate id: `pydantic-ai`
 
-Stack under evaluation: Pydantic AI plus Logfire/OpenTelemetry, with Pydantic Evals planned as the evaluation path and
+Stack under evaluation: Pydantic AI plus Langfuse/OpenTelemetry, with Pydantic Evals planned as the evaluation path and
 durable execution options evaluated after the deterministic comparable workflow exists.
 
 Approved decision: implement this as the next Python-first evidence-producing candidate lane. This is not a final
@@ -34,10 +34,10 @@ Tool and context access: app-local typed adapters over fixture project context, 
 dependencies. First evidence is fixture input mapped into tool or context calls with typed outputs. Watch MCP, A2A, and
 reusable capability bundles.
 
-Observability: Pydantic AI OpenTelemetry instrumentation, generic OTel as the self-hosted portability path, and Logfire
-as an optional first-party export target. First evidence is a repo-local trace export linked from the run artifact, with
-Logfire hosting feasibility recorded separately. Watch trace UI, token or cost views, tool-call inspection, SQL access,
-and MCP access to telemetry.
+Observability: Pydantic AI OpenTelemetry instrumentation, self-hosted Langfuse as the LLM-aware trace UI, and Logfire as
+an optional first-party export target only when an operator provides a suitable backend. First evidence is a repo-local
+trace export linked from the run artifact plus explicit self-hosted Langfuse ingestion proof. Watch trace UI, token or
+cost views, tool-call inspection, SQL access, and MCP access to telemetry.
 
 Evaluation: Pydantic Evals plus deterministic assertions for the shared comparable workflow. First evidence is eval
 output tied to the same run id and trace id. Watch datasets, experiments, span-based evals, and Logfire visualization.
@@ -75,9 +75,9 @@ evidence checklist:
 Future T021 command target:
 
 ```bash
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-run.json \
   --pretty
 ```
 
@@ -133,9 +133,10 @@ The executable Beads queue must preserve the implementation order implied by thi
 - T026 depends on T023 and T025 because matrix scoring must wait for eval evidence and durable smoke evidence.
 
 Self-hosted observability evaluation means telemetry evidence from the running candidate app can be inspected without
-requiring a third-party cloud project. T022 evidence must include the command used, run id, trace id, repo-local export
-path, the trace schema or instrumentation version, and any optional Logfire export setup path. Provider docs,
-screenshots, disconnected sample runs, or cloud-only trace links do not satisfy the self-hosted observability gate.
+requiring a third-party cloud project. T022 and T027 evidence must include the command used, run id, trace id,
+repo-local export path, the trace schema or instrumentation version, and any optional Logfire export setup path.
+Provider docs, screenshots, disconnected sample runs, or cloud-only trace links do not satisfy the self-hosted
+observability gate.
 
 ## Non-Goals
 
@@ -143,4 +144,4 @@ screenshots, disconnected sample runs, or cloud-only trace links do not satisfy 
 - Do not add dependencies, fixtures, runtime modules, or generated artifacts before T021.
 - Do not require hosted Logfire credentials for deterministic validation or T022 closure.
 - Do not choose DBOS, Prefect, Restate, Temporal, Hatchet, or another durable runtime in this planning task.
-- Do not treat Pydantic AI plus Logfire/OpenTelemetry as the final platform winner before comparable evidence exists.
+- Do not treat Pydantic AI plus Langfuse/OpenTelemetry as the final platform winner before comparable evidence exists.

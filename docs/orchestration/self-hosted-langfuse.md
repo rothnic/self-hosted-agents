@@ -28,15 +28,23 @@ of the proof contract.
 
 ## Headless Setup
 
-For repeatable proof runs, configure Langfuse headless initialization in the Compose environment before first startup:
+For repeatable proof runs, configure Langfuse headless initialization in the Compose environment before first startup.
+Generate the keys in a shell first:
+
+```bash
+export LANGFUSE_INIT_PROJECT_PUBLIC_KEY="pk-lf-$(openssl rand -hex 12)"
+export LANGFUSE_INIT_PROJECT_SECRET_KEY="sk-lf-$(openssl rand -hex 24)"
+```
+
+Then pass those generated values into the Compose environment:
 
 ```bash
 LANGFUSE_INIT_ORG_ID=self-hosted-agents
 LANGFUSE_INIT_ORG_NAME=Self Hosted Agents
 LANGFUSE_INIT_PROJECT_ID=self-hosted-agents-pydantic-ai
 LANGFUSE_INIT_PROJECT_NAME=Pydantic AI Candidate
-LANGFUSE_INIT_PROJECT_PUBLIC_KEY=pk-lf-self-hosted-agents
-LANGFUSE_INIT_PROJECT_SECRET_KEY=sk-lf-self-hosted-agents
+LANGFUSE_INIT_PROJECT_PUBLIC_KEY=<generated-project-public-key>
+LANGFUSE_INIT_PROJECT_SECRET_KEY=<generated-project-secret-key>
 LANGFUSE_INIT_USER_EMAIL=operator@example.local
 LANGFUSE_INIT_USER_NAME=Operator
 LANGFUSE_INIT_USER_PASSWORD=<local-only-password>
@@ -46,8 +54,8 @@ If the Compose file is cloned upstream, keep generated secrets outside this repo
 
 ```bash
 LANGFUSE_BASE_URL=http://localhost:3000
-LANGFUSE_PUBLIC_KEY=pk-lf-self-hosted-agents
-LANGFUSE_SECRET_KEY=sk-lf-self-hosted-agents
+LANGFUSE_PUBLIC_KEY=<generated-project-public-key>
+LANGFUSE_SECRET_KEY=<generated-project-secret-key>
 LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai
 ```
 
@@ -57,18 +65,18 @@ Run from this repository:
 
 ```bash
 LANGFUSE_BASE_URL=http://localhost:3000 \
-LANGFUSE_PUBLIC_KEY=pk-lf-self-hosted-agents \
-LANGFUSE_SECRET_KEY=sk-lf-self-hosted-agents \
+LANGFUSE_PUBLIC_KEY=<generated-project-public-key> \
+LANGFUSE_SECRET_KEY=<generated-project-secret-key> \
 LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai \
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-langfuse-run.json \
   --require-langfuse-ingestion \
   --pretty
 ```
 
-Passing service-backed evidence requires the command to write `/tmp/pydantic-ai-run.trace.json`, send OTLP/HTTP JSON to
-Langfuse, and verify the same OTLP trace id through `GET /api/public/traces/<trace-id>`.
+Passing service-backed evidence requires the command to write a repo-local `.trace.json` file next to the run artifact,
+send OTLP/HTTP JSON to Langfuse, and verify the same OTLP trace id through `GET /api/public/traces/<trace-id>`.
 
 ## Deterministic Fallback
 
@@ -76,6 +84,10 @@ Do not require Langfuse for `uv run awf workflow-fixture-test`. Without `LANGFUS
 `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY`, the Pydantic AI command records
 `missing-langfuse-otel-config`, writes the local trace artifact, and exits successfully unless
 `--require-langfuse-ingestion` is set.
+
+Credentials alone do not trigger network ingestion. The candidate only sends Langfuse traffic when
+`--require-langfuse-ingestion` is passed, so ambient developer shell variables cannot make fixture validation depend on
+a running service.
 
 ## Reset
 

@@ -95,9 +95,9 @@ Durable execution is required in each final solution. The project must evaluate 
 Pydantic AI path, framework-specific options should be considered first, then Hatchet should be compared with Temporal,
 DBOS, Prefect, and Restate.
 
-The next implementation backlog is approved for Pydantic AI plus Logfire/OpenTelemetry and self-hosted Langfuse
-ingestion as the LLM-aware observability proof. It must evaluate durable execution for this project's purpose: easy to
-start, easy to understand, easy to scale, and not too complex to operate.
+The next implementation backlog is approved for Pydantic AI plus Langfuse/OpenTelemetry as the LLM-aware observability
+proof, with Logfire kept optional. It must evaluate durable execution for this project's purpose: easy to start, easy to
+understand, easy to scale, and not too complex to operate.
 
 ### Acceptance Language For Promotion
 
@@ -369,15 +369,20 @@ Pydantic Evals or durable execution.
 
 Evidence inspected on 2026-05-31:
 
-- **Run artifact**: `/tmp/pydantic-ai-langfuse-run.json` recorded
-  `run-b955c2242f44d8ed882cc04d` in deterministic fixture mode.
-- **Repo-local trace artifact**: `/tmp/pydantic-ai-langfuse-run.trace.json` recorded local trace id
-  `trace-8b14215d61aa6e29d4bbac47`, OTLP trace id `99c38cb17d8c97581c52fda9934eb100`, and four spans.
+- **Run artifact**: `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json` recorded
+  `run-e545699517a2885613711cf9` in deterministic fixture mode.
+- **Repo-local trace artifact**: `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json` recorded
+  local trace id `trace-573f0157f5d65ccdc1c963d4`, OTLP trace id `735c1665d723b965ef77950eeeac36df`,
+  and five spans including a `run_pydantic_ai_agent` span.
+- **Pydantic AI runtime proof**: the run used `pydantic_ai.Agent` with
+  `pydantic_ai.models.test.TestModel`, preserving a deterministic no-network model path.
 - **Self-hosted Langfuse proof**: Langfuse ran on `vps` from upstream commit `b6c2e91` with Compose project
   `sha_langfuse`, reached through `ssh -N -L 13300:127.0.0.1:3300 vps`.
 - **Ingestion verification**: the Pydantic AI command posted OTLP/HTTP JSON to
   `http://127.0.0.1:13300/api/public/otel/v1/traces`, received HTTP 200, and verified the same trace through
-  `GET /api/public/traces/99c38cb17d8c97581c52fda9934eb100`.
+  `GET /api/public/traces/735c1665d723b965ef77950eeeac36df`.
+- **Fixture safety**: `uv run awf workflow-fixture-test` asserts that ambient Logfire and Langfuse credentials are
+  recorded as configured but do not send traffic unless the explicit proof flags are passed.
 - **Durable evidence record**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
 - **Setup notes**: `docs/orchestration/self-hosted-langfuse.md` documents services, ports, secrets, reset, and
   troubleshooting. `apps/pydantic-ai/README.md` documents `--require-langfuse-ingestion`.

@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def command_used(argv: list[str] | None) -> str:
-    parts = ["python3", "apps/pydantic-ai/run.py", *(argv if argv is not None else sys.argv[1:])]
+    parts = ["uv", "run", "python", "apps/pydantic-ai/run.py", *(argv if argv is not None else sys.argv[1:])]
     return " ".join(shlex.quote(part) for part in parts)
 
 

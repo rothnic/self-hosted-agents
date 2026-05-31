@@ -9,19 +9,19 @@ Detailed slice plan: `apps/pydantic-ai/implementation-plan.md`.
 
 Candidate id: `pydantic-ai`.
 
-Stack: Pydantic AI plus Logfire/OpenTelemetry, with Pydantic Evals and durable execution evaluated by later tickets.
+Stack: Pydantic AI plus Langfuse/OpenTelemetry, with Pydantic Evals and durable execution evaluated by later tickets.
 
-The current scaffold implements the shared comparable-agent workflow in deterministic fixture mode. It uses app-local
-typed data boundaries to shape fixture input and structured output, and it writes a repo-local OpenTelemetry-style trace
-export that is correlated to the run artifact. It does not call a live model, require cloud-hosted Logfire ingestion,
-run Pydantic Evals, or select a durable runtime.
+The current scaffold implements the shared comparable-agent workflow in deterministic fixture mode. It uses
+`pydantic_ai.Agent` with `pydantic_ai.models.test.TestModel` to return structured output without a network model call,
+and it writes a repo-local OpenTelemetry-style trace export that is correlated to the run artifact. It does not call a
+live model, require cloud-hosted Logfire ingestion, run Pydantic Evals, or select a durable runtime.
 
 Run it from the repo root:
 
 ```bash
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-run.json \
   --pretty
 ```
 
@@ -32,10 +32,10 @@ written next to it with a `.trace.json` suffix unless `--trace-output` is set.
 Optional explicit trace path:
 
 ```bash
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
-  --trace-output /tmp/pydantic-ai-run.trace.json \
+  --output .agent-runs/verifications/pydantic-ai-run.json \
+  --trace-output .agent-runs/verifications/pydantic-ai-run.trace.json \
   --pretty
 ```
 
@@ -64,8 +64,8 @@ Environment variable placeholders for later tickets:
 Logfire export verification remains separate from fixture validation. Cloud-hosted Logfire credentials are not required
 and are not sufficient acceptance evidence for this self-hosted agents assessment. If an operator-approved Logfire
 backend is available, record the command, run id, trace id, safe project or trace URL, and repo-local trace export path.
-The local command records whether `LOGFIRE_TOKEN` was present, but missing credentials do not fail deterministic
-validation.
+The local command records whether `LOGFIRE_TOKEN` was present, but credentials alone do not send traffic. Logfire export
+only runs when `--require-logfire-export` is set, and missing credentials do not fail deterministic validation.
 
 Optional Logfire export verification path:
 
@@ -73,9 +73,9 @@ Optional Logfire export verification path:
 LOGFIRE_TOKEN=<write-token> \
 LOGFIRE_PROJECT_URL=<safe-project-or-trace-url> \
 LOGFIRE_BASE_URL=<optional-self-managed-url> \
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-logfire-run.json \
   --require-logfire-export \
   --pretty
 ```
@@ -90,15 +90,17 @@ LANGFUSE_BASE_URL=http://localhost:3000 \
 LANGFUSE_PUBLIC_KEY=<pk-lf-...> \
 LANGFUSE_SECRET_KEY=<sk-lf-...> \
 LANGFUSE_PROJECT_ID=<optional-project-id> \
-python3 apps/pydantic-ai/run.py \
+uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output /tmp/pydantic-ai-run.json \
+  --output .agent-runs/verifications/pydantic-ai-langfuse-run.json \
   --require-langfuse-ingestion \
   --pretty
 ```
 
 The command posts OTLP/HTTP JSON to `LANGFUSE_BASE_URL/api/public/otel/v1/traces`, verifies the trace through the
-Langfuse public API, and preserves `/tmp/pydantic-ai-run.trace.json` as the deterministic fallback artifact. See
+Langfuse public API, and preserves a repo-local `.trace.json` file next to the run artifact as the deterministic
+fallback artifact. Credentials alone do not send Langfuse traffic; ingestion only runs when
+`--require-langfuse-ingestion` is set. See
 `docs/orchestration/self-hosted-langfuse.md` for the local or VPS Docker Compose profile, ports, secrets, reset flow,
 and troubleshooting.
 
@@ -106,7 +108,7 @@ Common deterministic-run failures:
 
 - Missing fixture path: rerun from the repo root or pass an absolute `--fixture` path.
 - Invalid fixture JSON: keep the fixture categories aligned with `docs/comparison-evidence.md`.
-- Missing output directory permission: choose a writable `--output` path such as `/tmp/pydantic-ai-run.json`.
+- Missing output directory permission: choose a writable `--output` path under `.agent-runs/verifications/`.
 - Missing Langfuse service or keys: omit `--require-langfuse-ingestion` for deterministic fixture validation, or start
   the self-hosted Langfuse profile and export `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY`.
 
@@ -127,4 +129,4 @@ Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation
 ## Non-Goals
 
 Do not prove cloud-hosted Logfire, Pydantic Evals, or durable execution in this scaffold. Do not declare Pydantic AI
-plus Logfire/OpenTelemetry as the final architecture until comparable implementation evidence exists.
+plus Langfuse/OpenTelemetry as the final architecture until comparable implementation evidence exists.

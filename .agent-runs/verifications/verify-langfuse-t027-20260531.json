@@ -1,28 +1,39 @@
 {
   "acceptance_command": "uv run awf workflow-fixture-test",
   "candidate_app": "apps/pydantic-ai",
-  "created_at": "2026-05-31T20:38:45Z",
+  "created_at": "2026-05-31T21:01:22Z",
   "issue_id": "awf-ftu.1",
-  "local_trace_id": "trace-8b14215d61aa6e29d4bbac47",
+  "local_trace_id": "trace-573f0157f5d65ccdc1c963d4",
   "notes": [
     "Langfuse ran as a self-hosted Docker Compose stack on vps.",
     "The local repo connected through ssh -L 13300:127.0.0.1:3300 vps.",
-    "Deterministic fixture validation does not require Langfuse service credentials."
+    "Deterministic fixture validation does not require Langfuse service credentials.",
+    "The run used pydantic_ai.Agent with pydantic_ai.models.test.TestModel, so no external model provider was required.",
+    "The trace artifact includes two spans captured from Pydantic AI's native Instrumentation capability.",
+    "Ambient Logfire or Langfuse credentials do not trigger network export without an explicit proof flag."
   ],
-  "otel_trace_id": "99c38cb17d8c97581c52fda9934eb100",
-  "repo_local_artifacts": {
-    "run_artifact": "/tmp/pydantic-ai-langfuse-run.json",
-    "trace_artifact": "/tmp/pydantic-ai-langfuse-run.trace.json"
+  "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+  "pydantic_ai_runtime": {
+    "agent_class": "pydantic_ai.Agent",
+    "instrumentation": "pydantic_ai.capabilities.instrumentation.Instrumentation",
+    "model_class": "pydantic_ai.models.test.TestModel",
+    "native_otel_span_count": 2,
+    "network_required": false,
+    "version": "1.104.0"
   },
-  "run_id": "run-b955c2242f44d8ed882cc04d",
+  "repo_local_artifacts": {
+    "run_artifact": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json",
+    "trace_artifact": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+  },
+  "run_id": "run-e545699517a2885613711cf9",
   "service_backed_command": [
     "LANGFUSE_BASE_URL=http://127.0.0.1:13300",
     "LANGFUSE_PUBLIC_KEY=<project-public-key>",
     "LANGFUSE_SECRET_KEY=<project-secret-key>",
     "LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai",
-    "python3 apps/pydantic-ai/run.py",
+    "uv run python apps/pydantic-ai/run.py",
     "--fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json",
-    "--output /tmp/pydantic-ai-langfuse-run.json",
+    "--output .agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json",
     "--require-langfuse-ingestion",
     "--pretty"
   ],
@@ -48,10 +59,10 @@
     "http_status": 200,
     "sent": true,
     "status": "verified-in-langfuse",
-    "trace_api": "http://127.0.0.1:13300/api/public/traces/99c38cb17d8c97581c52fda9934eb100",
+    "trace_api": "http://127.0.0.1:13300/api/public/traces/735c1665d723b965ef77950eeeac36df",
     "trace_url": {
       "base_url": "http://127.0.0.1:13300",
-      "path": "/project/self-hosted-agents-pydantic-ai/traces/99c38cb17d8c97581c52fda9934eb100"
+      "path": "/project/self-hosted-agents-pydantic-ai/traces/735c1665d723b965ef77950eeeac36df"
     },
     "verified": true,
     "verify_http_status": 200

@@ -1,0 +1,184 @@
+{
+  "format": "otel-style-json",
+  "gaps": [
+    "External Logfire telemetry is not sent during deterministic fixture validation.",
+    "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+    "Optional Logfire export requires an operator-provided token and backend.",
+    "Token, cost, and live model-call spans require a later non-fixture model run."
+  ],
+  "instrumentation": {
+    "notes": [
+      "The deterministic agent path captures spans from Pydantic AI's Instrumentation capability.",
+      "Repo-local workflow spans are normalized with Pydantic AI native spans for Langfuse ingestion.",
+      "OpenTelemetry GenAI conventions are experimental and may change."
+    ],
+    "pydantic_ai_format_version": 2,
+    "semantic_conventions": "OpenTelemetry GenAI semantic conventions 1.37.0",
+    "target": "Repo-local OTLP export with Pydantic AI native OpenTelemetry spans"
+  },
+  "langfuse": {
+    "base_url_configured": true,
+    "configured": true,
+    "credential_names": [
+      "LANGFUSE_BASE_URL",
+      "LANGFUSE_PUBLIC_KEY",
+      "LANGFUSE_SECRET_KEY"
+    ],
+    "endpoint": "http://127.0.0.1:13300/api/public/otel/v1/traces",
+    "endpoint_path": "/api/public/otel/v1/traces",
+    "http_status": 200,
+    "ingestion_requested": true,
+    "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+    "project_id_recorded": "self-hosted-agents-pydantic-ai",
+    "response_excerpt": "{\"name\":\"otel-ingestion-job\",\"data\":{\"id\":\"b1c5952e-af6f-4013-aa50-a63ca0af0c48\",\"timestamp\":\"2026-05-31T21:13:56.340Z\",\"name\":\"otel-ingestion-job\",\"payload\":{\"data\":{\"fileKey\":\"events/otel/self-hosted-agents-pydantic-ai/2026/05/31/21/13/39135762-5e54-4485-ac15-c69b905a8f4f.json\",\"publicKey\":\"pk-lf-",
+    "sent": true,
+    "status": "verified-in-langfuse",
+    "trace_api": "http://127.0.0.1:13300/api/public/traces/735c1665d723b965ef77950eeeac36df",
+    "trace_url": "http://127.0.0.1:13300/project/self-hosted-agents-pydantic-ai/traces/735c1665d723b965ef77950eeeac36df",
+    "verification_command": "LANGFUSE_BASE_URL=http://localhost:3000 LANGFUSE_PUBLIC_KEY=<pk-lf-...> LANGFUSE_SECRET_KEY=<sk-lf-...> LANGFUSE_PROJECT_ID=<optional-project-id> uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-langfuse-run.json --require-langfuse-ingestion --pretty",
+    "verified": true,
+    "verify_http_status": 200,
+    "verify_response_excerpt": "{\"id\":\"735c1665d723b965ef77950eeeac36df\",\"projectId\":\"self-hosted-agents-pydantic-ai\",\"name\":\"pydantic-ai decision slice\",\"timestamp\":\"2023-11-14T22:13:20.000Z\",\"environment\":\"self-hosted-agents-fixture\",\"tags\":[\"fixture\",\"pydantic-ai\",\"self-hosted-agents\"],\"bookmarked\":false,\"release\":\"self-hosted-"
+  },
+  "logfire": {
+    "base_url_configured": false,
+    "configured": false,
+    "credential_names": [
+      "LOGFIRE_TOKEN"
+    ],
+    "emission_requested": false,
+    "flush_successful": false,
+    "project_url_recorded": "",
+    "sent": false,
+    "status": "missing-logfire-export-config",
+    "verification_command": "LOGFIRE_TOKEN=<write-token> LOGFIRE_PROJECT_URL=<safe-project-or-trace-url> LOGFIRE_BASE_URL=<optional-self-managed-url> uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-logfire-run.json --require-logfire-export --pretty"
+  },
+  "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+  "provider": "local-otel-json",
+  "pydantic_ai_otel": {
+    "span_count": 2,
+    "spans": [
+      {
+        "attributes": {
+          "gen_ai.agent.call.id": "019e7fe2-e2eb-7537-991a-793097e56eb6",
+          "gen_ai.agent.name": "DecisionSliceAgent",
+          "gen_ai.conversation.id": "019e7fe2-e2eb-7537-991a-792f40c6947b",
+          "gen_ai.input.messages": "[{\"role\": \"user\", \"parts\": [{\"type\": \"text\", \"content\": \"Objective: Compare self-hostable agent application stacks through runnable candidate implementations.\\nCurrent slice: T027\\nNext expected slice: T023\"}]}]",
+          "gen_ai.operation.name": "chat",
+          "gen_ai.output.messages": "[{\"role\": \"assistant\", \"parts\": [{\"type\": \"tool_call\", \"id\": \"pyd_ai_tool_call_id__final_result\", \"name\": \"final_result\", \"arguments\": {\"next_slice\": \"Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.\", \"reason\": \"The runnable candidate now has deterministic local trace evidence plus optional self-hosted Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run and trace identity.\", \"linked_task\": \"T023\"}}]}]",
+          "gen_ai.provider.name": "test",
+          "gen_ai.request.model": "self-hosted-agents-fixture",
+          "gen_ai.response.model": "self-hosted-agents-fixture",
+          "gen_ai.system": "test",
+          "gen_ai.system_instructions": "[{\"type\": \"text\", \"content\": \"Return the next implementation slice for the Pydantic AI candidate as structured data. Do not call external services.\"}]",
+          "gen_ai.tool.definitions": "[{\"type\":\"function\",\"name\":\"final_result\",\"description\":\"The final response which ends this conversation\",\"parameters\":{\"properties\":{\"next_slice\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"},\"linked_task\":{\"type\":\"string\"}},\"required\":[\"next_slice\",\"reason\",\"linked_task\"],\"title\":\"DecisionRecommendation\",\"type\":\"object\"}}]",
+          "gen_ai.usage.input_tokens": 67,
+          "gen_ai.usage.output_tokens": 50,
+          "logfire.json_schema": "{\"type\": \"object\", \"properties\": {\"gen_ai.input.messages\": {\"type\": \"array\"}, \"gen_ai.output.messages\": {\"type\": \"array\"}, \"gen_ai.system_instructions\": {\"type\": \"array\"}, \"model_request_parameters\": {\"type\": \"object\"}}}",
+          "model_request_parameters": "{\"function_tools\":[],\"native_tools\":[],\"output_mode\":\"tool\",\"output_object\":null,\"output_tools\":[{\"name\":\"final_result\",\"parameters_json_schema\":{\"properties\":{\"next_slice\":{\"type\":\"string\"},\"reason\":{\"type\":\"string\"},\"linked_task\":{\"type\":\"string\"}},\"required\":[\"next_slice\",\"reason\",\"linked_task\"],\"title\":\"DecisionRecommendation\",\"type\":\"object\"},\"description\":\"The final response which ends this conversation\",\"outer_typed_dict_key\":null,\"strict\":null,\"sequential\":false,\"kind\":\"output\",\"metadata\":null,\"timeout\":null,\"defer_loading\":false,\"unless_native\":null,\"with_native\":null,\"tool_kind\":null,\"return_schema\":null,\"include_return_schema\":null}],\"prompted_output_template\":null,\"allow_text_output\":false,\"allow_image_output\":false,\"instruction_parts\":[{\"content\":\"Return the next implementation slice for the Pydantic AI candidate as structured data. Do not call external services.\",\"dynamic\":false,\"part_kind\":\"instruction\"}],\"thinking\":null}"
+        },
+        "kind": "CLIENT",
+        "name": "chat self-hosted-agents-fixture",
+        "parent_span_id": "bb95b0bb36e430fb",
+        "span_id": "6a409e03c86372f6",
+        "status_code": "UNSET",
+        "trace_id": "3ab3d70f4ffd79a7dbc8a4d8fd2d26a8"
+      },
+      {
+        "attributes": {
+          "agent_name": "DecisionSliceAgent",
+          "final_result": "{\"next_slice\":\"Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.\",\"reason\":\"The runnable candidate now has deterministic local trace evidence plus optional self-hosted Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run and trace identity.\",\"linked_task\":\"T023\"}",
+          "gen_ai.agent.call.id": "019e7fe2-e2eb-7537-991a-793097e56eb6",
+          "gen_ai.agent.name": "DecisionSliceAgent",
+          "gen_ai.conversation.id": "019e7fe2-e2eb-7537-991a-792f40c6947b",
+          "gen_ai.operation.name": "invoke_agent",
+          "gen_ai.system_instructions": "[{\"type\": \"text\", \"content\": \"Return the next implementation slice for the Pydantic AI candidate as structured data. Do not call external services.\"}]",
+          "gen_ai.usage.input_tokens": 67,
+          "gen_ai.usage.output_tokens": 50,
+          "logfire.json_schema": "{\"type\":\"object\",\"properties\":{\"pydantic_ai.all_messages\":{\"type\":\"array\"},\"gen_ai.system_instructions\":{\"type\":\"array\"},\"final_result\":{\"type\":\"object\"}}}",
+          "logfire.msg": "DecisionSliceAgent run",
+          "model_name": "self-hosted-agents-fixture",
+          "pydantic_ai.all_messages": "[{\"role\":\"user\",\"parts\":[{\"type\":\"text\",\"content\":\"Objective: Compare self-hostable agent application stacks through runnable candidate implementations.\\nCurrent slice: T027\\nNext expected slice: T023\"}]},{\"role\":\"assistant\",\"parts\":[{\"type\":\"tool_call\",\"id\":\"pyd_ai_tool_call_id__final_result\",\"name\":\"final_result\",\"arguments\":{\"next_slice\":\"Add Pydantic Evals output and run artifact capture for the Pydantic AI slice.\",\"reason\":\"The runnable candidate now has deterministic local trace evidence plus optional self-hosted Langfuse ingestion, so the next useful slice is evaluation evidence correlated to the same run and trace identity.\",\"linked_task\":\"T023\"}}]},{\"role\":\"user\",\"parts\":[{\"type\":\"tool_call_response\",\"id\":\"pyd_ai_tool_call_id__final_result\",\"name\":\"final_result\",\"result\":\"Final result processed.\"}]}]"
+        },
+        "kind": "INTERNAL",
+        "name": "agent run",
+        "parent_span_id": "",
+        "span_id": "bb95b0bb36e430fb",
+        "status_code": "UNSET",
+        "trace_id": "3ab3d70f4ffd79a7dbc8a4d8fd2d26a8"
+      }
+    ],
+    "status": "captured"
+  },
+  "resource": {
+    "candidate.id": "pydantic-ai",
+    "service.name": "pydantic-ai"
+  },
+  "run_id": "run-e545699517a2885613711cf9",
+  "spans": [
+    {
+      "attributes": {
+        "constraint_count": 5,
+        "has_objective": true
+      },
+      "name": "load_typed_fixture_context",
+      "otel_span_id": "e48d67768c962904",
+      "parent_otel_span_id": null,
+      "parent_span_id": null,
+      "span_id": "span-e48d67768c962904",
+      "status": "ok"
+    },
+    {
+      "attributes": {
+        "functional_area_count": 5
+      },
+      "name": "map_pydantic_ai_functional_needs",
+      "otel_span_id": "50c58a3761739448",
+      "parent_otel_span_id": "e48d67768c962904",
+      "parent_span_id": "span-e48d67768c962904",
+      "span_id": "span-50c58a3761739448",
+      "status": "ok"
+    },
+    {
+      "attributes": {
+        "agent": "DecisionSliceAgent",
+        "input_tokens": 67,
+        "linked_task": "T023",
+        "model": "TestModel",
+        "native_otel_span_count": 2,
+        "output_tokens": 50,
+        "pydantic_ai_version": "1.104.0",
+        "requests": 1
+      },
+      "name": "run_pydantic_ai_agent",
+      "otel_span_id": "fcefac4d65af72f9",
+      "parent_otel_span_id": "50c58a3761739448",
+      "parent_span_id": "span-50c58a3761739448",
+      "span_id": "span-fcefac4d65af72f9",
+      "status": "ok"
+    },
+    {
+      "attributes": {
+        "linked_task": "T023"
+      },
+      "name": "select_next_slice",
+      "otel_span_id": "4d49f6de13eda6a3",
+      "parent_otel_span_id": "fcefac4d65af72f9",
+      "parent_span_id": "span-fcefac4d65af72f9",
+      "span_id": "span-4d49f6de13eda6a3",
+      "status": "ok"
+    },
+    {
+      "attributes": {
+        "candidate_app_id": "pydantic-ai"
+      },
+      "name": "format_structured_run_artifact",
+      "otel_span_id": "d9807572d5711cd0",
+      "parent_otel_span_id": "4d49f6de13eda6a3",
+      "parent_span_id": "span-4d49f6de13eda6a3",
+      "span_id": "span-d9807572d5711cd0",
+      "status": "ok"
+    }
+  ],
+  "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+}

@@ -36,18 +36,20 @@ def logfire_export_state() -> dict[str, Any]:
         "verification_command": (
             "LOGFIRE_TOKEN=<write-token> LOGFIRE_PROJECT_URL=<safe-project-or-trace-url> "
             "LOGFIRE_BASE_URL=<optional-self-managed-url> "
-            "python3 apps/pydantic-ai/run.py --fixture "
+            "uv run python apps/pydantic-ai/run.py --fixture "
             "packages/comparison/fixtures/pydantic-ai-decision-slice.json "
-            "--output /tmp/pydantic-ai-run.json --require-logfire-export --pretty"
+            "--output .agent-runs/verifications/pydantic-ai-logfire-run.json --require-logfire-export --pretty"
         ),
     }
 
 
 def emit_logfire_export(trace_export: dict[str, Any], *, require: bool) -> dict[str, Any]:
     evidence = logfire_export_state()
-    evidence["emission_requested"] = require or evidence["configured"]
+    evidence["emission_requested"] = require
     evidence["flush_successful"] = False
     if not evidence["emission_requested"]:
+        if evidence["configured"]:
+            evidence["status"] = "configured-not-requested"
         return evidence
     if not evidence["configured"]:
         evidence["error"] = "LOGFIRE_TOKEN is required only when requiring Logfire export evidence."
@@ -116,9 +118,9 @@ def langfuse_ingestion_state() -> dict[str, Any]:
             "LANGFUSE_BASE_URL=http://localhost:3000 "
             "LANGFUSE_PUBLIC_KEY=<pk-lf-...> LANGFUSE_SECRET_KEY=<sk-lf-...> "
             "LANGFUSE_PROJECT_ID=<optional-project-id> "
-            "python3 apps/pydantic-ai/run.py --fixture "
+            "uv run python apps/pydantic-ai/run.py --fixture "
             "packages/comparison/fixtures/pydantic-ai-decision-slice.json "
-            "--output /tmp/pydantic-ai-run.json --require-langfuse-ingestion --pretty"
+            "--output .agent-runs/verifications/pydantic-ai-langfuse-run.json --require-langfuse-ingestion --pretty"
         ),
     }
 
@@ -185,6 +187,40 @@ def langfuse_otlp_payload(trace_export: dict[str, Any]) -> dict[str, Any]:
         if span.get("parent_otel_span_id"):
             otlp_span["parentSpanId"] = span["parent_otel_span_id"]
         spans.append(otlp_span)
+    native_span_id_map: dict[str, str] = {}
+    native_spans = trace_export.get("pydantic_ai_otel", {}).get("spans", [])
+    for index, span in enumerate(native_spans):
+        original_span_id = str(span.get("span_id", ""))
+        native_span_id_map[original_span_id] = stable_hex(
+            {"pydantic_ai_native_span": original_span_id, "index": index},
+            16,
+        )
+    offset = len(spans)
+    for index, span in enumerate(native_spans):
+        original_span_id = str(span.get("span_id", ""))
+        original_parent_span_id = str(span.get("parent_span_id", ""))
+        attributes = {
+            **span.get("attributes", {}),
+            "candidate.id": "pydantic-ai",
+            "local.trace_id": trace_export["trace_id"],
+            "pydantic_ai.otel.native": True,
+            "pydantic_ai.otel.original_span_id": original_span_id,
+            "pydantic_ai.otel.original_trace_id": span.get("trace_id", ""),
+            "run.id": run_id,
+        }
+        otlp_span = {
+            "traceId": trace_id,
+            "spanId": native_span_id_map[original_span_id],
+            "name": str(span.get("name", "pydantic_ai_span")),
+            "kind": 1,
+            "startTimeUnixNano": str(start + (offset + index) * 1_000_000),
+            "endTimeUnixNano": str(start + (offset + index) * 1_000_000 + 500_000),
+            "attributes": otlp_attributes(attributes),
+            "status": {"code": 1},
+        }
+        if original_parent_span_id and original_parent_span_id in native_span_id_map:
+            otlp_span["parentSpanId"] = native_span_id_map[original_parent_span_id]
+        spans.append(otlp_span)
     return {
         "resourceSpans": [
             {
@@ -238,7 +274,7 @@ def langfuse_request(
 
 def emit_langfuse_ingestion(trace_export: dict[str, Any], *, require: bool) -> dict[str, Any]:
     evidence = langfuse_ingestion_state()
-    evidence["ingestion_requested"] = require or evidence["configured"]
+    evidence["ingestion_requested"] = require
     base_url = os.getenv("LANGFUSE_BASE_URL", "").rstrip("/")
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY", "")
     secret_key = os.getenv("LANGFUSE_SECRET_KEY", "")
@@ -247,6 +283,8 @@ def emit_langfuse_ingestion(trace_export: dict[str, Any], *, require: bool) -> d
     evidence["otel_trace_id"] = trace_id
     evidence["trace_url"] = langfuse_trace_url(base_url, project_id, trace_id)
     if not evidence["ingestion_requested"]:
+        if evidence["configured"]:
+            evidence["status"] = "configured-not-requested"
         return evidence
     if not evidence["configured"]:
         evidence["error"] = "LANGFUSE_BASE_URL, LANGFUSE_PUBLIC_KEY, and LANGFUSE_SECRET_KEY are required."
@@ -327,6 +365,7 @@ class TraceRecorder:
     payload: dict[str, Any]
     provider: str = "local-otel-json"
     spans: list[TraceSpan] = field(default_factory=list)
+    pydantic_ai_otel_spans: list[dict[str, Any]] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.trace_id = stable_id("trace", self.payload, length=24)
@@ -346,15 +385,19 @@ class TraceRecorder:
             )
         )
 
+    def record_pydantic_ai_otel_spans(self, spans: list[dict[str, Any]]) -> None:
+        self.pydantic_ai_otel_spans.extend(spans)
+
     def export(self) -> dict[str, Any]:
         return {
             "format": "otel-style-json",
             "instrumentation": {
-                "target": "Pydantic AI OpenTelemetry instrumentation",
+                "target": "Repo-local OTLP export with Pydantic AI native OpenTelemetry spans",
                 "semantic_conventions": "OpenTelemetry GenAI semantic conventions 1.37.0",
                 "pydantic_ai_format_version": 2,
                 "notes": [
-                    "Pydantic AI Logfire instrumentation defaults to format version 2.",
+                    "The deterministic agent path captures spans from Pydantic AI's Instrumentation capability.",
+                    "Repo-local workflow spans are normalized with Pydantic AI native spans for Langfuse ingestion.",
                     "OpenTelemetry GenAI conventions are experimental and may change.",
                 ],
             },
@@ -366,11 +409,16 @@ class TraceRecorder:
                 "candidate.id": "pydantic-ai",
             },
             "spans": [span.to_dict() for span in self.spans],
+            "pydantic_ai_otel": {
+                "status": "captured" if self.pydantic_ai_otel_spans else "missing",
+                "span_count": len(self.pydantic_ai_otel_spans),
+                "spans": self.pydantic_ai_otel_spans,
+            },
             "logfire": logfire_export_state(),
             "langfuse": langfuse_ingestion_state(),
             "gaps": [
                 "External Logfire telemetry is not sent during deterministic fixture validation.",
-                "Self-hosted Langfuse ingestion is not attempted without local service credentials.",
+                "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
                 "Optional Logfire export requires an operator-provided token and backend.",
                 "Token, cost, and live model-call spans require a later non-fixture model run.",
             ],
