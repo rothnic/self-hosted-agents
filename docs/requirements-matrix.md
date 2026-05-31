@@ -364,8 +364,8 @@ the evidence required by `docs/comparison-evidence.md`.
 ### Pydantic AI Self-Hosted Langfuse Evidence Update (T027)
 
 Evidence status: Pydantic AI now has implementation evidence for repo-local trace export plus self-hosted Langfuse
-OTLP ingestion. This closes the "generic trace only" observability gap for the trace path, but it does not complete
-Pydantic Evals or durable execution.
+OTLP ingestion. T023 also adds Pydantic Evals output correlated to the same run and trace identity, but durable
+execution remains open.
 
 Evidence inspected on 2026-05-31:
 
@@ -383,19 +383,24 @@ Evidence inspected on 2026-05-31:
   `GET /api/public/traces/735c1665d723b965ef77950eeeac36df`.
 - **Fixture safety**: `uv run awf workflow-fixture-test` asserts that ambient Logfire and Langfuse credentials are
   recorded as configured but do not send traffic unless the explicit proof flags are passed.
+- **Pydantic Evals proof**: `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json` recorded
+  `eval-a584886d68bad6f4`, scored 5/5, rejects placeholder-only artifact paths, and links to the same run id and
+  trace id. The evaluated fixture records T023 as the recommended slice to preserve correlation with the T027
+  self-hosted Langfuse proof; Beads ready-work advances to T024 after T023 closure.
 - **Durable evidence record**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
 - **Setup notes**: `docs/orchestration/self-hosted-langfuse.md` documents services, ports, secrets, reset, and
   troubleshooting. `apps/pydantic-ai/README.md` documents `--require-langfuse-ingestion`.
 
 ### Pydantic AI T027 Rubric View
 
-These scores are still slice-level, not final-solution scores, because evaluation and durable execution remain open.
+These scores are still slice-level, not final-solution scores, because durable execution remains open and T026 owns the
+final Pydantic AI matrix scoring update.
 
 | Criterion | Slice Score | Evidence Basis | Gap Or Cap |
 | --- | --- | --- | --- |
 | Infrastructure ownership | 3 | Langfuse provides self-hosted trace UI, ingestion, and trace API | Operating effort still needs comparison against Phoenix or Opik if Langfuse stays heavy |
 | Observability | 4 | Tested app emits repo-local traces and verifies the same OTLP trace in self-hosted Langfuse | Live model/tool spans, token and cost views, and failure traces are not proven |
-| Evaluation | 1 | Eval output is still planned for T023 | Cap until Pydantic Evals output correlates to this run and trace identity |
+| Evaluation | 3 | Pydantic Evals deterministic assertions pass and correlate run, trace, and evidence artifacts | Model-judge, dataset expansion, and Langfuse eval visualization are not proven |
 | Scalability | 2 | Docker Compose stack proves service topology but not production operations | Needs deployment and retention strategy |
 | Operating effort | 2 | VPS proof required six services plus SSH tunnel and explicit secrets | Needs simpler bootstrap or documented hosted-on-controlled-infra pattern |
 

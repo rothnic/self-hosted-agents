@@ -1,0 +1,32 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "candidate_app": "apps/pydantic-ai",
+  "created_at": "2026-05-31T21:23:00Z",
+  "evaluation_id": "eval-a584886d68bad6f4",
+  "issue_id": "awf-ktw",
+  "notes": [
+    "T023 adds Pydantic Evals deterministic assertions for the Pydantic AI candidate run artifact.",
+    "The evaluation artifact is repo-local, rejects placeholder-only artifact paths, and correlates to the same run id and trace id as the run and trace artifacts.",
+    "The evaluated fixture intentionally records T023 as the recommended slice so this evidence remains correlated with the T027 self-hosted Langfuse proof for the same run and trace identity.",
+    "After closure, Beads ready-work advances the roadmap to T024 for durable execution comparison.",
+    "Fixture validation still requires no hosted credentials, no running Langfuse service, and no external model provider."
+  ],
+  "repo_local_artifacts": {
+    "evaluation_artifact": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json",
+    "run_artifact": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.json",
+    "trace_artifact": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json"
+  },
+  "run_id": "run-e545699517a2885613711cf9",
+  "score": {
+    "max_score": 5,
+    "passed": true,
+    "score": 5
+  },
+  "service_backed_command": [
+    "uv run python apps/pydantic-ai/run.py",
+    "--fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json",
+    "--output .agent-runs/verifications/pydantic-ai-evals-run-20260531.json",
+    "--pretty"
+  ],
+  "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+}

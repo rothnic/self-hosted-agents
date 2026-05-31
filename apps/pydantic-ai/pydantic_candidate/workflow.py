@@ -35,7 +35,7 @@ FUNCTIONAL_NEEDS = [
     {
         "area": "Evaluation",
         "provider": "Pydantic Evals with deterministic assertions",
-        "first_slice_status": "planned-for-T023",
+        "first_slice_status": "completed-through-T023",
     },
     {
         "area": "Durable execution",
@@ -243,12 +243,10 @@ class DecisionSliceAgentScaffold:
             ],
             candidate_app_id=self.payload.candidate.id,
             evaluation_output={
-                "status": "planned",
+                "status": "provided-by-cli",
                 "linked_task": "T023",
                 "provider": "Pydantic Evals",
-                "gaps": [
-                    "No Pydantic Evals dataset, scorer, or serialized report is emitted by the T027 candidate.",
-                ],
+                "artifact": "provided by --evaluation-output or next to --output",
             },
             evidence_paths={
                 "fixture_input": "packages/comparison/fixtures/pydantic-ai-decision-slice.json",
@@ -256,10 +254,10 @@ class DecisionSliceAgentScaffold:
                 "setup_notes": "apps/pydantic-ai/README.md",
                 "gap_notes": "apps/pydantic-ai/implementation-plan.md",
                 "trace_evidence": "provided by --trace-output or next to --output",
+                "evaluation_evidence": "provided by --evaluation-output or next to --output",
             },
             gaps=[
                 "External Logfire export is optional diagnostic evidence and is not required for fixture validation.",
-                "Pydantic Evals output is planned for T023 and is not represented as passing implementation evidence.",
                 "Durable runtime selection and smoke proof remain T024 and T025 work.",
             ],
             questions=[

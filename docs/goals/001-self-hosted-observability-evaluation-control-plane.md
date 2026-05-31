@@ -83,6 +83,12 @@ uv run python apps/pydantic-ai/run.py \
 
 T027 evidence lives in `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
 
+T023 Pydantic Evals evidence:
+
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json`
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json`
+
 ## Review Blocking Criteria
 
 - The only observability proof is local JSON without an LLM-aware UI.

@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .evaluation import evaluate_candidate_run
 from .trace import emit_langfuse_ingestion, emit_logfire_export
 from .workflow import run_candidate_workflow
 
@@ -26,6 +27,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--fixture", required=True, type=Path, help="Shared comparison fixture JSON path.")
     parser.add_argument("--output", type=Path, help="Optional run artifact output path.")
     parser.add_argument("--trace-output", type=Path, help="Optional OpenTelemetry trace export output path.")
+    parser.add_argument("--evaluation-output", type=Path, help="Optional Pydantic Evals artifact output path.")
     parser.add_argument(
         "--require-logfire-export",
         action="store_true",
@@ -67,11 +69,27 @@ def main(argv: list[str] | None = None) -> int:
     trace_output = args.trace_output
     if trace_output is None and args.output is not None:
         trace_output = args.output.with_suffix(".trace.json")
+    evaluation_output = args.evaluation_output
+    if evaluation_output is None and args.output is not None:
+        evaluation_output = args.output.with_suffix(".evaluation.json")
+    if args.output is not None:
+        output["evidence_paths"]["run_artifact"] = str(args.output)
     if trace_output is not None:
         write_output(trace_output, result.trace_export, args.pretty)
         output["evidence_paths"]["trace_evidence"] = str(trace_output)
+    if evaluation_output is not None:
+        output["evidence_paths"]["evaluation_evidence"] = str(evaluation_output)
+    evaluation = evaluate_candidate_run(
+        run_id=str(output["run_id"]),
+        trace_id=str(output["trace_id"]),
+        artifact=output,
+        rerun_command=output["command_used"],
+        evidence_links=output["evidence_paths"],
+    )
+    output["evaluation_output"] = evaluation
+    if evaluation_output is not None:
+        write_output(evaluation_output, evaluation, args.pretty)
     if args.output is not None:
-        output["evidence_paths"]["run_artifact"] = str(args.output)
         write_output(args.output, output, args.pretty)
     print(json.dumps(output, indent=2 if args.pretty else None, sort_keys=True))
     if args.require_logfire_export and not logfire_export.get("sent"):

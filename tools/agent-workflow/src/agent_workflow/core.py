@@ -1246,6 +1246,11 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "fixture": rel(fixture),
             "runner": rel(runner),
         }
+    try:
+        fixture_data = json.loads(fixture.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        fixture_data = {}
+    expected_next_task = fixture_data.get("project_context", {}).get("next_expected_slice", "T024")
     with tempfile.TemporaryDirectory() as tmpdir:
         output_path = Path(tmpdir) / "pydantic-ai-run.json"
         command = [
@@ -1267,6 +1272,11 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             trace_export = json.loads(trace_path.read_text(encoding="utf-8")) if trace_path.exists() else {}
         except json.JSONDecodeError as exc:
             trace_export = {"decode_error": str(exc)}
+        evaluation_path = output_path.with_suffix(".evaluation.json")
+        try:
+            evaluation_export = json.loads(evaluation_path.read_text(encoding="utf-8")) if evaluation_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            evaluation_export = {"decode_error": str(exc)}
         ambient_output_path = Path(tmpdir) / "pydantic-ai-ambient-run.json"
         ambient_env = os.environ.copy()
         ambient_env.update(
@@ -1296,13 +1306,32 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             ambient_trace = json.loads(ambient_output_path.with_suffix(".trace.json").read_text(encoding="utf-8"))
         except (FileNotFoundError, json.JSONDecodeError) as exc:
             ambient_trace = {"decode_error": str(exc)}
+        placeholder_eval_path = Path(tmpdir) / "pydantic-ai-placeholder.evaluation.json"
+        placeholder_proc = run(
+            [
+                sys.executable,
+                str(runner),
+                "--fixture",
+                str(fixture),
+                "--evaluation-output",
+                str(placeholder_eval_path),
+                "--pretty",
+            ]
+        )
+        try:
+            placeholder_evaluation = json.loads(placeholder_eval_path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            placeholder_evaluation = {"decode_error": str(exc)}
+        placeholder_criteria = {
+            item.get("name"): item.get("passed") for item in placeholder_evaluation.get("criteria", [])
+        }
         trace = artifact.get("trace_evidence", {})
         evaluation = artifact.get("evaluation_output", {})
         required = {
             "candidate_app_id": artifact.get("candidate_app_id") == "pydantic-ai",
             "run_id": bool(artifact.get("run_id")),
             "run_mode": artifact.get("run_mode") == "deterministic-fixture",
-            "recommendation": artifact.get("recommendation", {}).get("linked_task") == "T023"
+            "recommendation": artifact.get("recommendation", {}).get("linked_task") == expected_next_task
             and bool(artifact.get("recommendation", {}).get("next_slice")),
             "alternatives": bool(artifact.get("alternatives")),
             "questions": bool(artifact.get("questions")),
@@ -1317,6 +1346,12 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             and artifact.get("workflow", {}).get("pydantic_ai_runtime", {}).get("native_otel_span_count", 0) >= 2,
             "trace_export": trace_export.get("provider") == "local-otel-json" and bool(trace_export.get("spans")),
             "trace_linked": artifact.get("evidence_paths", {}).get("trace_evidence") == str(trace_path),
+            "evaluation_export": evaluation_export.get("provider") == "Pydantic Evals"
+            and evaluation_export.get("passed") is True
+            and bool(evaluation_export.get("criteria")),
+            "evaluation_linked": artifact.get("evidence_paths", {}).get("evaluation_evidence") == str(evaluation_path),
+            "evaluation_correlated": evaluation_export.get("run_id") == artifact.get("run_id")
+            and evaluation_export.get("trace_id") == artifact.get("trace_id"),
             "trace_correlated": bool(artifact.get("trace_id"))
             and trace.get("trace_id") == artifact.get("trace_id")
             and trace_export.get("trace_id") == artifact.get("trace_id"),
@@ -1338,7 +1373,14 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             and ambient_trace.get("langfuse", {}).get("sent") is False
             and ambient_trace.get("logfire", {}).get("status") == "configured-not-requested"
             and ambient_trace.get("logfire", {}).get("sent") is False,
-            "evaluation_gap_status": evaluation.get("status") == "planned" and evaluation.get("linked_task") == "T023",
+            "evaluation_rejects_placeholder_paths": placeholder_proc.returncode == 0
+            and placeholder_evaluation.get("provider") == "Pydantic Evals"
+            and placeholder_evaluation.get("passed") is False
+            and placeholder_criteria.get("evidence_completeness") is False,
+            "evaluation_output": evaluation.get("provider") == "Pydantic Evals"
+            and evaluation.get("passed") is True
+            and evaluation.get("run_id") == artifact.get("run_id")
+            and evaluation.get("trace_id") == artifact.get("trace_id"),
             "gap_notes": bool(artifact.get("gaps")) and bool(artifact.get("evidence_paths", {}).get("gap_notes")),
         }
         return {
@@ -1350,14 +1392,21 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "fixture": rel(fixture),
             "output": str(output_path),
             "trace_output": str(trace_path),
+            "evaluation_output": str(evaluation_path),
             "ambient_credential_check": {
                 "returncode": ambient_proc.returncode,
                 "stderr": ambient_proc.stderr.strip(),
                 "trace": ambient_trace,
             },
+            "placeholder_evaluation_check": {
+                "returncode": placeholder_proc.returncode,
+                "stderr": placeholder_proc.stderr.strip(),
+                "evaluation": placeholder_evaluation,
+            },
             "required": required,
             "artifact": artifact,
             "trace": trace_export,
+            "evaluation": evaluation_export,
         }
 
 

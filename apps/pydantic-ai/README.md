@@ -25,9 +25,10 @@ uv run python apps/pydantic-ai/run.py \
   --pretty
 ```
 
-The run artifact records the fixture input, recommendation output, trace id, local trace evidence, planned evaluation
+The run artifact records the fixture input, recommendation output, trace id, local trace evidence, Pydantic Evals
 evidence, setup notes, gap notes, command used, and acceptance check. When `--output` is provided, the trace export is
-written next to it with a `.trace.json` suffix unless `--trace-output` is set.
+written next to it with a `.trace.json` suffix and the evaluation artifact is written next to it with an
+`.evaluation.json` suffix unless explicit output paths are set.
 
 Optional explicit trace path:
 
@@ -36,8 +37,22 @@ uv run python apps/pydantic-ai/run.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
   --output .agent-runs/verifications/pydantic-ai-run.json \
   --trace-output .agent-runs/verifications/pydantic-ai-run.trace.json \
+  --evaluation-output .agent-runs/verifications/pydantic-ai-run.evaluation.json \
   --pretty
 ```
+
+## Pydantic Evals Output
+
+Fixture mode runs a deterministic Pydantic Evals dataset against the run artifact. The evaluation checks
+recommendation shape, acceptance command, run and trace correlation, Pydantic AI runtime evidence, and evidence path
+completeness. It writes a repo-local artifact that includes the dataset name, case id, evaluator results, score,
+summary, rerun command, and links to the run and trace artifacts.
+
+Current T023 evidence:
+
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json`
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json`
 
 ## Local Setup
 
@@ -128,5 +143,6 @@ Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation
 
 ## Non-Goals
 
-Do not prove cloud-hosted Logfire, Pydantic Evals, or durable execution in this scaffold. Do not declare Pydantic AI
-plus Langfuse/OpenTelemetry as the final architecture until comparable implementation evidence exists.
+Do not prove cloud-hosted Logfire, live model or model-judge evals, or durable execution in this scaffold. Do not
+declare Pydantic AI plus Langfuse/OpenTelemetry as the final architecture until comparable implementation evidence
+exists.

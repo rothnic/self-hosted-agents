@@ -105,9 +105,9 @@ the env vars and command, and preserve the repo-local trace artifact as determin
 Opik remain comparison alternatives, but Langfuse is the default backend target because it is self-hostable,
 LLM-specific, and already part of the LangGraph lane.
 
-T023 should add Pydantic Evals output and run artifact capture tied to the same run id and trace id. It should keep a
-deterministic assertion path for fixture validation, update setup notes with eval rerun details and artifact locations,
-and treat Logfire visualization as additive evidence.
+T023 adds Pydantic Evals output and run artifact capture tied to the same run id and trace id. It keeps a deterministic
+assertion path for fixture validation, writes `.evaluation.json` next to the run artifact by default, updates setup
+notes with eval rerun details and artifact locations, and treats Logfire visualization as additive evidence.
 
 T024 should compare durable execution options before choosing a runtime. Evaluate Pydantic AI framework-specific paths
 first: DBOS, Prefect, Restate, and Temporal. Compare Hatchet as the primary non-framework-specific Python workflow
