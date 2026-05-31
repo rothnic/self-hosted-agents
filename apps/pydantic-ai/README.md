@@ -54,6 +54,10 @@ Environment variable placeholders for later tickets:
 - `LOGFIRE_TOKEN`: optional Logfire write token for an operator-approved export run.
 - `LOGFIRE_PROJECT_URL`: optional safe reviewer-facing project or trace URL when available.
 - `LOGFIRE_BASE_URL`: optional self-managed or non-default Logfire backend URL.
+- `LANGFUSE_BASE_URL`: self-hosted Langfuse base URL for T027 service-backed OTLP ingestion.
+- `LANGFUSE_PUBLIC_KEY`: self-hosted Langfuse project public key for OTLP Basic Auth.
+- `LANGFUSE_SECRET_KEY`: self-hosted Langfuse project secret key for OTLP Basic Auth.
+- `LANGFUSE_PROJECT_ID`: optional project id used only to record a reviewer-facing trace URL.
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: optional generic OpenTelemetry collector endpoint.
 - `PYDANTIC_AI_MODEL`: later live model selection; unused in fixture mode.
 
@@ -76,11 +80,35 @@ python3 apps/pydantic-ai/run.py \
   --pretty
 ```
 
+## Self-Hosted Langfuse Ingestion
+
+T027 uses Langfuse as the self-hosted LLM observability target. Fixture validation still passes without a running
+Langfuse service, but a service-backed proof run can require OTLP ingestion and trace lookup:
+
+```bash
+LANGFUSE_BASE_URL=http://localhost:3000 \
+LANGFUSE_PUBLIC_KEY=<pk-lf-...> \
+LANGFUSE_SECRET_KEY=<sk-lf-...> \
+LANGFUSE_PROJECT_ID=<optional-project-id> \
+python3 apps/pydantic-ai/run.py \
+  --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
+  --output /tmp/pydantic-ai-run.json \
+  --require-langfuse-ingestion \
+  --pretty
+```
+
+The command posts OTLP/HTTP JSON to `LANGFUSE_BASE_URL/api/public/otel/v1/traces`, verifies the trace through the
+Langfuse public API, and preserves `/tmp/pydantic-ai-run.trace.json` as the deterministic fallback artifact. See
+`docs/orchestration/self-hosted-langfuse.md` for the local or VPS Docker Compose profile, ports, secrets, reset flow,
+and troubleshooting.
+
 Common deterministic-run failures:
 
 - Missing fixture path: rerun from the repo root or pass an absolute `--fixture` path.
 - Invalid fixture JSON: keep the fixture categories aligned with `docs/comparison-evidence.md`.
 - Missing output directory permission: choose a writable `--output` path such as `/tmp/pydantic-ai-run.json`.
+- Missing Langfuse service or keys: omit `--require-langfuse-ingestion` for deterministic fixture validation, or start
+  the self-hosted Langfuse profile and export `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY`.
 
 ## Evidence Required
 
@@ -88,7 +116,8 @@ The implementation sequence should produce:
 
 - a runnable command for the candidate demo;
 - a passing shared behavior-contract or fixture check;
-- repo-local OpenTelemetry evidence for the workflow run, plus optional Logfire export notes;
+- repo-local OpenTelemetry evidence for the workflow run, plus self-hosted Langfuse ingestion when services are
+  available;
 - Pydantic Evals output tied to the same run and trace;
 - setup notes covering required services, environment variables, and local startup;
 - explicit gaps for self-hosted observability, evaluation, durable execution, scalability, and operating risk.

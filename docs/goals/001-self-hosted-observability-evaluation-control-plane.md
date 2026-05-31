@@ -67,7 +67,21 @@ python3 apps/pydantic-ai/run.py \
   --pretty
 ```
 
-Add a service-backed proof command during implementation when the Langfuse local profile exists.
+Service-backed Langfuse proof command from T027:
+
+```bash
+LANGFUSE_BASE_URL=http://127.0.0.1:13300 \
+LANGFUSE_PUBLIC_KEY=<project-public-key> \
+LANGFUSE_SECRET_KEY=<project-secret-key> \
+LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai \
+python3 apps/pydantic-ai/run.py \
+  --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
+  --output /tmp/pydantic-ai-langfuse-run.json \
+  --require-langfuse-ingestion \
+  --pretty
+```
+
+T027 evidence lives in `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
 
 ## Review Blocking Criteria
 

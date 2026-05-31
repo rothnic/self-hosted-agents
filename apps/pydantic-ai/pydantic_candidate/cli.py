@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .trace import emit_logfire_export
+from .trace import emit_langfuse_ingestion, emit_logfire_export
 from .workflow import run_candidate_workflow
 
 
@@ -31,6 +31,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Fail unless optional Logfire export evidence is sent with configured credentials.",
     )
+    parser.add_argument(
+        "--require-langfuse-ingestion",
+        action="store_true",
+        help="Fail unless trace evidence is ingested and verified in a configured self-hosted Langfuse instance.",
+    )
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
     return parser
 
@@ -47,10 +52,18 @@ def main(argv: list[str] | None = None) -> int:
     output = result.to_dict()
     output["command_used"] = command_used(argv)
     output["evidence_paths"]["fixture_input"] = str(args.fixture)
+    result.trace_export["run_id"] = result.run_id
     logfire_export = emit_logfire_export(result.trace_export, require=args.require_logfire_export)
+    langfuse_ingestion = emit_langfuse_ingestion(
+        result.trace_export,
+        require=args.require_langfuse_ingestion,
+    )
     result.trace_export["logfire"] = logfire_export
+    result.trace_export["langfuse"] = langfuse_ingestion
     output["trace_evidence"]["logfire"] = logfire_export
     output["trace_evidence"]["logfire_configured"] = bool(logfire_export["configured"])
+    output["trace_evidence"]["langfuse"] = langfuse_ingestion
+    output["trace_evidence"]["langfuse_configured"] = bool(langfuse_ingestion["configured"])
     trace_output = args.trace_output
     if trace_output is None and args.output is not None:
         trace_output = args.output.with_suffix(".trace.json")
@@ -63,4 +76,6 @@ def main(argv: list[str] | None = None) -> int:
     print(json.dumps(output, indent=2 if args.pretty else None, sort_keys=True))
     if args.require_logfire_export and not logfire_export.get("sent"):
         return 2
+    if args.require_langfuse_ingestion and not langfuse_ingestion.get("verified"):
+        return 3
     return 0

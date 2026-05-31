@@ -33,7 +33,7 @@ The first user is the project owner as an engineer. The working assumptions are:
 | R7 | Scalable architecture path | The chosen approach should grow beyond a toy demo | Clear path to durable services |
 | R8 | Roadmap learning loop | Requirements should evolve as prototypes reveal issues | Review notes update specs and backlog |
 | R9 | Low custom critical infrastructure | Avoid rebuilding platform capabilities mature tools normally provide | Platform capabilities are provided or intentionally owned |
-| R10 | Hosted observability as part of the stack | Full solutions need real hosted trace review, not only local exports | Hosted trace evidence from the tested stack, correlated to run artifacts |
+| R10 | LLM-aware observability | Full solutions need product trace review, not only local exports | Self-hosted trace evidence correlated to run artifacts |
 | R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison with retry/resume/human-wait/side-effect evidence |
 
 ## Functional Needs Map
@@ -46,7 +46,7 @@ or a small amount of app-local glue. The comparison should name those provider c
 | --- | --- | --- | --- |
 | Agent orchestration | Represent the workflow as inspectable steps | Framework graph, runtime, or app-local pipeline | Branching, retries, persistence, skills, or approval hooks |
 | Tool and context access | Safely call tools over project context | Tool APIs, DI, MCP, retrieval connectors, or typed adapters | Connectors, approval policy, schemas, or capability bundles |
-| Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, or traces | Hosted trace UI, cost tracking, failure views, eval dashboards, or OTel export |
+| Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, or traces | Self-hosted trace UI, cost tracking, failure views, eval dashboards, or OTel export |
 | Evaluation | Rerun and score comparable behavior | Deterministic checks, eval datasets, framework evals, or custom scorer | Regression history, trace-linked scores, judges, or annotation workflows |
 | Evidence storage | Preserve run, trace, eval, setup, and gaps | Repo artifacts, observability backend, eval store, or exports | Cross-run comparison UI, searchable evidence, or reports |
 | Durable execution | Recover or resume long-running workflows | Pydantic integrations, Hatchet, Temporal, DBOS, Prefect, Restate, or queues | Retries, human waits, workers, or replay UI |
@@ -83,20 +83,21 @@ Legend: `High` means likely strong fit; `Medium` means plausible but needs proof
 | R7 Scalable architecture path | Medium | Medium | Medium | High | Medium | High |
 | R8 Roadmap learning loop | High | High | High | High | High | Medium |
 | R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | Medium | High if approved |
-| R10 Hosted observability evidence | Medium | Medium | Low | High | Medium | High |
+| R10 Product observability evidence | Medium | Medium | Low | High | Medium | High |
 | R11 Durable execution evidence | Low | Low | Medium | High | Medium | High |
 
 ## Human Direction Update - 2026-05-23
 
-Hosted observability is part of the stack being tested and evaluated. A deterministic fixture path remains necessary
-for repeatable agent validation, but local-only trace evidence is not enough for a final solution.
+Product-grade observability is part of the stack being tested and evaluated. A deterministic fixture path remains
+necessary for repeatable agent validation, but local-only trace evidence is not enough for a final solution.
 
 Durable execution is required in each final solution. The project must evaluate options before selecting one. For the
 Pydantic AI path, framework-specific options should be considered first, then Hatchet should be compared with Temporal,
 DBOS, Prefect, and Restate.
 
-The next implementation backlog is approved for Pydantic AI plus Logfire/OpenTelemetry. It must evaluate durable
-execution for this project's purpose: easy to start, easy to understand, easy to scale, and not too complex to operate.
+The next implementation backlog is approved for Pydantic AI plus Logfire/OpenTelemetry and self-hosted Langfuse
+ingestion as the LLM-aware observability proof. It must evaluate durable execution for this project's purpose: easy to
+start, easy to understand, easy to scale, and not too complex to operate.
 
 ### Acceptance Language For Promotion
 
@@ -359,6 +360,39 @@ the evidence required by `docs/comparison-evidence.md`.
   as part of the first Pydantic AI slice.
 - Record the exact Pydantic AI instrumentation format/version because OpenTelemetry GenAI conventions are still in
   development.
+
+### Pydantic AI Self-Hosted Langfuse Evidence Update (T027)
+
+Evidence status: Pydantic AI now has implementation evidence for repo-local trace export plus self-hosted Langfuse
+OTLP ingestion. This closes the "generic trace only" observability gap for the trace path, but it does not complete
+Pydantic Evals or durable execution.
+
+Evidence inspected on 2026-05-31:
+
+- **Run artifact**: `/tmp/pydantic-ai-langfuse-run.json` recorded
+  `run-b955c2242f44d8ed882cc04d` in deterministic fixture mode.
+- **Repo-local trace artifact**: `/tmp/pydantic-ai-langfuse-run.trace.json` recorded local trace id
+  `trace-8b14215d61aa6e29d4bbac47`, OTLP trace id `99c38cb17d8c97581c52fda9934eb100`, and four spans.
+- **Self-hosted Langfuse proof**: Langfuse ran on `vps` from upstream commit `b6c2e91` with Compose project
+  `sha_langfuse`, reached through `ssh -N -L 13300:127.0.0.1:3300 vps`.
+- **Ingestion verification**: the Pydantic AI command posted OTLP/HTTP JSON to
+  `http://127.0.0.1:13300/api/public/otel/v1/traces`, received HTTP 200, and verified the same trace through
+  `GET /api/public/traces/99c38cb17d8c97581c52fda9934eb100`.
+- **Durable evidence record**: `.agent-runs/verifications/verify-langfuse-t027-20260531.json`.
+- **Setup notes**: `docs/orchestration/self-hosted-langfuse.md` documents services, ports, secrets, reset, and
+  troubleshooting. `apps/pydantic-ai/README.md` documents `--require-langfuse-ingestion`.
+
+### Pydantic AI T027 Rubric View
+
+These scores are still slice-level, not final-solution scores, because evaluation and durable execution remain open.
+
+| Criterion | Slice Score | Evidence Basis | Gap Or Cap |
+| --- | --- | --- | --- |
+| Infrastructure ownership | 3 | Langfuse provides self-hosted trace UI, ingestion, and trace API | Operating effort still needs comparison against Phoenix or Opik if Langfuse stays heavy |
+| Observability | 4 | Tested app emits repo-local traces and verifies the same OTLP trace in self-hosted Langfuse | Live model/tool spans, token and cost views, and failure traces are not proven |
+| Evaluation | 1 | Eval output is still planned for T023 | Cap until Pydantic Evals output correlates to this run and trace identity |
+| Scalability | 2 | Docker Compose stack proves service topology but not production operations | Needs deployment and retention strategy |
+| Operating effort | 2 | VPS proof required six services plus SSH tunnel and explicit secrets | Needs simpler bootstrap or documented hosted-on-controlled-infra pattern |
 
 ## Roadmap Review Questions
 

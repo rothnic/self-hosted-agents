@@ -143,6 +143,7 @@ class DecisionSliceAgentScaffold:
         )
         trace_export = self.trace.export()
         trace_id = trace_export["trace_id"]
+        otel_trace_id = trace_export["otel_trace_id"]
         run_id = stable_id(
             "run",
             {
@@ -197,10 +198,13 @@ class DecisionSliceAgentScaffold:
                 "linked_task": "T022",
                 "provider": trace_export["provider"],
                 "trace_id": trace_id,
+                "otel_trace_id": otel_trace_id,
                 "span_count": len(trace_export["spans"]),
                 "instrumentation": trace_export["instrumentation"],
                 "logfire": trace_export["logfire"],
                 "logfire_configured": bool(trace_export["logfire"]["configured"]),
+                "langfuse": trace_export["langfuse"],
+                "langfuse_configured": bool(trace_export["langfuse"]["configured"]),
                 "gaps": trace_export["gaps"],
             },
             trace_export=trace_export,

@@ -1,0 +1,59 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "candidate_app": "apps/pydantic-ai",
+  "created_at": "2026-05-31T20:38:45Z",
+  "issue_id": "awf-ftu.1",
+  "local_trace_id": "trace-8b14215d61aa6e29d4bbac47",
+  "notes": [
+    "Langfuse ran as a self-hosted Docker Compose stack on vps.",
+    "The local repo connected through ssh -L 13300:127.0.0.1:3300 vps.",
+    "Deterministic fixture validation does not require Langfuse service credentials."
+  ],
+  "otel_trace_id": "99c38cb17d8c97581c52fda9934eb100",
+  "repo_local_artifacts": {
+    "run_artifact": "/tmp/pydantic-ai-langfuse-run.json",
+    "trace_artifact": "/tmp/pydantic-ai-langfuse-run.trace.json"
+  },
+  "run_id": "run-b955c2242f44d8ed882cc04d",
+  "service_backed_command": [
+    "LANGFUSE_BASE_URL=http://127.0.0.1:13300",
+    "LANGFUSE_PUBLIC_KEY=<project-public-key>",
+    "LANGFUSE_SECRET_KEY=<project-secret-key>",
+    "LANGFUSE_PROJECT_ID=self-hosted-agents-pydantic-ai",
+    "python3 apps/pydantic-ai/run.py",
+    "--fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json",
+    "--output /tmp/pydantic-ai-langfuse-run.json",
+    "--require-langfuse-ingestion",
+    "--pretty"
+  ],
+  "self_hosted_langfuse": {
+    "compose_project": "sha_langfuse",
+    "host": "vps",
+    "langfuse_commit": "b6c2e91",
+    "local_base_url": "http://127.0.0.1:3300",
+    "observed_web_status": "running",
+    "published_web_port": "127.0.0.1:3300->3000",
+    "services": [
+      "langfuse-web",
+      "langfuse-worker",
+      "postgres",
+      "clickhouse",
+      "redis",
+      "minio"
+    ],
+    "ssh_tunnel": "ssh -N -L 13300:127.0.0.1:3300 vps"
+  },
+  "trace_ingestion": {
+    "endpoint": "http://127.0.0.1:13300/api/public/otel/v1/traces",
+    "http_status": 200,
+    "sent": true,
+    "status": "verified-in-langfuse",
+    "trace_api": "http://127.0.0.1:13300/api/public/traces/99c38cb17d8c97581c52fda9934eb100",
+    "trace_url": {
+      "base_url": "http://127.0.0.1:13300",
+      "path": "/project/self-hosted-agents-pydantic-ai/traces/99c38cb17d8c97581c52fda9934eb100"
+    },
+    "verified": true,
+    "verify_http_status": 200
+  }
+}

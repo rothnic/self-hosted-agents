@@ -1,0 +1,16 @@
+{
+  "claimed_at": "2026-05-31T20:28:56.672680+00:00",
+  "id": "awf-ftu.1",
+  "work": {
+    "created_at": "2026-05-31T19:44:18.254412Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 002-solution-comparison-roadmap\nTask: T027\nSource: specs/002-solution-comparison-roadmap/tasks.md\nAcceptance: uv run awf workflow-fixture-test\n\nImplement the next observability slice by proving the tested apps/pydantic-ai candidate can emit trace evidence into a self-hosted or locally deployed Langfuse backend. Use OpenTelemetry as transport, but do not treat generic OTel JSON as the final observability product. Preserve deterministic fixture validation without hosted credentials and keep repo-local fallback artifacts. Record the local deployment shape, env vars, command, run id, trace id, Langfuse project/trace URL or local path, and fallback trace artifact path.",
+    "id": "awf-ftu.1",
+    "issue_type": "task",
+    "priority": 1,
+    "status": "open",
+    "title": "Prove self-hosted Langfuse ingestion for the Pydantic AI trace path",
+    "updated_at": "2026-05-31T20:28:49.408195Z"
+  },
+  "worker_id": "codex-awf-ftu-1"
+}

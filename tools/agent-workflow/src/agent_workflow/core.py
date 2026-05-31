@@ -1288,9 +1288,14 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "trace_correlated": bool(artifact.get("trace_id"))
             and trace.get("trace_id") == artifact.get("trace_id")
             and trace_export.get("trace_id") == artifact.get("trace_id"),
+            "langfuse_otel_trace_id": isinstance(trace_export.get("otel_trace_id"), str)
+            and len(trace_export.get("otel_trace_id", "")) == 32,
             "trace_capture_status": trace.get("status") == "captured" and trace.get("linked_task") == "T022",
             "trace_instrumentation": trace_export.get("instrumentation", {}).get("target")
             == "Pydantic AI OpenTelemetry instrumentation",
+            "langfuse_optional": trace_export.get("langfuse", {}).get("configured") is False
+            and trace_export.get("langfuse", {}).get("status") == "missing-langfuse-otel-config",
+            "langfuse_not_sent_without_credentials": trace_export.get("langfuse", {}).get("sent") is False,
             "logfire_optional": trace_export.get("logfire", {}).get("configured") is False
             and trace_export.get("logfire", {}).get("status") == "missing-logfire-export-config",
             "logfire_not_sent_without_credentials": trace_export.get("logfire", {}).get("sent") is False,
