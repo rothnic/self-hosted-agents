@@ -23,9 +23,10 @@ task platform with durable tasks, a dashboard, replay, OpenTelemetry export, and
 evaluated as the main non-Pydantic-specific Python durable option because it may offer a simpler operator model for
 background tasks and agent workflows than a lower-level durable runtime.
 
-Logfire hosted observability is a real part of the Pydantic AI stack. Logfire also has a self-hosted path, but the
-self-hosted deployment is Enterprise and Kubernetes-heavy. The next slice should therefore prove hosted Logfire
-observability as part of the full solution while keeping repo-local artifacts for deterministic validation and review.
+Logfire observability is a real part of the Pydantic AI stack. Logfire also has a self-hosted path, but the self-hosted
+deployment is Enterprise and Kubernetes-heavy. The next slice should therefore prove self-hosted-compatible
+OpenTelemetry evidence while keeping repo-local artifacts for deterministic validation and review. A cloud-hosted
+Logfire project should remain optional diagnostic evidence, not the acceptance gate.
 
 DBOS appears lightweight for Python and Pydantic AI because it can wrap an agent with `DBOSAgent`, checkpoint workflow
 state in a database, and use SQLite for local examples or Postgres-like system storage for stronger operation. Its risk
@@ -48,7 +49,7 @@ Use the next Pydantic AI slice to compare durable execution options before selec
 
 1. Pydantic AI framework-specific paths: DBOS, Prefect, Restate, and Temporal.
 2. Hatchet as the primary Python workflow-platform comparison.
-3. Reject any option that cannot produce simple local setup, understandable recovery behavior, hosted observability
+3. Reject any option that cannot produce simple local setup, understandable recovery behavior, observability
    correlation, and a credible scale path without excessive service sprawl.
 
 Do not choose a durable runtime in this planning task. The next backlog should produce evidence that lets the roadmap
@@ -58,7 +59,7 @@ pick the lowest-complexity viable option.
 
 - What is the smallest local setup that proves crash/resume or retry behavior?
 - Does the durable runtime preserve model calls, tool calls, human waits, and external side effects without duplicates?
-- Can hosted observability correlate durable workflow runs to model/tool traces and evaluation outputs?
+- Can self-hosted-compatible observability correlate durable workflow runs to model/tool traces and evaluation outputs?
 - How many services, credentials, and moving parts does one engineer need to run and debug it?
 - What is the credible path from local proof to production scale?
 

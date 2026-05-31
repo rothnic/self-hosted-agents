@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from .trace import stable_id
+from .trace import TraceRecorder, stable_id
 
 
 FUNCTIONAL_NEEDS = [
@@ -19,7 +19,7 @@ FUNCTIONAL_NEEDS = [
     },
     {
         "area": "Observability",
-        "provider": "Logfire plus portable OpenTelemetry export",
+        "provider": "Portable OpenTelemetry export with optional Logfire export",
         "first_slice_status": "planned-for-T022",
     },
     {
@@ -72,6 +72,7 @@ class CandidateRun:
     run_mode: str
     stack: list[str]
     trace_evidence: dict[str, Any]
+    trace_export: dict[str, Any]
     trace_id: str
     workflow: dict[str, Any]
     command_used: str = "provided by CLI"
@@ -97,24 +98,38 @@ class CandidateRun:
 
 
 class DecisionSliceAgentScaffold:
-    def __init__(self, payload: FixturePayload) -> None:
+    def __init__(self, payload: FixturePayload, trace: TraceRecorder) -> None:
         self.payload = payload
+        self.trace = trace
         self.steps: list[str] = []
 
     def load_context(self) -> None:
         self.steps.append("load_typed_fixture_context")
+        self.trace.record(
+            "load_typed_fixture_context",
+            {
+                "constraint_count": len(self.payload.constraints),
+                "has_objective": bool(self.payload.objective),
+            },
+        )
 
     def map_functional_needs(self) -> None:
         self.steps.append("map_pydantic_ai_functional_needs")
+        self.trace.record(
+            "map_pydantic_ai_functional_needs",
+            {"functional_area_count": len(FUNCTIONAL_NEEDS)},
+        )
 
     def select_next_slice(self) -> dict[str, str]:
         self.steps.append("select_next_slice")
         linked_task = self.payload.project_context.next_expected_slice or "T022"
+        self.trace.record("select_next_slice", {"linked_task": linked_task})
         return {
-            "next_slice": "Add hosted Logfire and OpenTelemetry trace evidence for the Pydantic AI slice.",
+            "next_slice": "Add self-hosted-compatible OpenTelemetry trace evidence for the Pydantic AI slice.",
             "reason": (
                 "The deterministic scaffold now proves the Pydantic AI lane can accept the shared comparison input "
-                "and return structured decision output, so the next useful slice is live observability evidence."
+                "and return structured decision output, so the next useful slice is inspectable local observability "
+                "evidence with an optional Logfire export path."
             ),
             "linked_task": linked_task,
         }
@@ -122,15 +137,12 @@ class DecisionSliceAgentScaffold:
     def format_run(self, recommendation: dict[str, str]) -> CandidateRun:
         self.steps.append("format_structured_run_artifact")
         candidate_data = {"id": self.payload.candidate.id, "stack": self.payload.candidate.stack}
-        trace_id = stable_id(
-            "trace",
-            {
-                "candidate": candidate_data,
-                "objective": self.payload.objective,
-                "steps": self.steps,
-            },
-            length=24,
+        self.trace.record(
+            "format_structured_run_artifact",
+            {"candidate_app_id": self.payload.candidate.id},
         )
+        trace_export = self.trace.export()
+        trace_id = trace_export["trace_id"]
         run_id = stable_id(
             "run",
             {
@@ -144,8 +156,8 @@ class DecisionSliceAgentScaffold:
             acceptance_check="uv run awf workflow-fixture-test",
             alternatives=[
                 {
-                    "option": "Add Pydantic Evals before hosted telemetry",
-                    "tradeoff": "Useful scoring path, but it would not satisfy the Logfire evidence dependency.",
+                    "option": "Add Pydantic Evals before trace evidence",
+                    "tradeoff": "Useful scoring path, but it would leave the run hard to inspect and correlate.",
                 },
                 {
                     "option": "Compare durable runtimes immediately",
@@ -166,32 +178,32 @@ class DecisionSliceAgentScaffold:
                 "run_artifact": "provided by --output",
                 "setup_notes": "apps/pydantic-ai/README.md",
                 "gap_notes": "apps/pydantic-ai/implementation-plan.md",
+                "trace_evidence": "provided by --trace-output or next to --output",
             },
             gaps=[
-                "Hosted Logfire telemetry is not sent in deterministic fixture mode and remains T022 evidence.",
-                "Repo-local OpenTelemetry export shape is planned for T022 after the runnable lane exists.",
+                "External Logfire export is optional diagnostic evidence and is not required for fixture validation.",
                 "Pydantic Evals output is planned for T023 and is not represented as passing implementation evidence.",
                 "Durable runtime selection and smoke proof remain T024 and T025 work.",
             ],
             questions=[
-                "Which hosted Logfire project should receive the first live Pydantic AI telemetry evidence?",
+                "Which self-hosted OpenTelemetry backend should later receive live Pydantic AI telemetry evidence?",
             ],
             recommendation=recommendation,
             run_id=run_id,
             run_mode="deterministic-fixture",
             stack=self.payload.candidate.stack,
             trace_evidence={
-                "status": "planned",
+                "status": "captured",
                 "linked_task": "T022",
-                "provider": "Logfire/OpenTelemetry",
+                "provider": trace_export["provider"],
                 "trace_id": trace_id,
-                "instrumentation_target": "Pydantic AI OpenTelemetry instrumentation",
-                "hosted_logfire_configured": False,
-                "gaps": [
-                    "No hosted Logfire run is emitted by the T021 scaffold.",
-                    "No local OTLP or trace JSON export is emitted by the T021 scaffold.",
-                ],
+                "span_count": len(trace_export["spans"]),
+                "instrumentation": trace_export["instrumentation"],
+                "logfire": trace_export["logfire"],
+                "logfire_configured": bool(trace_export["logfire"]["configured"]),
+                "gaps": trace_export["gaps"],
             },
+            trace_export=trace_export,
             trace_id=trace_id,
             workflow={
                 "style": "pydantic-ai-typed-agent-scaffold",
@@ -224,4 +236,15 @@ def run_candidate_workflow(payload: dict[str, Any]) -> CandidateRun:
         objective=str(payload["objective"]),
         project_context=project_context,
     )
-    return DecisionSliceAgentScaffold(fixture).run()
+    trace = TraceRecorder(
+        {
+            "candidate": {"id": fixture.candidate.id, "stack": fixture.candidate.stack},
+            "objective": fixture.objective,
+            "project_context": {
+                "active_spec": fixture.project_context.active_spec,
+                "current_slice": fixture.project_context.current_slice,
+                "next_expected_slice": fixture.project_context.next_expected_slice,
+            },
+        }
+    )
+    return DecisionSliceAgentScaffold(fixture, trace).run()

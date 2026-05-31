@@ -1262,6 +1262,11 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
         except json.JSONDecodeError as exc:
             artifact = {"decode_error": str(exc)}
+        trace_path = output_path.with_suffix(".trace.json")
+        try:
+            trace_export = json.loads(trace_path.read_text(encoding="utf-8")) if trace_path.exists() else {}
+        except json.JSONDecodeError as exc:
+            trace_export = {"decode_error": str(exc)}
         trace = artifact.get("trace_evidence", {})
         evaluation = artifact.get("evaluation_output", {})
         required = {
@@ -1278,8 +1283,17 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "command_used": "apps/pydantic-ai/run.py" in artifact.get("command_used", ""),
             "workflow_steps": bool(artifact.get("workflow", {}).get("steps")),
             "functional_needs": bool(artifact.get("workflow", {}).get("functional_needs")),
-            "trace_correlated": bool(artifact.get("trace_id")) and trace.get("trace_id") == artifact.get("trace_id"),
-            "trace_gap_status": trace.get("status") == "planned" and trace.get("linked_task") == "T022",
+            "trace_export": trace_export.get("provider") == "local-otel-json" and bool(trace_export.get("spans")),
+            "trace_linked": artifact.get("evidence_paths", {}).get("trace_evidence") == str(trace_path),
+            "trace_correlated": bool(artifact.get("trace_id"))
+            and trace.get("trace_id") == artifact.get("trace_id")
+            and trace_export.get("trace_id") == artifact.get("trace_id"),
+            "trace_capture_status": trace.get("status") == "captured" and trace.get("linked_task") == "T022",
+            "trace_instrumentation": trace_export.get("instrumentation", {}).get("target")
+            == "Pydantic AI OpenTelemetry instrumentation",
+            "logfire_optional": trace_export.get("logfire", {}).get("configured") is False
+            and trace_export.get("logfire", {}).get("status") == "missing-logfire-export-config",
+            "logfire_not_sent_without_credentials": trace_export.get("logfire", {}).get("sent") is False,
             "evaluation_gap_status": evaluation.get("status") == "planned" and evaluation.get("linked_task") == "T023",
             "gap_notes": bool(artifact.get("gaps")) and bool(artifact.get("evidence_paths", {}).get("gap_notes")),
         }
@@ -1291,8 +1305,10 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "stderr": proc.stderr.strip(),
             "fixture": rel(fixture),
             "output": str(output_path),
+            "trace_output": str(trace_path),
             "required": required,
             "artifact": artifact,
+            "trace": trace_export,
         }
 
 

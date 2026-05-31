@@ -13,6 +13,7 @@ pip-wheel-metadata/
 .mypy_cache/
 .coverage
 htmlcov/
+.logfire/
 node_modules/
 .turbo/
 .next/

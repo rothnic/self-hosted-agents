@@ -110,8 +110,8 @@ trace, and evaluation evidence.
 - **SC-004**: Shared contracts define the evidence needed for candidate comparison before implementation depth grows.
 - **SC-005**: The approved roadmap decision identifies both the first implementation slice and the next Python-first
   candidate research target.
-- **SC-006**: The next approved implementation backlog includes hosted observability evidence and durable execution
-  option comparison before candidate promotion.
+- **SC-006**: The next approved implementation backlog includes self-hosted-compatible observability evidence and
+  durable execution option comparison before candidate promotion.
 
 ## Assumptions
 

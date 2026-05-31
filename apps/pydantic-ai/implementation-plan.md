@@ -34,22 +34,23 @@ Tool and context access: app-local typed adapters over fixture project context, 
 dependencies. First evidence is fixture input mapped into tool or context calls with typed outputs. Watch MCP, A2A, and
 reusable capability bundles.
 
-Observability: Pydantic AI OpenTelemetry instrumentation, Logfire as the hosted first-party path, and generic OTel as
-the portability path. First evidence is a repo-local trace export linked from the run artifact, with hosted Logfire gap
-or evidence recorded separately. Watch trace UI, token or cost views, tool-call inspection, SQL access, and MCP access
-to telemetry.
+Observability: Pydantic AI OpenTelemetry instrumentation, generic OTel as the self-hosted portability path, and Logfire
+as an optional first-party export target. First evidence is a repo-local trace export linked from the run artifact, with
+Logfire hosting feasibility recorded separately. Watch trace UI, token or cost views, tool-call inspection, SQL access,
+and MCP access to telemetry.
 
 Evaluation: Pydantic Evals plus deterministic assertions for the shared comparable workflow. First evidence is eval
 output tied to the same run id and trace id. Watch datasets, experiments, span-based evals, and Logfire visualization.
 
-Evidence storage: repo-local run, trace, eval, setup, and gap artifacts, with hosted links only as additive evidence.
-First evidence is one run artifact linking all evidence groups. Watch cross-run reports and searchable hosted telemetry.
+Evidence storage: repo-local run, trace, eval, setup, and gap artifacts, with external UI links only as additive
+evidence. First evidence is one run artifact linking all evidence groups. Watch cross-run reports and searchable
+self-hosted telemetry.
 
 Durable execution: out of scope for the first runnable slice beyond explicit gap notes. First evidence is a gap note
 naming durable runtime selection as blocked until T024/T025 evidence. Watch DBOS, Prefect, Restate, Temporal, and
 Hatchet.
 
-Operator experience: local deterministic command, README setup notes, and optional hosted env vars. First evidence is
+Operator experience: local deterministic command, README setup notes, and optional export env vars. First evidence is
 one no-credential command plus setup and failure notes. Watch single-command local stack, low service count, and
 diagnostics.
 
@@ -68,8 +69,8 @@ evidence checklist:
 4. Produce a run artifact that links command, input, output, trace evidence, eval evidence, setup notes, and gaps.
 5. Emit a repo-local OpenTelemetry trace or trace-shaped export that is correlated to the run artifact.
 6. Record the Pydantic AI instrumentation format or semantic-convention version used by the trace path.
-7. Keep Logfire optional for deterministic validation; missing hosted credentials should become gap evidence, not a
-   failed fixture run.
+7. Keep Logfire optional for deterministic validation; missing external export credentials should become gap evidence,
+   not a failed fixture run.
 
 Future T021 command target:
 
@@ -91,15 +92,22 @@ app-local modules needed by later trace and evaluation work, and app README setu
 setup notes must include the rerun command, required local tools, env var placeholders, service count for fixture mode,
 and common deterministic-run failure notes. T021 should not require hosted Logfire credentials.
 
-T022 should add hosted Logfire and repo-local OpenTelemetry trace evidence capture. It should prove hosted telemetry
-from the tested candidate stack, document credential handling and hosted verification commands, preserve deterministic
-validation without credentials, and record the instrumentation format or semantic-convention version to avoid brittle
-assertions against moving GenAI conventions. T022 is not complete with only local OTel plus a gap note; if hosted
-credentials are unavailable, record the blocker and leave the hosted-evidence portion open.
+T022 should add self-hosted-compatible OpenTelemetry trace evidence capture for the tested candidate stack. It should
+write repo-local trace evidence, document optional Logfire export handling for an operator-provided backend, preserve
+deterministic validation without credentials, and record the instrumentation format or semantic-convention version to
+avoid brittle assertions against moving GenAI conventions. A cloud-hosted Logfire project or token is not valid
+acceptance evidence for this self-hosted assessment; if self-hosted Logfire is unavailable, record the feasibility gap
+and close T022 with repo-local OTel evidence.
+
+T027 should prove self-hosted Langfuse ingestion for the Pydantic AI trace path before eval scoring depends on that
+trace context. It should use OpenTelemetry as the transport into Langfuse, document the local deployment shape, record
+the env vars and command, and preserve the repo-local trace artifact as deterministic fallback evidence. Phoenix and
+Opik remain comparison alternatives, but Langfuse is the default backend target because it is self-hostable,
+LLM-specific, and already part of the LangGraph lane.
 
 T023 should add Pydantic Evals output and run artifact capture tied to the same run id and trace id. It should keep a
 deterministic assertion path for fixture validation, update setup notes with eval rerun details and artifact locations,
-and treat hosted Logfire visualization as additive evidence.
+and treat Logfire visualization as additive evidence.
 
 T024 should compare durable execution options before choosing a runtime. Evaluate Pydantic AI framework-specific paths
 first: DBOS, Prefect, Restate, and Temporal. Compare Hatchet as the primary non-framework-specific Python workflow
@@ -111,27 +119,28 @@ or logs.
 
 T026 should update `docs/requirements-matrix.md` only after the Pydantic AI lane produces implementation evidence. It
 should score the slice against the functional needs map, keep final-solution language blocked until hosted
-observability and durable execution evidence exist, and record promotion gaps explicitly.
+self-hosted-compatible observability and durable execution evidence exist, and record promotion gaps explicitly.
 
 ## Dependency And Live Evaluation Gates
 
 The executable Beads queue must preserve the implementation order implied by this plan:
 
-- T022 depends on T021 because hosted Logfire and local OTel evidence require a runnable candidate app.
-- T023 depends on T022 because Pydantic Evals evidence must correlate to the same run and trace ids.
+- T022 depends on T021 because local OTel evidence and optional Logfire export notes require a runnable candidate app.
+- T027 depends on T022 because Langfuse ingestion needs the runnable local trace path.
+- T023 depends on T027 because Pydantic Evals evidence must correlate to the same run and Langfuse-backed trace ids.
 - T024 depends on T021 because durable execution options should be evaluated against the actual candidate lane.
 - T025 depends on T024 because the durable smoke path must use the selected lowest-complexity option.
 - T026 depends on T023 and T025 because matrix scoring must wait for eval evidence and durable smoke evidence.
 
-Live hosted evaluation means telemetry from the running candidate app reaches a real hosted Logfire project that a
-reviewer can inspect. T022 evidence must include the command used, credential names or setup path, run id, trace id,
-hosted Logfire project or trace link when safe to record, and repo-local export paths. Provider docs, screenshots,
-fixture-only local JSON, or disconnected sample runs do not satisfy the hosted Logfire gate.
+Self-hosted observability evaluation means telemetry evidence from the running candidate app can be inspected without
+requiring a third-party cloud project. T022 evidence must include the command used, run id, trace id, repo-local export
+path, the trace schema or instrumentation version, and any optional Logfire export setup path. Provider docs,
+screenshots, disconnected sample runs, or cloud-only trace links do not satisfy the self-hosted observability gate.
 
 ## Non-Goals
 
 - Do not build the runnable Pydantic AI app in T020.
 - Do not add dependencies, fixtures, runtime modules, or generated artifacts before T021.
-- Do not require hosted Logfire credentials for deterministic validation.
+- Do not require hosted Logfire credentials for deterministic validation or T022 closure.
 - Do not choose DBOS, Prefect, Restate, Temporal, Hatchet, or another durable runtime in this planning task.
 - Do not treat Pydantic AI plus Logfire/OpenTelemetry as the final platform winner before comparable evidence exists.

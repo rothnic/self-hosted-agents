@@ -10,8 +10,9 @@ evaluations, setup, and known gaps.
 
 Do not treat research notes or framework claims as implementation evidence. A candidate app only has comparable evidence
 after the shared behavior contract runs and the artifacts below can be reviewed from repo state or linked run outputs.
-For final-solution review, hosted observability and durable execution are required acceptance evidence, not optional
-upgrade paths.
+For final-solution review, self-hosted-compatible observability and durable execution are required acceptance evidence,
+not optional upgrade paths. Cloud-hosted observability can be useful comparison evidence, but it cannot be the only
+inspection path for this self-hosted agents assessment.
 
 ## Minimum Comparable Demo
 
@@ -55,10 +56,12 @@ but it cannot be accepted as a final solution.
 
 The minimum demo can be fixture-backed, but final solution promotion requires more evidence:
 
-- Hosted observability must be exercised as part of the candidate stack, including trace visibility for model calls,
-  tool calls, state transitions, failures, tokens or cost where available, and correlation back to run artifacts.
-- Hosted trace evidence must come from the tested candidate app running against a live hosted observability system, not
-  only provider documentation, screenshots, fixture-only exports, or a disconnected sample run.
+- Self-hosted-compatible observability must be exercised as part of the candidate stack, including trace visibility for
+  model calls, tool calls, state transitions, failures, tokens or cost where available, and correlation back to run
+  artifacts.
+- Trace evidence must come from the tested candidate app and be inspectable from repo-local artifacts or a self-hosted
+  OpenTelemetry-compatible backend, not only provider documentation, screenshots, cloud-only links, fixture-only exports,
+  or a disconnected sample run.
 - Durable execution must be proven for the final solution, including retry, resume, human wait, and side-effect
   behavior. The durable runtime should be selected through evidence rather than assumed.
 - Durable execution evidence must explain the selected runtime or the comparison basis for selecting it, including why
@@ -88,7 +91,8 @@ Capture enough trace detail to make agent behavior inspectable:
 - Coverage for model calls, tool calls, retrieval, state transitions, inputs, outputs, latency, token usage, and failures.
 - Correlation from the trace back to the run artifact and candidate app revision.
 - Gaps where manual instrumentation, custom storage, or custom visualization would be needed.
-- For final-solution review, hosted trace evidence from the actual candidate stack plus portable repo-local exports.
+- For final-solution review, self-hosted-compatible trace evidence from the actual candidate stack plus portable
+  repo-local exports.
 
 ### Evaluation Evidence
 
@@ -128,7 +132,7 @@ Capture what the implementation does not prove yet:
 
 - Missing trace or evaluation coverage.
 - Reliability, scalability, or operator-experience risks.
-- Framework limitations or hosted-only assumptions.
+- Framework limitations, hosted-only assumptions, or self-hosting gaps.
 - Follow-up spec tasks or Beads tickets needed before a candidate can be promoted.
 
 ## Promotion Gate
@@ -138,15 +142,17 @@ Implementation slices can be compared with explicit gaps. Final-solution promoti
 A candidate app is not ready to be described as a final solution unless it has:
 
 - A passing shared behavior contract run.
-- Hosted trace evidence from the actual candidate stack that can be inspected by a reviewer.
+- Trace evidence from the actual candidate stack that can be inspected by a reviewer without relying on a third-party
+  cloud project.
 - Repo-local trace and run artifacts that preserve deterministic validation.
 - Evaluation evidence tied to the same behavior run.
 - Setup and operating notes sufficient for another agent or engineer to rerun the slice.
 - Durable execution evidence for retry, resume, human wait, and side-effect behavior.
 - Explicit gap notes for missing evidence and custom critical infrastructure risk.
 
-Missing evidence should be recorded as a gap, not silently inferred. If hosted observability or durable execution is
-missing, the candidate can remain a comparison option, but final-solution language is blocked until the evidence exists.
+Missing evidence should be recorded as a gap, not silently inferred. If self-hosted-compatible observability or durable
+execution is missing, the candidate can remain a comparison option, but final-solution language is blocked until the
+evidence exists.
 
 ## Storage Rule
 

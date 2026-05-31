@@ -1,0 +1,9 @@
+{
+  "beads": null,
+  "created_at": "2026-05-30T19:48:23.962774+00:00",
+  "details": "T022 now writes repo-local OpenTelemetry-style trace evidence for apps/pydantic-ai and uv run awf workflow-fixture-test passes, but LOGFIRE_TOKEN and LOGFIRE_PROJECT_URL are absent in this environment. Per apps/pydantic-ai/implementation-plan.md, awf-52w must remain open until a real hosted Logfire project receives telemetry from the tested candidate app and the run id, trace id, hosted project or trace URL, command, and repo-local export path are recorded.",
+  "id": "health-20260530T194823Z",
+  "severity": "blocker",
+  "source": "awf-52w implementation",
+  "title": "Hosted Logfire evidence unavailable for awf-52w"
+}

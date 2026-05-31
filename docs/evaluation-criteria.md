@@ -10,9 +10,9 @@ high-level needs into evidence that can be checked against runnable apps.
 
 Do not use this rubric to declare a final winner from research alone. A candidate should only be promoted after it has
 implementation evidence from a runnable app, shared contracts, traces, evaluations, and setup notes.
-Final-solution promotion also requires hosted observability exercised as part of the candidate stack and durable
-execution proof. Repo-local artifacts remain required for repeatable validation, but they are not enough by themselves
-for final-solution acceptance.
+Final-solution promotion also requires self-hosted-compatible observability exercised as part of the candidate stack and
+durable execution proof. Repo-local artifacts remain required for repeatable validation; cloud-hosted traces alone are
+not enough for final-solution acceptance in this self-hosted agents assessment.
 
 ## Scoring Scale
 
@@ -28,11 +28,11 @@ Use a qualitative 1-4 score for each criterion.
 If a candidate requires custom critical infrastructure, cap the affected criterion at `2` unless the roadmap explicitly
 decides that owning that infrastructure is strategically necessary.
 
-For final-solution review, cap Observability at `2` when hosted observability has not been exercised by the candidate
-app and linked to the same run evidence reviewers inspect. Cap Durable Execution and Scalability at `2` when retry,
-resume, human wait, and side-effect behavior are not proven through a selected or explicitly evaluated durable runtime.
-These caps do not block research or first-slice implementation work; they mean the candidate is not final-solution
-ready.
+For final-solution review, cap Observability at `2` when self-hosted-compatible observability has not been exercised by
+the candidate app and linked to the same run evidence reviewers inspect. Cap Observability at `2` when the only
+inspection path is a third-party hosted project. Cap Durable Execution and Scalability at `2` when retry, resume, human
+wait, and side-effect behavior are not proven through a selected or explicitly evaluated durable runtime. These caps do
+not block research or first-slice implementation work; they mean the candidate is not final-solution ready.
 
 ## Criteria
 
@@ -53,23 +53,24 @@ Warning conditions:
 
 ### Observability
 
-Evaluate whether hosted observability and local or exportable traces make agent behavior inspectable. Hosted
-observability is part of the full stack under evaluation, while repo-local artifacts keep validation repeatable.
+Evaluate whether self-hosted-compatible observability and local or exportable traces make agent behavior inspectable.
+Repo-local artifacts keep validation repeatable, and any external UI must be backed by a self-hosted or portable export
+path.
 
 Strong evidence:
 
-- Readable hosted traces for model calls, tools, retrieval, state transitions, inputs, outputs, latency, tokens, costs,
-  and failures.
-- Hosted trace evidence produced by the candidate app as part of the tested stack, correlated to the run artifact,
-  evaluation output, and candidate revision.
+- Readable traces for model calls, tools, retrieval, state transitions, inputs, outputs, latency, tokens, costs, and
+  failures through repo-local artifacts or a self-hosted-compatible backend.
+- Trace evidence produced by the candidate app as part of the tested stack, correlated to the run artifact, evaluation
+  output, and candidate revision.
 - Repo-local trace exports that let agents validate behavior without hosted credentials.
 
 Warning conditions:
 
-- Traces are incomplete, hard to correlate, local-only, hosted-only without portable exports, or require extensive
-  custom instrumentation.
-- Hosted observability remains a planned integration, disconnected sample, screenshot, or framework claim instead of
-  stack evidence from the tested candidate.
+- Traces are incomplete, hard to correlate, cloud-only without portable exports, or require extensive custom
+  instrumentation.
+- Observability remains a planned integration, disconnected sample, screenshot, or framework claim instead of stack
+  evidence from the tested candidate.
 
 ### Evaluation
 

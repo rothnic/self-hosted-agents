@@ -101,17 +101,17 @@ execution for this project's purpose: easy to start, easy to understand, easy to
 ### Acceptance Language For Promotion
 
 Use "candidate slice" language when an implementation proves the shared behavior contract but still has explicit
-hosted observability, evaluation, operating, or durable execution gaps.
+self-hosted-compatible observability, evaluation, operating, or durable execution gaps.
 
 Use "final solution" language only when both of these are true:
 
-- Hosted observability is stack evidence from the tested candidate app, correlated to repo-local run and evaluation
-  artifacts.
+- Self-hosted-compatible observability is stack evidence from the tested candidate app, correlated to repo-local run and
+  evaluation artifacts.
 - Durable execution is proven for retry, resume, human wait, and side-effect behavior through an evaluated runtime.
 
 Deterministic repo-local artifacts remain mandatory in both cases so agents can rerun validation without hidden hosted
-state. Missing hosted observability or durable execution evidence blocks final-solution acceptance rather than becoming
-an implied follow-up.
+state. Missing self-hosted-compatible observability or durable execution evidence blocks final-solution acceptance
+rather than becoming an implied follow-up.
 
 ### Durable Execution Options To Evaluate
 
@@ -241,8 +241,8 @@ These scores use `docs/evaluation-criteria.md` and are intentionally provisional
 
 - Do not promote LangGraph plus Langfuse beyond first-candidate status until hosted or self-hosted Langfuse ingestion is
   proven against the same run artifact contract.
-- Preserve deterministic fixture validation without hosted credentials; hosted observability must be additive, not a
-  prerequisite for `uv run awf workflow-fixture-test`.
+- Preserve deterministic fixture validation without hosted credentials; cloud-hosted observability must be additive, not
+  a prerequisite for `uv run awf workflow-fixture-test`.
 - Add real model/tool spans or explicit simulated equivalents before claiming trace coverage for production agent
   behavior.
 - Add dataset, model-judge, annotation, or regression-history evidence before treating evaluation support as strong.
@@ -354,7 +354,7 @@ the evidence required by `docs/comparison-evidence.md`.
   repo-local run, trace, evaluation, setup, and gap artifacts.
 - Preserve deterministic fixture validation without hosted credentials. Logfire or any hosted backend must be additive,
   not required by `uv run awf workflow-fixture-test`.
-- Verify a generic local OTel backend path before depending on Logfire-specific UI or hosted telemetry.
+- Verify a generic local OTel backend path before depending on Logfire-specific UI or cloud-hosted telemetry.
 - Treat durable execution as follow-up architecture evidence; do not silently choose Temporal, DBOS, Prefect, or Restate
   as part of the first Pydantic AI slice.
 - Record the exact Pydantic AI instrumentation format/version because OpenTelemetry GenAI conventions are still in

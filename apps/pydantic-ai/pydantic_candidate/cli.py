@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from .trace import emit_logfire_export
 from .workflow import run_candidate_workflow
 
 
@@ -24,6 +25,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the deterministic Pydantic AI comparison workflow.")
     parser.add_argument("--fixture", required=True, type=Path, help="Shared comparison fixture JSON path.")
     parser.add_argument("--output", type=Path, help="Optional run artifact output path.")
+    parser.add_argument("--trace-output", type=Path, help="Optional OpenTelemetry trace export output path.")
+    parser.add_argument(
+        "--require-logfire-export",
+        action="store_true",
+        help="Fail unless optional Logfire export evidence is sent with configured credentials.",
+    )
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
     return parser
 
@@ -40,8 +47,20 @@ def main(argv: list[str] | None = None) -> int:
     output = result.to_dict()
     output["command_used"] = command_used(argv)
     output["evidence_paths"]["fixture_input"] = str(args.fixture)
+    logfire_export = emit_logfire_export(result.trace_export, require=args.require_logfire_export)
+    result.trace_export["logfire"] = logfire_export
+    output["trace_evidence"]["logfire"] = logfire_export
+    output["trace_evidence"]["logfire_configured"] = bool(logfire_export["configured"])
+    trace_output = args.trace_output
+    if trace_output is None and args.output is not None:
+        trace_output = args.output.with_suffix(".trace.json")
+    if trace_output is not None:
+        write_output(trace_output, result.trace_export, args.pretty)
+        output["evidence_paths"]["trace_evidence"] = str(trace_output)
     if args.output is not None:
         output["evidence_paths"]["run_artifact"] = str(args.output)
         write_output(args.output, output, args.pretty)
     print(json.dumps(output, indent=2 if args.pretty else None, sort_keys=True))
+    if args.require_logfire_export and not logfire_export.get("sent"):
+        return 2
     return 0

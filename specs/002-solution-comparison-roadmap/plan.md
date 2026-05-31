@@ -58,7 +58,8 @@ specs/
 4. Implement candidate app slices one at a time.
 5. Review demos and evidence with the human.
 6. Update requirements, matrix, specs, and backlog as implementation learning changes the decision space.
-7. Evaluate hosted observability and durable execution as first-class solution components before promoting a candidate.
+7. Evaluate self-hosted-compatible observability and durable execution as first-class solution components before
+   promoting a candidate.
 
 ## Complexity Tracking
 
@@ -70,6 +71,6 @@ specs/
 ## Open Questions
 
 1. Which durable execution option is easiest to start, understand, and scale for the first Python production path?
-2. Does hosted Logfire provide enough full-stack observability for the Pydantic AI candidate without excessive
+2. Does Pydantic AI's OpenTelemetry path provide enough self-hosted-compatible observability without excessive
    operational burden?
 3. Which durable runtime should be selected after comparing framework-specific Pydantic AI options and Hatchet?
