@@ -196,6 +196,14 @@ def langfuse_otlp_payload(trace_export: dict[str, Any]) -> dict[str, Any]:
             16,
         )
     offset = len(spans)
+    run_agent_otel_span_id = next(
+        (
+            str(span.get("otel_span_id", ""))
+            for span in trace_export.get("spans", [])
+            if span.get("name") == "run_pydantic_ai_agent"
+        ),
+        "",
+    )
     for index, span in enumerate(native_spans):
         original_span_id = str(span.get("span_id", ""))
         original_parent_span_id = str(span.get("parent_span_id", ""))
@@ -220,6 +228,8 @@ def langfuse_otlp_payload(trace_export: dict[str, Any]) -> dict[str, Any]:
         }
         if original_parent_span_id and original_parent_span_id in native_span_id_map:
             otlp_span["parentSpanId"] = native_span_id_map[original_parent_span_id]
+        elif run_agent_otel_span_id:
+            otlp_span["parentSpanId"] = run_agent_otel_span_id
         spans.append(otlp_span)
     return {
         "resourceSpans": [

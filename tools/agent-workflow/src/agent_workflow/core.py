@@ -92,10 +92,15 @@ def emit(data: Any, as_json: bool) -> int:
     return 0
 
 
-def run(cmd: list[str], check: bool = False, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
+def run(
+    cmd: list[str],
+    check: bool = False,
+    cwd: Path | None = None,
+    timeout: int | None = None,
+) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env.setdefault("RUST_LOG", "error")
-    return subprocess.run(cmd, cwd=cwd or ROOT, text=True, capture_output=True, check=check, env=env)
+    return subprocess.run(cmd, cwd=cwd or ROOT, text=True, capture_output=True, check=check, env=env, timeout=timeout)
 
 
 def find_br() -> str | None:
@@ -1185,7 +1190,7 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
             str(output_path),
             "--pretty",
         ]
-        proc = run(command)
+        proc = run(command, timeout=30)
         try:
             artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
         except json.JSONDecodeError as exc:
@@ -1301,6 +1306,7 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             text=True,
             capture_output=True,
             env=ambient_env,
+            timeout=30,
         )
         try:
             ambient_trace = json.loads(ambient_output_path.with_suffix(".trace.json").read_text(encoding="utf-8"))
@@ -1316,7 +1322,8 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
                 "--evaluation-output",
                 str(placeholder_eval_path),
                 "--pretty",
-            ]
+            ],
+            timeout=30,
         )
         try:
             placeholder_evaluation = json.loads(placeholder_eval_path.read_text(encoding="utf-8"))
