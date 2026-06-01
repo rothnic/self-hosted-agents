@@ -712,6 +712,11 @@ def ready_work(args: argparse.Namespace) -> int:
     return emit(data, args.json)
 
 
+def enrich_ready_issues(raw_ready: list[dict[str, Any]], issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    issues_by_id = {issue.get("id"): issue for issue in issues if issue.get("id")}
+    return [issues_by_id.get(issue.get("id"), issue) for issue in raw_ready]
+
+
 def ready_work_data() -> dict[str, Any]:
     br = find_br()
     if br:
@@ -733,9 +738,10 @@ def ready_work_data() -> dict[str, Any]:
             and is_implementation_issue(issue)
             and issue_open_dependencies(issue)
         ]
+        enriched_raw_ready = enrich_ready_issues(raw_ready, issues)
         ready = [
             issue
-            for issue in raw_ready
+            for issue in enriched_raw_ready
             if is_implementation_issue(issue) and not issue_open_dependencies(issue)
         ]
         return {
@@ -1090,7 +1096,8 @@ def health_status_data(deep: bool) -> dict[str, Any]:
             code, data = fn()
         else:
             code, data = fn(check_args)
-        checks.append({"name": name, "ok": code == 0, "data": data})
+        ok = code == 0 or (name == "review-gate" and review_gate_is_human_review_handoff(data))
+        checks.append({"name": name, "ok": ok, "data": data})
     if deep:
         code, data = workflow_fixture_test_result(write=False)
         checks.append({"name": "workflow-fixture-test", "ok": code == 0, "data": data})
@@ -1165,7 +1172,8 @@ def workflow_check(name: str) -> dict[str, Any]:
         code, data = workflow_fixture_test_result(write=False, include_orchestration=False)
     else:
         return {"name": name, "command": command, "ok": False, "data": {"error": f"unknown check {name}"}}
-    return {"name": name, "command": command, "ok": code == 0, "data": data}
+    ok = code == 0 or (name == "review-gate" and review_gate_is_human_review_handoff(data))
+    return {"name": name, "command": command, "ok": ok, "data": data}
 
 
 def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
@@ -2456,13 +2464,27 @@ def review_gate(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[
         text = read_text(path)
         if "[NEEDS CLARIFICATION:" in text:
             open_questions.append(rel(path))
+    human_required = []
+    if root.resolve() == ROOT.resolve():
+        human_required = ready_work_data().get("human_required", [])
     data = {
-        "ok": not existing and not open_questions and not spec_errors,
+        "ok": not existing and not open_questions and not spec_errors and not human_required,
         "blocked_files": [rel(p) for p in existing],
         "open_questions": open_questions,
         "spec_errors": spec_errors,
+        "human_required": human_required,
+        "human_required_count": len(human_required),
     }
     return (0 if data["ok"] else 1), data
+
+
+def review_gate_is_human_review_handoff(data: dict[str, Any]) -> bool:
+    return (
+        bool(data.get("human_required"))
+        and not data.get("blocked_files")
+        and not data.get("open_questions")
+        and not data.get("spec_errors")
+    )
 
 
 def workflow_run(args: argparse.Namespace) -> int:
@@ -2668,6 +2690,18 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": ready,
         }
     )
+    code, data = review_gate(args, ROOT)
+    expected_human_gate = bool(ready.get("human_required"))
+    results.append(
+        {
+            "name": "root review gate mirrors Beads human review state",
+            "ok": (
+                (expected_human_gate and code != 0 and review_gate_is_human_review_handoff(data))
+                or (not expected_human_gate and code == 0 and not data.get("human_required"))
+            ),
+            "data": data,
+        }
+    )
     ticket_data = ticket_sync_data(write=False)
     open_task_ids = {task["id"] for task in collect_tasks() if not task.get("done")}
     existing_open_task_ids = {
@@ -2755,6 +2789,34 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and worker_one_claims[0]["id"] == "awf-one"
             and [item["id"] for item in unclaimed_items] == ["awf-three"],
             "data": {"worker_one_claims": worker_one_claims, "unclaimed_items": unclaimed_items},
+        }
+    )
+    synthetic_full_issues = [
+        {
+            "id": "awf-human",
+            "title": "Needs approval",
+            "status": "open",
+            "issue_type": "task",
+            "labels": ["human-review"],
+        },
+        {
+            "id": "awf-ready",
+            "title": "Ready implementation",
+            "status": "open",
+            "issue_type": "task",
+            "labels": [],
+        },
+    ]
+    synthetic_raw_ready = [
+        {"id": "awf-human", "title": "Needs approval", "issue_type": "task"},
+        {"id": "awf-ready", "title": "Ready implementation", "issue_type": "task"},
+    ]
+    enriched_ready = enrich_ready_issues(synthetic_raw_ready, synthetic_full_issues)
+    results.append(
+        {
+            "name": "ready work enrichment preserves Beads human review labels",
+            "ok": [item["id"] for item in enriched_ready if is_implementation_issue(item)] == ["awf-ready"],
+            "data": {"enriched_ready": enriched_ready},
         }
     )
     if include_orchestration:
