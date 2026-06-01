@@ -2137,7 +2137,9 @@ def automation_loop_data(
             "next_action": next_action,
         }
     verify = verify_data("increment", write=write)
-    if status["review_status"] == "ready-for-increment-review" and verify["ok"]:
+    if status["review_status"] == "human-review-required" and verify["ok"]:
+        next_action = "pm-review-loop should present the human gate"
+    elif status["review_status"] == "ready-for-increment-review" and verify["ok"]:
         next_action = "prepare the feature branch for human review against main"
     elif status["blocked"]:
         next_action = "route blockers to pm-review-loop before integrating"
@@ -2788,12 +2790,22 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and active_increment.get("ready_count") == 0
             and active_increment.get("next_action") == "integrator-loop should prepare the phase review PR"
         )
+        active_increment_is_human_review = (
+            active_increment.get("review_status") == "human-review-required"
+            and active_increment.get("ready_count") == 0
+            and bool(active_increment.get("human_required"))
+            and active_increment.get("next_action") == "pm-review-loop should present the human gate"
+        )
         results.append(
             {
                 "name": "active increment status routes Phase 6 lifecycle",
                 "ok": active_increment["increment_id"] == "002-solution-comparison-roadmap-phase-6"
                 and bool(active_child_ticket_ids)
-                and (active_increment_is_executing or active_increment_is_ready_for_review),
+                and (
+                    active_increment_is_executing
+                    or active_increment_is_ready_for_review
+                    or active_increment_is_human_review
+                ),
                 "data": active_increment,
             }
         )
@@ -2825,6 +2837,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                         and active_orchestrator.get("next_action")
                         == "integrator-loop should prepare the phase review PR"
                     )
+                    or (
+                        active_claim.get("claimed") is None
+                        and active_claim.get("ready_count") == 0
+                        and active_orchestrator.get("next_action")
+                        == "pm-review-loop should present the human gate"
+                    )
                 ),
                 "data": active_orchestrator,
             }
@@ -2838,11 +2856,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             phase="Phase 999",
         )
         idle_claim = idle_worker.get("claim") if isinstance(idle_worker.get("claim"), dict) else {}
+        idle_status = idle_worker.get("increment", {}).get("review_status")
         results.append(
             {
                 "name": "worker loop treats idle active increments as successful",
                 "ok": idle_worker["ok"]
-                and idle_worker["increment"]["review_status"] == "planning"
+                and idle_status in {"planning", "human-review-required"}
                 and idle_claim.get("ok") is True
                 and idle_claim.get("claimed") is None,
                 "data": idle_worker,

@@ -125,5 +125,6 @@ or Opik before accepting Langfuse, or reopen candidate comparison before durable
 The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should continue to implement
 that same decision-ready workflow before roadmap review compares platform quality.
 
-There are no ready Phase 6 worker tickets. The open Phase 6 epic `awf-ftu` is waiting for human review. For
-long-horizon work, use the goal backlog instead of selecting isolated tasks.
+There are no ready Phase 6 worker tickets. The open Phase 6 epic `awf-ftu` is labeled `human-review`, so PM/review must
+record the decision before Goal 002 implementation tickets are created. For long-horizon work, use the goal backlog
+instead of selecting isolated tasks.

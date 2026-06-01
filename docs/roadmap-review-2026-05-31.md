@@ -2,9 +2,9 @@
 
 ## Executive Snapshot
 
-Where we are: Phase 6 of `002-solution-comparison-roadmap` is implementation-complete and ready for increment review.
-All Phase 6 child tickets are closed, `ready-work` reports no worker-ready tasks, and the increment ledger now routes to
-`integrator-loop should prepare the phase review PR`.
+Where we are: Phase 6 of `002-solution-comparison-roadmap` is implementation-complete and waiting on human review. All
+Phase 6 child tickets are closed, `ready-work` reports no worker-ready tasks, and the Phase 6 epic `awf-ftu` is labeled
+`human-review`.
 
 Why it matters: the project now has tested Pydantic AI evidence for self-hosted-compatible observability, Pydantic
 Evals, DBOS durable smoke behavior, and requirements-matrix scoring. This is enough to review Goal 001 and decide
@@ -31,7 +31,7 @@ What the agent checked:
 - `docs/evaluation-criteria.md`
 - `docs/orchestration/self-hosted-langfuse.md`
 - `.agent-runs/increments/002-solution-comparison-roadmap-phase-6.json`
-- `.agent-runs/verifications/verify-increment-20260531T235614Z.json`
+- `.agent-runs/verifications/verify-increment-20260601T002227Z.json`
 - Beads ready-work and Phase 6 tickets
 
 What changed recently:
@@ -43,7 +43,8 @@ What changed recently:
 - T024 compared durable execution options and selected DBOS as the first low-complexity smoke path.
 - T025 added a DBOS SQLite smoke proving resume after a killed child process without duplicating the side-effect step.
 - T026 scored Pydantic AI as a tested candidate slice and kept final-solution blockers explicit.
-- The workflow fixture now accepts the completed Phase 6 lifecycle and routes to increment review.
+- The workflow fixture now accepts the completed Phase 6 lifecycle and routes to human review when the epic is labeled
+  `human-review`.
 - Goal 001 follow-up Beads epics were recorded for the remaining non-blocking gaps: `awf-eas` for Langfuse production
   operations, `awf-2du` for richer Langfuse evaluation workflows, and `awf-4t2` for Phoenix or Opik fallback comparison
   if Langfuse becomes too heavy.
