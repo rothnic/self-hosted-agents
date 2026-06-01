@@ -89,6 +89,12 @@ T023 Pydantic Evals evidence:
 - `.agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json`
 - `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json`
 
+Follow-up Beads tickets for remaining operation and fallback gaps:
+
+- `awf-eas`: Follow up Langfuse production operations proof.
+- `awf-2du`: Follow up Langfuse evaluation workflow proof.
+- `awf-4t2`: Follow up Phoenix or Opik fallback comparison.
+
 ## Review Blocking Criteria
 
 - The only observability proof is local JSON without an LLM-aware UI.

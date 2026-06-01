@@ -56,15 +56,15 @@ and Hatchet against the actual candidate app lane, then implements the lowest-co
 T024 selects Pydantic AI plus DBOS as the first durable smoke path for Goal 002. The decision is intentionally scoped to
 the next proof, not the final platform. DBOS was selected because the tested Pydantic AI package exposes a native DBOS
 module, the first smoke can use local SQLite state, and the proof can run without hosted services or external model
-providers. T025 must add the missing DBOS optional dependency before importing `DBOSAgent`.
+providers. T025 added the optional DBOS dependency required to import and run `DBOSAgent`.
 
 Evidence to inspect:
 
 - `docs/research/durable-execution-selection-2026-05-31.md`
 - `.agent-runs/verifications/verify-durable-options-t024-20260531.json`
 
-Next proof: T025 should implement a DBOS smoke around the existing deterministic Pydantic AI candidate path and prove
-retry or resume behavior without duplicating an explicit side-effect-like step.
+Remaining Goal 002 proofs: extend the DBOS smoke beyond resume and side-effect non-duplication to cover retry, human
+wait, production storage, worker topology, and recovery behavior.
 
 ## Current Smoke Evidence
 

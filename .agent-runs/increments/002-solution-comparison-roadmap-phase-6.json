@@ -6,67 +6,75 @@
   "blocked": [],
   "child_tickets": [
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T019",
       "task_id": "T019",
       "ticket_id": "awf-hrm",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Update comparison criteria for hosted observability and durable execution requirements"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T020",
       "task_id": "T020",
       "ticket_id": "awf-9im",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Define the `pydantic-ai` implementation slice plan with Logfire evidence"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T021",
       "task_id": "T021",
       "ticket_id": "awf-olx",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Scaffold the runnable `apps/pydantic-ai/` comparable workflow with deterministic fixture support"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T022",
       "task_id": "T022",
       "ticket_id": "awf-52w",
-      "ticket_status": "open",
-      "title": "Add hosted Logfire and OpenTelemetry trace evidence capture for the Pydantic AI slice"
+      "ticket_status": "closed",
+      "title": "Add self-hosted-compatible OpenTelemetry trace evidence capture for the Pydantic AI slice"
     },
     {
-      "done": false,
+      "done": true,
+      "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T027",
+      "task_id": "T027",
+      "ticket_id": "awf-ftu.1",
+      "ticket_status": "closed",
+      "title": "Prove self-hosted Langfuse ingestion for the Pydantic AI trace path"
+    },
+    {
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T023",
       "task_id": "T023",
       "ticket_id": "awf-ktw",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add Pydantic Evals output and run artifact capture for the Pydantic AI slice"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T024",
       "task_id": "T024",
       "ticket_id": "awf-c4e",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Compare durable execution options for Pydantic AI and Python workflow candidates"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T025",
       "task_id": "T025",
       "ticket_id": "awf-4wg",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add a durable execution smoke path for the lowest-complexity selected option"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/002-solution-comparison-roadmap/tasks.md#T026",
       "task_id": "T026",
       "ticket_id": "awf-4th",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Update the requirements matrix with Pydantic AI evidence, scores, and promotion gaps"
     }
   ],
@@ -75,15 +83,20 @@
   "human_required": [],
   "increment_id": "002-solution-comparison-roadmap-phase-6",
   "learning_proposals": [],
-  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+  "next_action": "integrator-loop should prepare the phase review PR",
   "objective_id": "agentic-development-foundation",
   "ok": true,
   "path": ".agent-runs/increments/002-solution-comparison-roadmap-phase-6.json",
   "phase": "Phase 6",
-  "ready_count": 8,
-  "review_status": "executing",
+  "ready_count": 0,
+  "review_status": "ready-for-increment-review",
   "spec_id": "002-solution-comparison-roadmap",
   "stale_claims": [],
-  "updated_at": "2026-05-23T19:44:42.262762+00:00",
-  "validation_evidence": []
+  "updated_at": "2026-05-31T23:45:26.131399+00:00",
+  "validation_evidence": [
+    {
+      "path": ".agent-runs/verifications/verify-increment-20260531T235614Z.json",
+      "summary": "Increment verification passed after Phase 6 review handoff edits; next action is the increment review gate."
+    }
+  ]
 }
