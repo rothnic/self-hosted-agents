@@ -2,10 +2,10 @@
 
 ## Objective
 
-Build a complete self-hosted agent operating system by executing the linked product goals in order.
+Execute the self-hosted agent system roadmap in order.
 
-This is the parent goal. Use it as the single long-running `/goal` target when the work should advance the full
-roadmap instead of one focused product iteration.
+This is the short parent goal for a long-running `/goal` session. It exists only to route work through the ordered
+child goals below; each child goal owns its own specs, tasks, Beads backlog, evidence, and review gates.
 
 ## Ordered Goals
 
@@ -24,8 +24,8 @@ roadmap instead of one focused product iteration.
 
 ## Completion Standard
 
-This umbrella goal is complete only when every linked goal has its own proof evidence, review outcome, and follow-up
-backlog. Do not close it after completing only one child goal.
+This goal is complete only when all ordered child goals are complete, reviewed, and backed by durable evidence. Do not
+close this parent goal after only one child goal.
 
 ## Kickoff Prompt
 
