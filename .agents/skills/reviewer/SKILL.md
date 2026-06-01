@@ -16,10 +16,13 @@ Find bugs, process drift, missing acceptance criteria, and mismatches between sp
 - Are behavior contracts updated for changed e2e behavior?
 - Are operational expectations covered when relevant?
 - Do acceptance checks pass?
-- Are new human decisions recorded instead of guessed?
+- For goal or increment evidence, did a presenting agent provide enough durable evidence to accept the goal?
+- Are new decisions recorded instead of guessed?
 
 ## Output
 
 Lead with findings ordered by severity. Include file and line references when reviewing local files.
-When the review is clean, state the human's next options: approve/merge, request changes, or continue with another
-ready Beads item. Do not imply that approval or merge happened unless it was explicitly requested and completed.
+When reviewing goal or increment evidence, clearly state `accepted` or `rejected`, list the evidence checked, and name
+any required follow-up tickets. When reviewing merge readiness, state the human's next options: approve/merge, request
+changes, or continue with another ready Beads item. Do not imply that approval or merge happened unless it was
+explicitly requested and completed.

@@ -15,8 +15,8 @@ Feature: Automated increment orchestration
     Then it assigns only unclaimed unblocked work to a focused worker branch
     And the operational record keeps blocked work visible for the PM review loop instead of idling the increment
 
-  Scenario: Integrator stops at a human increment gate
+  Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch
-    Then it prepares the increment for human review rather than merging to main
-    And the operational record links the phase evidence, learnings, and review status
+    Then it presents increment evidence for independent reviewer acceptance before merging
+    And the operational record links the phase evidence, learnings, reviewer, and review status

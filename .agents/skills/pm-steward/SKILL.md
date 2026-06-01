@@ -23,7 +23,7 @@ missing specs, stale tickets, missing behavior contracts, and the next safe acti
 
 1. Build a context index.
 2. Compare current objectives with active specs, tasks, tickets, and checks.
-3. Identify drift, missing acceptance criteria, unresolved human gates, and work that is too large.
+3. Identify drift, missing acceptance criteria, unresolved review gates, and work that is too large.
 4. Inspect Beads ready work and git status before telling the user what to do next.
 5. Translate workflow state into a CEO-level decision brief, not a command list for the human to operate manually.
 6. If the next step needs outside context, gather bounded research first and then ask targeted questions.
@@ -37,12 +37,12 @@ missing specs, stale tickets, missing behavior contracts, and the next safe acti
 
 - Always answer "what do I do now?" with options, not a single vague instruction.
 - Use the `AGENTS.md` next-action response template so the message includes process position, git state, work in
-  progress, context, recommendation, options, meta-process notes, and what happens after approval.
+  progress, context, recommendation, options, meta-process notes, and what happens after review.
 - Do not ask the human to run workflow CLI commands. Use commands as agent instrumentation, then present the decision,
   researched recommendation, or targeted questions.
 - When the repo is healthy but no work is ready, recommend the next product/objective discovery move and provide the
   questions needed to shape it.
-- If local changes are already verified, the human owns approval; the agent can prepare merge/commit/PR steps after approval.
+- If local changes are already verified, the human owns merge approval; the agent can prepare commit/PR steps.
 - If Beads has ready work, the implementer owns execution after claiming one issue.
 - If `tasks.md` has open work that is not in Beads, ticket planner owns backlog sync before implementers start.
 - If a decision affects scope, priority, architecture, or acceptance, the human owns that decision.
@@ -53,7 +53,7 @@ missing specs, stale tickets, missing behavior contracts, and the next safe acti
 
 - Product intent is unclear.
 - Acceptance criteria are missing.
-- The next action would choose architecture or scope without human review.
+- The next action would choose architecture or scope without explicit human direction or a recorded reviewer outcome.
 - BDD contract expectations are ambiguous.
 
 ## References

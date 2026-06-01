@@ -1,6 +1,6 @@
 # Agent Operating Guide
 
-This repository is managed through specs, local tickets, behavior contracts, small verified changes, and human review gates.
+This repository is managed through specs, local tickets, behavior contracts, small verified changes, and review gates.
 Treat repository artifacts as the durable source of truth; local machines, CI runners, Codex, and cloud agent services are replaceable execution environments.
 
 ## First Steps
@@ -37,7 +37,7 @@ Use this loop to keep the project ratcheting forward:
 1. **Bootstrap**: verify environment and hooks with `uv run awf bootstrap`.
 2. **Index**: inspect current state with `uv run awf context-index`.
 3. **Role Select**: choose and load exactly one primary skill for the current activity.
-4. **Gate Check**: run `review-gate`; stop if a human decision is required.
+4. **Gate Check**: run `review-gate`; stop only when evidence is missing, contradictory, or outside agent authority.
 5. **Plan**: PM steward aligns objectives, specs, tickets, behavior contracts, checks, recent reports, and learnings.
 6. **Decompose**: epic decomposer turns approved scope into small spec tasks.
 7. **Ticket**: ticket planner syncs approved tasks into Beads Rust tickets.
@@ -50,7 +50,9 @@ Use this loop to keep the project ratcheting forward:
     otherwise add follow-up tasks and return to planning.
 13. **Learn**: retrospector records useful process learnings before the next run.
 
-The loop pauses whenever the next transition would require guessing about scope, architecture, priority, acceptance, or behavior.
+The loop does not pause merely because a human-review label exists. For goal and increment evidence, one agent presents
+the evidence and an independent reviewer agent accepts or rejects it in a durable artifact. The loop pauses only when
+review evidence is missing or contradictory, or when the user has explicitly reserved a decision for themselves.
 
 ## Session Boundaries
 
@@ -118,7 +120,8 @@ git status --short --branch
 Choose the recommendation by state:
 
 - If health fails: load `health-status`, log or propose the issue, and stop before implementation.
-- If a review gate or human approval is open: load `review-gatekeeper` and ask for that decision.
+- If a review gate is open: load `review-gatekeeper`; if the gate concerns goal evidence, have an independent reviewer
+  agent accept or reject the presented evidence and record the outcome before continuing.
 - If there are verified local changes waiting for human review: load `reviewer`; present approve/merge, request changes,
   or continue options. Do not merge without explicit human approval.
 - If an approved spec has unsynced open tasks: load `ticket-planner` and run `uv run awf ticket-sync`; use `--write`
@@ -126,7 +129,7 @@ Choose the recommendation by state:
 - If Beads has ready work: load `implementer`, claim one item, and execute only that item.
 - If no ready work exists: load `pm-steward` to propose the next objective/spec/backlog action.
 
-Use this response template for every next-action or human-review handoff. The visible user-facing request should be a
+Use this response template for every next-action or review handoff. The visible user-facing request should be a
 decision, answer, approval, or prioritization choice, not a CLI command.
 
 ```markdown
@@ -180,7 +183,7 @@ the human to operate the workflow manually.
 
 ## Role Swimlanes
 
-- **Human reviewer**: sets project objectives, approves specs and human gates, chooses priority when tradeoffs remain,
+- **Human reviewer**: sets project objectives, can reserve decisions explicitly, chooses priority when tradeoffs remain,
   and approves merges. The human should not need to manually inspect status commands; agents present options and evidence.
 - **PM steward**: reads project state and returns the next safe action, options, blockers, and recommendation. It does not
   implement product changes.
@@ -189,9 +192,10 @@ the human to operate the workflow manually.
 - **Ticket planner**: turns approved open spec tasks into Beads backlog items and validates traceability.
 - **Implementer**: consumes Beads ready work, claims one item, makes the smallest coherent change, and records evidence.
 - **Test steward**: runs acceptance and workflow checks, then records precise failures or passing evidence.
-- **Reviewer**: reviews code/spec/ticket alignment and decides whether the change is ready for human approval.
-- **Review gatekeeper**: pauses automation when a human decision is required and resumes only after that decision is
-  recorded in a durable artifact.
+- **Reviewer**: reviews code/spec/ticket alignment and goal evidence. For goal or increment completion, the presenting
+  agent records evidence and an independent reviewer agent records acceptance or rejection.
+- **Review gatekeeper**: pauses automation when review evidence is missing or contradictory and resumes after the
+  review outcome is recorded in a durable artifact.
 - **Retrospector**: records durable process learnings after a run.
 
 ## Backlog Population
@@ -228,7 +232,8 @@ The PM/review loop reviews health, objectives, specs, tickets, run reports, and 
 It refreshes backlog when ready work runs low and opens phase review gates when needed.
 The orchestrator reads increment state, claims unblocked work, and assigns worker branches.
 Workers only inspect claimed work, verify with `uv run awf verify --profile ticket`, record evidence, and push.
-The integrator reviews completed worker branches, verifies the increment, and stops at the human review boundary.
+The integrator reviews completed worker branches, verifies the increment, and routes goal evidence to an independent
+reviewer agent. It does not stop solely because human review might be useful.
 Work separation is handled through Beads ready work plus `.agent-runs/claims/`; workers do not mutate unless a task is
 claimed.
 If a cron run finds a problem, it must log it with `uv run awf issue-log --write` before exiting.

@@ -13,6 +13,10 @@ evaluation, orchestration, scalability, and operating effort.
 Current long-horizon goal: execute `docs/goals/000-self-hosted-agent-system-roadmap.md` as the parent goal, working
 through its linked child goals in order.
 
+Current roadmap checkpoint: Goal 001 is accepted for this roadmap increment by independent reviewer evidence in
+`.agent-runs/reports/goal-001-evidence-review-20260601.md`. The next product iteration is Goal 002 durable agent
+execution runtime.
+
 ## Success Criteria
 
 - A new agent can start from `AGENTS.md`, run bootstrap/context commands, and know the next safe action.
@@ -46,4 +50,5 @@ through its linked child goals in order.
 
 - Do not treat a framework or observability platform as the winner before comparable implementation evidence exists.
 - Do not automate risky writes without explicit `--write`.
-- Do not let recurring agents bypass human review gates.
+- Do not let recurring agents bypass review gates; goal and increment evidence requires independent reviewer
+  acceptance unless the user explicitly reserves the decision.

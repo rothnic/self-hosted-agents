@@ -37,7 +37,9 @@ Umbrella goal: [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-r
 - Decompose the selected goal into tasks and Beads tickets only after scope and proof gates are clear.
 - Keep deterministic repo-local validation even when the goal introduces services.
 - Record self-hosted service setup, credentials, ports, storage, and recovery evidence as part of completion.
-- Stop at human review when a goal would choose a platform, runtime, deployment topology, or user-facing workflow.
+- Do not stop solely because human review may be useful. For goal evidence, one agent presents the evidence and an
+  independent reviewer agent records acceptance or rejection. Escalate to the human only when the user explicitly
+  reserves the decision or the reviewer finds evidence missing or contradictory.
 
 ## Recommended Kickoff
 

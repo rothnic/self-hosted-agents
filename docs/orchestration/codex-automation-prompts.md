@@ -19,7 +19,8 @@ Run the PM/review automation loop for this repo.
 
 Use repo artifacts as source of truth. Run
 `.venv/bin/awf automation-loop --role pm-review --write --json`.
-If the output reports a human gate or unclear objective, summarize the decision needed and stop.
+If the output reports missing or contradictory evidence, summarize the decision needed and stop. If the gate is only
+goal or increment evidence review, route it to an independent reviewer agent and record the outcome.
 If ready work is low and approved spec tasks exist, refresh backlog through the command output only.
 Do not implement product changes.
 ```
@@ -52,8 +53,8 @@ Run the integrator automation loop for this repo.
 
 Review completed worker branches for the active increment. Merge only clean, verified worker branches into the feature
 branch. Run `.venv/bin/awf automation-loop --role integrator --write --json` and
-`.venv/bin/awf verify --profile increment --write --json`. Prepare the human review PR to `main` when the increment is
-ready, but do not merge to `main`.
+`.venv/bin/awf verify --profile increment --write --json`. Present increment evidence for independent reviewer
+acceptance when ready, but do not merge to `main`.
 ```
 
 ## Health Loop

@@ -41,7 +41,7 @@ claims, blockers, review status, and a safe next action.
 **Acceptance Scenarios**:
 
 1. **Given** a spec phase with open child work, **When** increment status is requested, **Then** the output identifies
-   whether PM/review, orchestration, worker, integration, or human review should happen next.
+   whether PM/review, orchestration, worker, integration, or reviewer acceptance should happen next.
 2. **Given** a claim is old or work is blocked, **When** increment status is requested, **Then** stale and blocked work
    remain visible instead of stopping the whole increment silently.
 
@@ -50,19 +50,19 @@ claims, blockers, review status, and a safe next action.
 ### User Story 3 - Scheduled Roles Move Work Without Merging To Main (Priority: P2)
 
 As the project owner, I can allow scheduled roles to plan, assign, implement, verify, and integrate work on feature
-branches while human review remains at the increment boundary.
+branches while independent reviewer acceptance remains at the increment evidence boundary.
 
 **Why this priority**: The project should keep moving without turning every worker step into a manual decision.
 
 **Independent Test**: Run each automation loop in dry form and confirm roles return a bounded action without merging to
-`main` or crossing human gates.
+`main` or crossing review gates.
 
 **Acceptance Scenarios**:
 
 1. **Given** ready unblocked work exists, **When** the orchestrator loop runs, **Then** it claims one safe item and
    assigns a worker branch.
-2. **Given** an increment is complete, **When** the integrator loop verifies it, **Then** it prepares human review rather
-   than merging to `main`.
+2. **Given** an increment is complete, **When** the integrator loop verifies it, **Then** it presents evidence for
+   independent reviewer acceptance rather than merging to `main`.
 3. **Given** a worker hits a blocker, **When** the automation loop reports status, **Then** the blocker is visible to
    the PM/review loop and unblocked work can continue.
 
@@ -81,10 +81,10 @@ branches while human review remains at the increment boundary.
 - **FR-009**: Blocked work MUST be recorded and visible; one blocker MUST NOT idle the whole increment unless it blocks
   all remaining work through dependencies.
 - **FR-010**: Integrators and scheduled workers MUST NOT merge to `main`.
-- **FR-011**: Human review MUST occur at increment boundaries, architecture/product decisions, and unresolved
-  scope/priority questions.
+- **FR-011**: Increment evidence MUST be accepted or rejected by an independent reviewer agent unless the user has
+  explicitly reserved the decision.
 - **FR-012**: The workflow fixture MUST cover verification, backlog creation behavior, work selection, evidence
-  recording, human review stopping, and blocker rerouting.
+  recording, reviewer acceptance routing, and blocker rerouting.
 
 ### Key Entities
 
@@ -92,14 +92,15 @@ branches while human review remains at the increment boundary.
 - **Verification Artifact**: Compact run output under `.agent-runs/verifications/`.
 - **Automation Role**: One scheduled concern: PM/review, orchestrator, worker, integrator, or health.
 - **Worker Branch**: Focused branch for one claimed ticket, normally targeting the increment feature branch.
-- **Review Gate**: A human boundary for increment approval or unresolved product, architecture, priority, or scope.
+- **Review Gate**: A boundary for reviewer acceptance or unresolved product, architecture, priority, or scope.
 
 ## Success Criteria *(mandatory)*
 
 - **SC-001**: Agents can run one verification command for ticket, increment, health, and pre-merge contexts.
 - **SC-002**: Increment status answers what should happen next from repo state without human CLI operation.
 - **SC-003**: Scheduled loops can return safe next actions for PM/review, orchestrator, worker, integrator, and health.
-- **SC-004**: The workflow fixture validates that automation stops at human review instead of merging to `main`.
+- **SC-004**: The workflow fixture validates that automation routes increment evidence to review instead of merging to
+  `main`.
 - **SC-005**: Blocked and stale work are visible to planning loops, while unrelated unblocked work can continue.
 
 ## Assumptions

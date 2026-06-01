@@ -10,13 +10,13 @@ cannot assume access to approved self-hosted LangSmith.
 
 ## Operating Model
 
-Agents own workflow commands, research, decomposition, tickets, and implementation evidence. The human operates at the
-roadmap and approval level:
+Agents own workflow commands, research, decomposition, tickets, implementation evidence, and independent evidence
+review. The human operates at the roadmap and approval level when they explicitly reserve a decision:
 
 1. The human states goals, constraints, and tradeoffs.
 2. Agents translate current repo state into a short decision brief.
 3. Agents research unclear solution areas before asking for decisions.
-4. The human answers targeted questions or approves a recommended path.
+4. A presenter agent records evidence and an independent reviewer agent accepts or rejects it.
 5. Agents update objectives, specs, tasks, Beads tickets, and comparison artifacts.
 6. Implementers build small slices in separate apps and run shared acceptance checks.
 7. Reviewers compare demo behavior, observability, scalability, and operating effort.
@@ -106,11 +106,11 @@ spec, tasks, and Beads tickets before implementation.
 
 Latest CEO-level review: `docs/roadmap-review-2026-05-31.md`.
 
-Phase 6 is implementation-complete and ready for human increment review. `apps/pydantic-ai/` now has tested evidence for
+Phase 6 is implementation-complete and independently reviewed. `apps/pydantic-ai/` now has tested evidence for
 self-hosted-compatible observability, Pydantic Evals, DBOS durable smoke behavior, and requirements-matrix scoring.
 Neither Pydantic AI nor DBOS is a final platform winner.
 
-Recommended next direction: accept Goal 001 as complete for the current roadmap increment and start Goal 002 next.
+Accepted next direction: Goal 001 is complete for the current roadmap increment, and Goal 002 starts next.
 Goal 001 has the required self-hosted Langfuse proof, repo-local trace fallback, Pydantic Evals output, fixture-safe
 service-unavailable behavior, setup docs, and matrix scoring. The remaining final-solution blockers are concentrated in
 Goal 002 durable execution work: retry, human wait, production DBOS storage, worker topology, and recovery.
@@ -125,6 +125,6 @@ or Opik before accepting Langfuse, or reopen candidate comparison before durable
 The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should continue to implement
 that same decision-ready workflow before roadmap review compares platform quality.
 
-There are no ready Phase 6 worker tickets. The open Phase 6 epic `awf-ftu` is labeled `human-review`, so PM/review must
-record the decision before Goal 002 implementation tickets are created. For long-horizon work, use the goal backlog
-instead of selecting isolated tasks.
+There are no remaining Phase 6 worker tickets. Independent review accepted Goal 001 evidence in
+`.agent-runs/reports/goal-001-evidence-review-20260601.md`; PM/review can now decompose Goal 002 into spec tasks and
+Beads tickets. For long-horizon work, use the goal backlog instead of selecting isolated tasks.

@@ -1824,7 +1824,11 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
     all_children_closed = child_tickets and all(
         item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
     )
-    if ready.get("human_required"):
+    accepted = state.get("review_status") == "accepted" and all_children_closed
+    if accepted:
+        review_status = "accepted"
+        next_action = "pm-review-loop should start next roadmap goal"
+    elif ready.get("human_required"):
         review_status = "human-review-required"
         next_action = "pm-review-loop should present the human gate"
     elif scoped_blocked and not scoped_ready:
@@ -2145,7 +2149,9 @@ def automation_loop_data(
             "next_action": next_action,
         }
     verify = verify_data("increment", write=write)
-    if status["review_status"] == "human-review-required" and verify["ok"]:
+    if status["review_status"] == "accepted" and verify["ok"]:
+        next_action = "pm-review-loop should start next roadmap goal"
+    elif status["review_status"] == "human-review-required" and verify["ok"]:
         next_action = "pm-review-loop should present the human gate"
     elif status["review_status"] == "ready-for-increment-review" and verify["ok"]:
         next_action = "prepare the feature branch for human review against main"
@@ -2858,6 +2864,11 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and bool(active_increment.get("human_required"))
             and active_increment.get("next_action") == "pm-review-loop should present the human gate"
         )
+        active_increment_is_accepted = (
+            active_increment.get("review_status") == "accepted"
+            and active_increment.get("ready_count") == 0
+            and active_increment.get("next_action") == "pm-review-loop should start next roadmap goal"
+        )
         results.append(
             {
                 "name": "active increment status routes Phase 6 lifecycle",
@@ -2867,6 +2878,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                     active_increment_is_executing
                     or active_increment_is_ready_for_review
                     or active_increment_is_human_review
+                    or active_increment_is_accepted
                 ),
                 "data": active_increment,
             }
@@ -2905,6 +2917,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                         and active_orchestrator.get("next_action")
                         == "pm-review-loop should present the human gate"
                     )
+                    or (
+                        active_claim.get("claimed") is None
+                        and active_claim.get("ready_count") == 0
+                        and active_orchestrator.get("next_action")
+                        == "pm-review-loop should start next roadmap goal"
+                    )
                 ),
                 "data": active_orchestrator,
             }
@@ -2923,7 +2941,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             {
                 "name": "worker loop treats idle active increments as successful",
                 "ok": idle_worker["ok"]
-                and idle_status in {"planning", "human-review-required"}
+                and idle_status in {"planning", "human-review-required", "accepted"}
                 and idle_claim.get("ok") is True
                 and idle_claim.get("claimed") is None,
                 "data": idle_worker,
