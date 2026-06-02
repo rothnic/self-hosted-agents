@@ -13,9 +13,9 @@ evaluation, orchestration, scalability, and operating effort.
 Current long-horizon goal: execute `docs/goals/000-self-hosted-agent-system-roadmap.md` as the parent goal, working
 through its linked child goals in order.
 
-Current roadmap checkpoint: Goal 001 is accepted for this roadmap increment by independent reviewer evidence in
-`.agent-runs/reports/goal-001-evidence-review-20260601.md`. The next product iteration is Goal 002 durable agent
-execution runtime.
+Current roadmap checkpoint: Goals 001 through 003 are accepted for this roadmap increment by independent reviewer
+evidence. Goal 004 is the active product iteration: choose the candidate platform from comparable implementation
+evidence and define the first product baseline workflow.
 
 ## Success Criteria
 

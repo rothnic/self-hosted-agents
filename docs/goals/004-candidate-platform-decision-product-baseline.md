@@ -32,7 +32,7 @@ alternatives, but focuses future implementation on the selected stack.
 4. Update the functional needs map with implementation evidence only.
 5. Score infrastructure ownership, observability, evaluation, scalability, and operating effort.
 6. Run a CEO-level roadmap review with recommendation and options.
-7. Record the human platform decision in objective, spec, matrix, and Beads.
+7. Record the platform decision in objective, spec, matrix, and Beads with independent reviewer acceptance.
 8. Define the first product baseline workflow for the selected stack.
 9. Convert comparison-only code into a product-oriented app boundary.
 10. Add product-level BDD contracts for the baseline workflow.
@@ -44,7 +44,7 @@ alternatives, but focuses future implementation on the selected stack.
 
 ## Definition Of Done
 
-- The repo has a recorded platform decision approved by the human.
+- The repo has a recorded platform decision accepted by an independent reviewer agent.
 - The selected stack has comparable evidence across run, trace, eval, setup, and durability.
 - The first product baseline workflow is defined with BDD contracts and acceptance checks.
 - Rejected or deferred candidates have explicit evidence-based reasons.
@@ -72,7 +72,7 @@ uv run awf workflow-state-lint --json
 ```text
 /goal Execute docs/goals/004-candidate-platform-decision-product-baseline.md
 in /Users/nroth/workspace/self-hosted-agents. Complete the candidate evidence
-needed for a human platform decision, update the comparison matrix, record the
+needed for an independently reviewed platform decision, update the comparison matrix, record the
 selected primary stack, and define the first product baseline workflow with BDD
 contracts and validation gates.
 ```
