@@ -2333,6 +2333,85 @@ def stale_claims_for_increment(
     return stale
 
 
+def compact_issue_item(issue: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": issue.get("id"),
+        "title": issue.get("title"),
+        "status": issue.get("status"),
+        "external_ref": issue.get("external_ref"),
+    }
+
+
+def compact_claim_item(claim: dict[str, Any]) -> dict[str, Any]:
+    work = claim.get("work") if isinstance(claim.get("work"), dict) else {}
+    issue = claim.get("issue") if isinstance(claim.get("issue"), dict) else {}
+    issue_context = issue or work
+    return {
+        "id": claim.get("id"),
+        "worker_id": claim.get("worker_id"),
+        "worker_branch": claim.get("worker_branch"),
+        "worktree_path": claim.get("worktree_path"),
+        "claimed_at": claim.get("claimed_at"),
+        "issue": {
+            "id": issue_context.get("id") or claim.get("id"),
+            "title": issue_context.get("title"),
+            "status": issue_context.get("status"),
+            "external_ref": issue_context.get("external_ref"),
+        },
+    }
+
+
+def active_work_summary_data(
+    scoped_ready: list[dict[str, Any]],
+    scoped_claims: list[dict[str, Any]],
+    stale_claims: list[dict[str, Any]],
+    scoped_blocked: list[dict[str, Any]],
+    blocker_reroute: dict[str, Any],
+    next_action: str,
+) -> dict[str, Any]:
+    return {
+        "summary_schema": "awf.active-work.compact.v1",
+        "counts": {
+            "ready": len(scoped_ready),
+            "active_claims": len(scoped_claims),
+            "stale_claims": len(stale_claims),
+            "blocked": len(scoped_blocked),
+        },
+        "next_action": next_action,
+        "next_unblocked_issue_id": blocker_reroute.get("next_unblocked_issue_id"),
+        "ready": [compact_issue_item(issue) for issue in scoped_ready[:5]],
+        "active_claims": [compact_claim_item(claim) for claim in scoped_claims[:5]],
+        "stale_claims": [
+            {
+                "id": claim.get("id"),
+                "worker_id": claim.get("worker_id"),
+                "worker_branch": claim.get("worker_branch"),
+                "worktree_path": claim.get("worktree_path"),
+                "age_hours": claim.get("age_hours"),
+                "issue": claim.get("issue"),
+                "handoff": claim.get("handoff"),
+            }
+            for claim in stale_claims[:5]
+        ],
+        "blocked": [
+            {
+                "id": issue.get("id"),
+                "title": issue.get("title"),
+                "external_ref": issue.get("external_ref"),
+                "blocking_dependencies": [
+                    {
+                        "id": dep.get("depends_on_id") or dep.get("id"),
+                        "type": dep.get("type"),
+                        "status": dep.get("status"),
+                    }
+                    for dep in issue_open_dependencies(issue)
+                ],
+            }
+            for issue in scoped_blocked[:5]
+        ],
+    }
+
+
 def increment_status_data(increment_id: str | None, spec_id: str, phase: str) -> dict[str, Any]:
     resolved_id = increment_id or default_increment_id(spec_id, phase)
     path = increment_path(resolved_id)
@@ -2363,6 +2442,7 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
     )
     accepted = state.get("review_status") == "accepted" and all_children_closed
+    stale_claims = stale_claims_for_increment(scoped_claims)
     if accepted:
         review_status = "accepted"
         next_action = "pm-review-loop should start next roadmap goal"
@@ -2381,6 +2461,14 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
     else:
         review_status = "planning"
         next_action = "pm-review-loop should refresh backlog from the approved spec phase"
+    active_work_summary = active_work_summary_data(
+        scoped_ready=scoped_ready,
+        scoped_claims=scoped_claims,
+        stale_claims=stale_claims,
+        scoped_blocked=scoped_blocked,
+        blocker_reroute=blocker_reroute,
+        next_action=next_action,
+    )
     return {
         "ok": True,
         "increment_id": resolved_id,
@@ -2400,9 +2488,10 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         "active_worktrees": [
             claim.get("worktree_path") for claim in scoped_claims if claim.get("worktree_path")
         ],
-        "stale_claims": stale_claims_for_increment(scoped_claims),
+        "stale_claims": stale_claims,
         "blocked": scoped_blocked,
         "blocker_reroute": blocker_reroute,
+        "active_work_summary": active_work_summary,
         "validation_evidence": state.get("validation_evidence", []),
         "learning_proposals": state.get("learning_proposals", []),
         "ready_count": len(scoped_ready),
@@ -3851,6 +3940,75 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and stale_claim.get("issue", {}).get("acceptance") == "uv run awf verify --profile ticket --json"
             and {"resume", "reassign", "archive"}.issubset(set(stale_claim.get("handoff", {}))),
             "data": {"stale_claims": stale_claims},
+        }
+    )
+    active_work_ready = [
+        {
+            "id": "awf-ready-summary",
+            "title": "Ready summary work",
+            "status": "open",
+            "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T019",
+        }
+    ]
+    active_work_claims = [
+        {
+            "id": "awf-stale-summary",
+            "worker_id": "worker-summary",
+            "worker_branch": "codex/awf-stale-summary-active-status",
+            "worktree_path": "../self-hosted-agents-worktrees/awf-stale-summary-active-status",
+            "claimed_at": "2026-06-02T00:00:00+00:00",
+            "path": ".agent-runs/claims/awf-stale-summary.json",
+            "issue": {
+                "id": "awf-stale-summary",
+                "title": "Stale summary claim",
+                "status": "open",
+                "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T019",
+                "description": "Acceptance: uv run awf verify --profile ticket --json",
+            },
+        }
+    ]
+    active_work_stale = stale_claims_for_increment(
+        active_work_claims,
+        stale_hours=2,
+        now=datetime(2026, 6, 2, 4, 30, tzinfo=timezone.utc),
+    )
+    active_work_blocked = [
+        {
+            "id": "awf-blocked-summary",
+            "title": "Blocked summary work",
+            "status": "open",
+            "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T020",
+            "dependencies": [
+                {
+                    "depends_on_id": "awf-blocking-summary",
+                    "type": "blocks",
+                    "status": "open",
+                }
+            ],
+        }
+    ]
+    active_work_reroute = blocker_reroute_data(active_work_ready, active_work_blocked)
+    active_work_summary = active_work_summary_data(
+        scoped_ready=active_work_ready,
+        scoped_claims=active_work_claims,
+        stale_claims=active_work_stale,
+        scoped_blocked=active_work_blocked,
+        blocker_reroute=active_work_reroute,
+        next_action=active_work_reroute["next_action"],
+    )
+    results.append(
+        {
+            "name": "active work summary compactly lists ready claims blockers and stale work",
+            "ok": active_work_summary["summary_schema"] == "awf.active-work.compact.v1"
+            and active_work_summary["counts"]
+            == {"ready": 1, "active_claims": 1, "stale_claims": 1, "blocked": 1}
+            and active_work_summary["next_unblocked_issue_id"] == "awf-ready-summary"
+            and active_work_summary["ready"][0]["id"] == "awf-ready-summary"
+            and active_work_summary["active_claims"][0]["worker_id"] == "worker-summary"
+            and active_work_summary["stale_claims"][0]["handoff"]["resume"].startswith("Resume `awf-stale-summary`")
+            and active_work_summary["blocked"][0]["blocking_dependencies"][0]["id"] == "awf-blocking-summary"
+            and "keep assigning unblocked work" in active_work_summary["next_action"],
+            "data": {"active_work_summary": active_work_summary},
         }
     )
     blocker_reroute = blocker_reroute_data(

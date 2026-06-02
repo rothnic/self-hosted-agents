@@ -50,6 +50,11 @@ Phase state lives in `.agent-runs/increments/<increment-id>.json`. The ledger re
 feature branch, child tickets, active worker branches, claims, blockers, validation evidence, review status, learning
 proposals, and the next action.
 
+`increment-status` and refreshed increment ledgers also include `active_work_summary`, a compact operator surface with
+counts for ready work, active claims, stale claims, and blockers; the next safe action; the next unblocked issue id; and
+short claim, stale-claim, ready-work, and blocker entries. Use it for quick handoffs before opening full claim files,
+Beads issue details, or archived evidence.
+
 Beads remains the executable backlog. Increment membership and role routing use normal labels instead of a Beads schema
 fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 

@@ -1,0 +1,26 @@
+{
+  "claimed_at": "2026-06-02T09:44:12.883698+00:00",
+  "id": "awf-urx",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T05:53:42.223577Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 003-automated-increment-orchestration\nTask: T019\nSource: specs/003-automated-increment-orchestration/tasks.md\nAcceptance: uv run awf verify --profile increment --json",
+    "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T019",
+    "id": "awf-urx",
+    "issue_type": "task",
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add compact active-work summaries for claims, ready work, blockers, and stale work",
+    "updated_at": "2026-06-02T05:54:18.114329Z"
+  },
+  "worker_branch": "codex/awf-urx-add-compact-active-work-summaries-for-cl",
+  "worker_id": "codex-goal003-t019",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-urx-add-compact-active-work-summaries-for-cl",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-urx-add-compact-active-work-summaries-for-cl ../self-hosted-agents-worktrees/awf-urx-add-compact-active-work-summaries-for-cl <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-urx-add-compact-active-work-summaries-for-cl && git status --short --branch"
+  }
+}

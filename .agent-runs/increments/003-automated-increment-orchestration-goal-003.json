@@ -1,5 +1,33 @@
 {
   "active_claims": [],
+  "active_work_summary": {
+    "active_claims": [],
+    "blocked": [],
+    "counts": {
+      "active_claims": 0,
+      "blocked": 0,
+      "ready": 2,
+      "stale_claims": 0
+    },
+    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+    "next_unblocked_issue_id": "awf-rgg",
+    "ready": [
+      {
+        "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T020",
+        "id": "awf-rgg",
+        "status": "open",
+        "title": "Add cleanup commands for obsolete active claims and old worktree pointers"
+      },
+      {
+        "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
+        "id": "awf-60y",
+        "status": "open",
+        "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence"
+      }
+    ],
+    "stale_claims": [],
+    "summary_schema": "awf.active-work.compact.v1"
+  },
   "active_worker_branches": [],
   "active_worktrees": [],
   "base_branch": "main",
@@ -10,8 +38,8 @@
     "blocked_count": 0,
     "can_continue": true,
     "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-urx",
-    "ready_count": 3
+    "next_unblocked_issue_id": "awf-rgg",
+    "ready_count": 2
   },
   "child_tickets": [
     {
@@ -95,11 +123,11 @@
       "title": "Add dry-run fixtures for role transitions and blocked-state recovery"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T019",
       "task_id": "T019",
       "ticket_id": "awf-urx",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add compact active-work summaries for claims, ready work, blockers, and stale work"
     },
     {
@@ -129,10 +157,10 @@
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 3,
+  "ready_count": 2,
   "review_status": "executing",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T09:37:54.309543+00:00",
+  "updated_at": "2026-06-02T09:53:04.531233+00:00",
   "validation_evidence": []
 }

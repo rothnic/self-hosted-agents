@@ -27,6 +27,12 @@ Feature: Automated increment orchestration
     Then the operational record proves the dry run does not mutate active claims
     And the operational record keeps the blocked ticket visible while routing unblocked work forward
 
+  Scenario: Operator inspects compact active work status
+    Given an increment has ready work, active claims, stale claims, and blocked tickets
+    When the operator requests increment status
+    Then the operational record includes compact counts and the next safe action
+    And the operational record lists enough claim, stale-claim, ready-work, and blocker context to resume work
+
   Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch
