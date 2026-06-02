@@ -31,12 +31,12 @@ def write_json(path: Path, data: dict[str, Any], pretty: bool) -> None:
 
 def durable_recommendation() -> dict[str, str]:
     return {
-        "linked_task": "T008",
-        "next_slice": "Add durable resume from independent reviewer acceptance evidence.",
+        "linked_task": "T009",
+        "next_slice": "Link wait, reviewer, resume, trace, eval, and Beads ids in the durable run artifact.",
         "reason": (
             "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect "
-            "idempotency evidence plus a fixture-safe review wait, so the next useful slice is accepted review "
-            "resume."
+            "idempotency evidence plus fixture-safe review wait and accepted-review continuation, so the next useful "
+            "slice is full artifact correlation."
         ),
     }
 
@@ -45,7 +45,7 @@ def durable_prompt(payload: dict[str, Any]) -> str:
     project_context = payload.get("project_context", {})
     return (
         f"Objective: {payload.get('objective', '')}\n"
-        f"Current slice: T007\n"
+        f"Current slice: T008\n"
         f"Active spec: {project_context.get('active_spec', '')}\n"
         "Return the next implementation slice after durable execution smoke evidence."
     )
@@ -391,6 +391,30 @@ def read_jsonl_events(path: Path) -> list[dict[str, Any]]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
+def write_review_acceptance_artifact(
+    path: Path,
+    *,
+    issue_id: str,
+    required_evidence_path: str,
+    reviewer_agent_id: str,
+    workflow_id: str,
+    pretty: bool,
+) -> dict[str, Any]:
+    artifact = {
+        "accepted": True,
+        "accepted_at": "fixture-deterministic-t008",
+        "beads_issue_id": issue_id,
+        "decision": "accepted",
+        "event": "independent-reviewer-acceptance",
+        "presented_by_agent_id": "fixture-worker-presenter",
+        "required_evidence_path": required_evidence_path,
+        "reviewer_agent_id": reviewer_agent_id,
+        "workflow_id": workflow_id,
+    }
+    write_json(path, artifact, pretty)
+    return artifact
+
+
 def side_effect_event_keys(events: list[dict[str, Any]]) -> list[str]:
     return sorted(
         f"{event.get('workflow_id', '')}:{event.get('event', '')}:{event.get('sequence', '')}" for event in events
@@ -406,7 +430,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         {
             "candidate": payload.get("candidate", {}),
             "issue": args.issue_id,
-            "slice": "T007",
+            "slice": "T008",
             "started_at_ns": time.time_ns(),
         },
         length=24,
@@ -427,6 +451,22 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         or f".agent-runs/reviews/{args.issue_id}-{review_wait_workflow_id}-acceptance.json"
     )
     review_child_result_output = db_path.parent / f"{review_wait_workflow_id}.child-result.json"
+    accepted_review_workflow_id = f"{workflow_id}-review-accepted"
+    accepted_review_wait_state = (
+        args.accepted_review_wait_state or output_dir / f"{accepted_review_workflow_id}.review-wait.json"
+    )
+    accepted_review_acceptance = (
+        args.accepted_review_acceptance or output_dir / f"{accepted_review_workflow_id}.review-acceptance.json"
+    )
+    accepted_post_wait_side_effect_log = (
+        args.accepted_post_wait_side_effect_log
+        or output_dir / f"{accepted_review_workflow_id}.post-wait-side-effect.jsonl"
+    )
+    accepted_required_review_evidence_path = (
+        args.accepted_required_review_evidence_path
+        or f".agent-runs/reviews/{args.issue_id}-{accepted_review_workflow_id}-acceptance.json"
+    )
+    accepted_review_child_result_output = db_path.parent / f"{accepted_review_workflow_id}.child-result.json"
     script = Path(__file__).resolve()
     base_child = [
         sys.executable,
@@ -527,14 +567,67 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         capture_output=True,
         timeout=60,
     )
+    accepted_review_acceptance_data = write_review_acceptance_artifact(
+        accepted_review_acceptance,
+        issue_id=args.issue_id,
+        required_evidence_path=accepted_required_review_evidence_path,
+        reviewer_agent_id="fixture-independent-reviewer",
+        workflow_id=accepted_review_workflow_id,
+        pretty=args.pretty,
+    )
+    accepted_review_wait_command = [
+        sys.executable,
+        str(script),
+        "--fixture",
+        str(args.fixture),
+        "--db-path",
+        str(db_path),
+        "--side-effect-log",
+        str(side_effect_log),
+        "--retry-state-log",
+        str(retry_state_log),
+        "--workflow-id",
+        accepted_review_workflow_id,
+        "--wait-seconds",
+        str(args.wait_seconds),
+        "--retry-failures",
+        str(args.retry_failures),
+        "--issue-id",
+        args.issue_id,
+        "--review-wait-state",
+        str(accepted_review_wait_state),
+        "--review-acceptance",
+        str(accepted_review_acceptance),
+        "--post-wait-side-effect-log",
+        str(accepted_post_wait_side_effect_log),
+        "--required-review-evidence-path",
+        accepted_required_review_evidence_path,
+        "--child-phase",
+        "review-wait",
+        "--child-result-output",
+        str(accepted_review_child_result_output),
+    ]
+    accepted_review_wait_proc = subprocess.run(
+        accepted_review_wait_command,
+        cwd=Path(__file__).resolve().parents[2],
+        text=True,
+        capture_output=True,
+        timeout=60,
+    )
     child_output = read_json(child_result_output) if child_result_output.exists() else {}
     review_child_output = read_json(review_child_result_output) if review_child_result_output.exists() else {}
+    accepted_review_child_output = (
+        read_json(accepted_review_child_result_output) if accepted_review_child_result_output.exists() else {}
+    )
     retry_events = read_jsonl_events(retry_state_log)
     side_effect_events = read_jsonl_events(side_effect_log)
     post_wait_side_effect_events = read_jsonl_events(post_wait_side_effect_log)
+    accepted_post_wait_side_effect_events = read_jsonl_events(accepted_post_wait_side_effect_log)
     workflow_result = child_output.get("workflow_result", {})
     review_wait_result = review_child_output.get("workflow_result", {})
+    accepted_review_wait_result = accepted_review_child_output.get("workflow_result", {})
     review_wait_state_data = read_json(review_wait_state) if review_wait_state.exists() else {}
+    accepted_review_wait_state_data = read_json(accepted_review_wait_state) if accepted_review_wait_state.exists() else {}
     retry_failures = [event for event in retry_events if event.get("will_fail") is True]
     retry_successes = [event for event in retry_events if event.get("will_fail") is False]
     retry_failures_before_resume = [event for event in retry_events_before_resume if event.get("will_fail") is True]
@@ -622,6 +715,30 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         and len(post_wait_side_effect_events) == 0
         and review_wait_result.get("post_wait_side_effect", {}).get("skipped") is True
     )
+    accepted_review_workflow_status = accepted_review_child_output.get("workflow_status", {})
+    accepted_post_wait_side_effect = accepted_review_wait_result.get("post_wait_side_effect", {})
+    accepted_post_wait_event = accepted_post_wait_side_effect_events[0] if accepted_post_wait_side_effect_events else {}
+    accepted_review_resume_proven = (
+        accepted_review_wait_proc.returncode == 0
+        and accepted_review_acceptance.exists()
+        and accepted_review_acceptance_data.get("accepted") is True
+        and bool(accepted_review_acceptance_data.get("reviewer_agent_id"))
+        and accepted_review_acceptance_data.get("workflow_id") == accepted_review_workflow_id
+        and accepted_review_acceptance_data.get("beads_issue_id") == args.issue_id
+        and accepted_review_acceptance_data.get("required_evidence_path") == accepted_required_review_evidence_path
+        and accepted_review_wait_result.get("review_wait", {}).get("status") == "accepted"
+        and accepted_review_wait_result.get("workflow_id") == accepted_review_workflow_id
+        and accepted_review_wait_state_data.get("status") == "accepted"
+        and accepted_review_wait_state_data.get("workflow_id") == accepted_review_workflow_id
+        and accepted_review_wait_state_data.get("beads_issue_id") == args.issue_id
+        and accepted_review_wait_state_data.get("required_evidence_path") == accepted_required_review_evidence_path
+        and accepted_review_wait_state_data.get("post_wait_side_effects_allowed") is True
+        and len(accepted_post_wait_side_effect_events) == 1
+        and accepted_post_wait_side_effect.get("line_count_before") == 0
+        and accepted_post_wait_side_effect.get("line_count_after") == 1
+        and accepted_post_wait_side_effect.get("event") == accepted_post_wait_event
+        and accepted_post_wait_event.get("workflow_id") == accepted_review_workflow_id
+    )
     artifact = {
         "acceptance_command": "uv run awf workflow-fixture-test",
         "candidate_app": "apps/pydantic-ai",
@@ -650,6 +767,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "run_identity_preserved": identity_proven,
             "retry_proven": retry_proven,
             "review_wait_proven": review_wait_proven,
+            "review_resume_proven": accepted_review_resume_proven,
             "resume_proven": resume_proc.returncode == 0 and bool(workflow_result),
             "side_effect_idempotency_proven": side_effect_idempotency_proven,
         },
@@ -698,6 +816,29 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "workflow_status": review_wait_workflow_status,
             "workflow_steps": review_child_output.get("dbos_steps", []),
         },
+        "accepted_review_resume": {
+            "acceptance": accepted_review_acceptance_data,
+            "acceptance_artifact_exists": accepted_review_acceptance.exists(),
+            "acceptance_path": str(accepted_review_acceptance),
+            "beads_issue_id": args.issue_id,
+            "command": command_text(accepted_review_wait_command),
+            "exit_code": accepted_review_wait_proc.returncode,
+            "post_wait_side_effect": {
+                "events": accepted_post_wait_side_effect_events,
+                "line_count": len(accepted_post_wait_side_effect_events),
+                "log_path": str(accepted_post_wait_side_effect_log),
+            },
+            "proven": accepted_review_resume_proven,
+            "required_evidence_path": accepted_required_review_evidence_path,
+            "state": accepted_review_wait_state_data,
+            "state_path": str(accepted_review_wait_state),
+            "stderr_excerpt": accepted_review_wait_proc.stderr[-1000:],
+            "stdout_excerpt": accepted_review_wait_proc.stdout[-1000:],
+            "workflow_id": accepted_review_workflow_id,
+            "workflow_result": accepted_review_wait_result,
+            "workflow_status": accepted_review_workflow_status,
+            "workflow_steps": accepted_review_child_output.get("dbos_steps", []),
+        },
         "retry": {
             "events": retry_events,
             "failure_count": len(retry_failures),
@@ -721,6 +862,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         artifact["durable_property"]["completed_step_not_duplicated"]
         and artifact["durable_property"]["run_identity_preserved"]
         and artifact["durable_property"]["retry_proven"]
+        and artifact["durable_property"]["review_resume_proven"]
         and artifact["durable_property"]["review_wait_proven"]
         and artifact["durable_property"]["resume_proven"]
         and artifact["durable_property"]["side_effect_idempotency_proven"]
@@ -747,12 +889,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--review-wait-state", type=Path, help="Optional review-wait state JSON path.")
     parser.add_argument("--review-acceptance", type=Path, help="Optional reviewer acceptance artifact path.")
     parser.add_argument("--post-wait-side-effect-log", type=Path, help="Optional post-review side-effect proof log path.")
+    parser.add_argument("--accepted-review-wait-state", type=Path, help="Optional accepted-review state JSON path.")
+    parser.add_argument("--accepted-review-acceptance", type=Path, help="Optional accepted reviewer artifact path.")
+    parser.add_argument(
+        "--accepted-post-wait-side-effect-log",
+        type=Path,
+        help="Optional accepted-review post-wait side-effect proof log path.",
+    )
     parser.add_argument(
         "--required-review-evidence-path",
         help="Reviewer evidence path the review-wait proof records as required before resume.",
     )
+    parser.add_argument(
+        "--accepted-required-review-evidence-path",
+        help="Reviewer evidence path the accepted-review resume proof links before post-wait continuation.",
+    )
     parser.add_argument("--retry-failures", type=int, default=1, help="Transient DBOS retry failures before success.")
-    parser.add_argument("--issue-id", default="awf-q8d", help="Beads issue id linked to the durable evidence.")
+    parser.add_argument("--issue-id", default="awf-vpi", help="Beads issue id linked to the durable evidence.")
     parser.add_argument("--side-effect-step-marker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--workflow-id", help="Optional deterministic DBOS workflow id.")
     parser.add_argument("--wait-seconds", type=float, default=300.0, help="Child wait duration before resume.")

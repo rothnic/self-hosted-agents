@@ -79,16 +79,20 @@ For durable repo evidence, prefer temporary DBOS state paths and keep only the J
 ```bash
 uv run python apps/pydantic-ai/durable_smoke.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json \
-  --db-path /tmp/pydantic-ai-dbos-t007.sqlite \
-  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t007.jsonl \
-  --retry-state-log /tmp/pydantic-ai-dbos-retry-t007.jsonl \
-  --review-wait-state /tmp/pydantic-ai-dbos-review-wait-t007.json \
-  --review-acceptance /tmp/pydantic-ai-dbos-review-acceptance-t007.json \
-  --post-wait-side-effect-log /tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl \
-  --required-review-evidence-path .agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json \
-  --workflow-id dbos-workflow-t007-review-wait \
-  --issue-id awf-q8d \
+  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json \
+  --db-path /tmp/pydantic-ai-dbos-t008.sqlite \
+  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t008.jsonl \
+  --retry-state-log /tmp/pydantic-ai-dbos-retry-t008.jsonl \
+  --review-wait-state /tmp/pydantic-ai-dbos-review-wait-t008.json \
+  --review-acceptance /tmp/pydantic-ai-dbos-review-acceptance-t008.json \
+  --post-wait-side-effect-log /tmp/pydantic-ai-dbos-post-wait-side-effect-t008.jsonl \
+  --accepted-review-wait-state /tmp/pydantic-ai-dbos-accepted-review-wait-t008.json \
+  --accepted-review-acceptance /tmp/pydantic-ai-dbos-accepted-review-acceptance-t008.json \
+  --accepted-post-wait-side-effect-log /tmp/pydantic-ai-dbos-accepted-post-wait-side-effect-t008.jsonl \
+  --required-review-evidence-path .agent-runs/reviews/awf-vpi-dbos-workflow-t008-review-resume-review-wait-acceptance.json \
+  --accepted-required-review-evidence-path .agent-runs/reviews/awf-vpi-dbos-workflow-t008-review-resume-review-accepted-acceptance.json \
+  --workflow-id dbos-workflow-t008-review-resume \
+  --issue-id awf-vpi \
   --pretty
 ```
 
@@ -99,6 +103,7 @@ Current durable evidence:
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json`
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json`
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json`
 
 ### DBOS Local Setup
 
@@ -133,24 +138,31 @@ The smoke creates local, disposable state:
 - `--review-wait-state`: JSON proof that the review wait stopped without reviewer acceptance.
 - `--review-acceptance`: JSON reviewer acceptance path checked by the review-wait proof.
 - `--post-wait-side-effect-log`: JSONL proof that post-wait side effects did not run without acceptance.
+- `--accepted-review-wait-state`: JSON proof that the accepted review wait resumed post-wait work.
+- `--accepted-review-acceptance`: JSON independent reviewer acceptance artifact written by the fixture.
+- `--accepted-post-wait-side-effect-log`: JSONL proof that accepted post-wait side effects ran exactly once.
 - `<workflow-id>.side-effect-step-complete.json`: marker written after the DBOS side-effect step returns.
 - `<workflow-id>.child-result.json`: child-process recovery output used to build the final evidence artifact.
 
 Use a fresh `--workflow-id` or delete all local state files before rerunning the same explicit workflow id. Reusing a
 workflow id with stale SQLite state is useful for recovery inspection, but it is not a clean smoke.
 
-Reset the fixed T007 local paths:
+Reset the fixed T008 local paths:
 
 ```bash
-rm -f /tmp/pydantic-ai-dbos-t007.sqlite \
-  /tmp/pydantic-ai-dbos-side-effect-t007.jsonl \
-  /tmp/pydantic-ai-dbos-retry-t007.jsonl \
-  /tmp/pydantic-ai-dbos-review-wait-t007.json \
-  /tmp/pydantic-ai-dbos-review-acceptance-t007.json \
-  /tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl \
-  /tmp/dbos-workflow-t007-review-wait.side-effect-step-complete.json \
-  /tmp/dbos-workflow-t007-review-wait.child-result.json \
-  /tmp/dbos-workflow-t007-review-wait-review-wait.child-result.json
+rm -f /tmp/pydantic-ai-dbos-t008.sqlite \
+  /tmp/pydantic-ai-dbos-side-effect-t008.jsonl \
+  /tmp/pydantic-ai-dbos-retry-t008.jsonl \
+  /tmp/pydantic-ai-dbos-review-wait-t008.json \
+  /tmp/pydantic-ai-dbos-review-acceptance-t008.json \
+  /tmp/pydantic-ai-dbos-post-wait-side-effect-t008.jsonl \
+  /tmp/pydantic-ai-dbos-accepted-review-wait-t008.json \
+  /tmp/pydantic-ai-dbos-accepted-review-acceptance-t008.json \
+  /tmp/pydantic-ai-dbos-accepted-post-wait-side-effect-t008.jsonl \
+  /tmp/dbos-workflow-t008-review-resume.side-effect-step-complete.json \
+  /tmp/dbos-workflow-t008-review-resume.child-result.json \
+  /tmp/dbos-workflow-t008-review-resume-review-wait.child-result.json \
+  /tmp/dbos-workflow-t008-review-resume-review-accepted.child-result.json
 ```
 
 The committed evidence artifact under `.agent-runs/verifications/` is durable review evidence and should not be deleted
@@ -169,6 +181,7 @@ The evidence artifact should show:
 - `durable_property.run_identity_preserved=true`
 - `durable_property.side_effect_idempotency_proven=true`
 - `durable_property.review_wait_proven=true`
+- `durable_property.review_resume_proven=true`
 - `durable_property.completed_step_not_duplicated=true`
 - `identity.requested_workflow_id`, `identity.first_attempt_workflow_id`, `identity.resume_attempt_workflow_id`,
   `identity.workflow_status_workflow_id`, and `identity.workflow_result_workflow_id` are the same value
@@ -182,6 +195,12 @@ The evidence artifact should show:
 - `review_wait.acceptance_artifact_exists=false`
 - `review_wait.post_wait_side_effect.line_count=0`
 - `review_wait.required_evidence_path` points to the reviewer acceptance artifact required before resume
+- `accepted_review_resume.acceptance.accepted=true`
+- `accepted_review_resume.acceptance.reviewer_agent_id` identifies the independent reviewer
+- `accepted_review_resume.state.status=accepted`
+- `accepted_review_resume.state.post_wait_side_effects_allowed=true`
+- `accepted_review_resume.post_wait_side_effect.line_count=1`
+- `accepted_review_resume.workflow_id` matches the accepted wait state, acceptance artifact, and post-wait event
 - `retry.failure_count=1`
 - `retry.success_count=1`
 - `retry.line_count=2`
@@ -194,14 +213,14 @@ The evidence artifact should show:
 - `dbos.workflow_steps` includes `controlled_retry_once`, `record_side_effect_once`, `controlled_resume_wait`, and the
   DBOS agent run
 
-Inspect the current T007 evidence summary:
+Inspect the current T008 evidence summary:
 
 ```bash
 python3 - <<'PY'
 import json
 from pathlib import Path
 
-path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json")
+path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json")
 artifact = json.loads(path.read_text())
 print(json.dumps({
     "workflow_id": artifact["dbos"]["workflow_id"],
@@ -210,9 +229,13 @@ print(json.dumps({
     "run_identity_preserved": artifact["durable_property"]["run_identity_preserved"],
     "side_effect_idempotency_proven": artifact["durable_property"]["side_effect_idempotency_proven"],
     "review_wait_proven": artifact["durable_property"]["review_wait_proven"],
+    "review_resume_proven": artifact["durable_property"]["review_resume_proven"],
     "review_wait_status": artifact["review_wait"]["state"]["status"],
     "review_acceptance_exists": artifact["review_wait"]["acceptance_artifact_exists"],
     "post_wait_side_effect_count": artifact["review_wait"]["post_wait_side_effect"]["line_count"],
+    "accepted_review_status": artifact["accepted_review_resume"]["state"]["status"],
+    "accepted_reviewer": artifact["accepted_review_resume"]["acceptance"]["reviewer_agent_id"],
+    "accepted_post_wait_side_effect_count": artifact["accepted_review_resume"]["post_wait_side_effect"]["line_count"],
     "first_attempt_workflow_id": artifact["identity"]["first_attempt_workflow_id"],
     "resume_attempt_workflow_id": artifact["identity"]["resume_attempt_workflow_id"],
     "completed_step_not_duplicated": artifact["durable_property"]["completed_step_not_duplicated"],

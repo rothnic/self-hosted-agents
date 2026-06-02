@@ -1453,7 +1453,7 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             str(side_effect_log),
             "--pretty",
         ]
-        proc = run(command, timeout=90)
+        proc = run(command, timeout=120)
         try:
             artifact = json.loads(output_path.read_text(encoding="utf-8")) if output_path.exists() else {}
         except json.JSONDecodeError as exc:
@@ -1466,6 +1466,20 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         side_effect_idempotency = artifact.get("side_effect", {}).get("idempotency", {})
         review_wait = artifact.get("review_wait", {})
         review_wait_state = review_wait.get("state", {}) if isinstance(review_wait.get("state"), dict) else {}
+        accepted_review_resume = artifact.get("accepted_review_resume", {})
+        accepted_review_state = (
+            accepted_review_resume.get("state", {})
+            if isinstance(accepted_review_resume.get("state"), dict)
+            else {}
+        )
+        accepted_review_acceptance = (
+            accepted_review_resume.get("acceptance", {})
+            if isinstance(accepted_review_resume.get("acceptance"), dict)
+            else {}
+        )
+        accepted_post_wait_events = accepted_review_resume.get("post_wait_side_effect", {}).get("events", [])
+        accepted_post_wait_event = accepted_post_wait_events[0] if len(accepted_post_wait_events) == 1 else {}
+        accepted_workflow_result = accepted_review_resume.get("workflow_result", {})
         first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
         workflow_step_names = [
             str(step.get("function_name", ""))
@@ -1475,6 +1489,11 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         review_wait_step_names = [
             str(step.get("function_name", ""))
             for step in review_wait.get("workflow_steps", [])
+            if isinstance(step, dict)
+        ]
+        accepted_review_step_names = [
+            str(step.get("function_name", ""))
+            for step in accepted_review_resume.get("workflow_steps", [])
             if isinstance(step, dict)
         ]
         required = {
@@ -1512,6 +1531,30 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             and review_wait.get("workflow_result", {}).get("post_wait_side_effect", {}).get("skipped") is True,
             "review_wait_step": review_wait_step_names.count("record_review_wait_state") == 1
             and "record_post_wait_side_effect" not in review_wait_step_names,
+            "review_resume_proven": durable.get("review_resume_proven") is True
+            and accepted_review_resume.get("proven") is True,
+            "review_resume_acceptance": accepted_review_resume.get("acceptance_artifact_exists") is True
+            and accepted_review_acceptance.get("accepted") is True
+            and bool(accepted_review_acceptance.get("reviewer_agent_id"))
+            and accepted_review_state.get("status") == "accepted"
+            and accepted_review_state.get("post_wait_side_effects_allowed") is True,
+            "review_resume_links": accepted_review_state.get("beads_issue_id") == artifact.get("issue_id")
+            and accepted_review_acceptance.get("beads_issue_id") == artifact.get("issue_id")
+            and accepted_review_state.get("required_evidence_path")
+            == accepted_review_resume.get("required_evidence_path")
+            == accepted_review_acceptance.get("required_evidence_path"),
+            "review_resume_identity": accepted_review_resume.get("workflow_id")
+            == accepted_review_state.get("workflow_id")
+            == accepted_review_acceptance.get("workflow_id")
+            == accepted_workflow_result.get("workflow_id")
+            == accepted_post_wait_event.get("workflow_id"),
+            "review_resume_post_side_effect": accepted_review_resume.get("post_wait_side_effect", {}).get("line_count")
+            == 1
+            and accepted_workflow_result.get("post_wait_side_effect", {}).get("line_count_before") == 0
+            and accepted_workflow_result.get("post_wait_side_effect", {}).get("line_count_after") == 1
+            and accepted_workflow_result.get("post_wait_side_effect", {}).get("event") == accepted_post_wait_event,
+            "review_resume_steps": accepted_review_step_names.count("record_review_wait_state") == 1
+            and accepted_review_step_names.count("record_post_wait_side_effect") == 1,
             "resume_proven": durable.get("resume_proven") is True,
             "side_effect_idempotency_proven": durable.get("side_effect_idempotency_proven") is True
             and side_effect_idempotency.get("proven") is True,
