@@ -33,6 +33,12 @@ Feature: Automated increment orchestration
     Then the operational record includes compact counts and the next safe action
     And the operational record lists enough claim, stale-claim, ready-work, and blocker context to resume work
 
+  Scenario: Operator cleans obsolete active work pointers
+    Given active claim files include open, closed, and missing Beads issue states
+    When the operator previews cleanup work
+    Then the operational record preserves open claims and proposes archives for obsolete claim files
+    And the operational record includes stale Git worktree pointer cleanup without deleting claim evidence
+
   Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch

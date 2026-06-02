@@ -58,6 +58,9 @@ T018 dry-run role transition fixture evidence is recorded in
 T019 active work summary evidence is recorded in
 `.agent-runs/reports/goal-003-t019-active-work-summary-20260602.md`.
 
+T020 cleanup work evidence is recorded in
+`.agent-runs/reports/goal-003-t020-cleanup-work-20260602.md`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
@@ -74,7 +77,7 @@ Backlog sync created the executable Beads tasks below:
 - `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
 - `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
 
-Next implementer claim after T019 closure: `awf-rgg` / T020. Use `uv run awf ready-work --json` as the source of truth
+Next implementer claim after T020 closure: `awf-60y` / T021. Use `uv run awf ready-work --json` as the source of truth
 before claiming, because priorities, blockers, or active claims may change.
 
 ## Scope

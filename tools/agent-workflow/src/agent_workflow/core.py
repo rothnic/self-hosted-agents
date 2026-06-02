@@ -410,9 +410,17 @@ def iter_repo_files(policy: dict[str, Any]) -> list[Path]:
     hygiene = policy.get("repo_hygiene", {})
     ignored_dirs = hygiene.get("ignored_directories", [])
     files = []
-    for path in ROOT.rglob("*"):
-        if path.is_file() and not is_ignored_path(path, ignored_dirs):
-            files.append(path)
+    for dirpath, dirnames, filenames in os.walk(ROOT):
+        current = Path(dirpath)
+        dirnames[:] = [
+            dirname
+            for dirname in dirnames
+            if not is_ignored_path(current / dirname, ignored_dirs)
+        ]
+        for filename in filenames:
+            path = current / filename
+            if not is_ignored_path(path, ignored_dirs):
+                files.append(path)
     return sorted(files)
 
 
@@ -3117,6 +3125,139 @@ def claim_path(work_id: str) -> Path:
     return ROOT / ".agent-runs" / "claims" / f"{safe_id}.json"
 
 
+def claim_archive_dir(checked_at: datetime | None = None) -> Path:
+    timestamp = checked_at or datetime.now(timezone.utc)
+    return ROOT / ".agent-runs" / "claims" / f"archive-{timestamp.strftime('%Y-%m')}"
+
+
+def unique_archive_path(path: Path, archive_dir: Path) -> Path:
+    candidate = archive_dir / path.name
+    if not candidate.exists():
+        return candidate
+    stem = path.stem
+    suffix = path.suffix
+    counter = 1
+    while True:
+        candidate = archive_dir / f"{stem}.{counter}{suffix}"
+        if not candidate.exists():
+            return candidate
+        counter += 1
+
+
+def obsolete_claim_cleanup_candidates(
+    claim_paths: list[Path] | None = None,
+    issues: list[dict[str, Any]] | None = None,
+    checked_at: datetime | None = None,
+) -> list[dict[str, Any]]:
+    issue_by_id_map = {str(issue.get("id")): issue for issue in (issues if issues is not None else beads_issues())}
+    archive_dir = claim_archive_dir(checked_at)
+    paths = claim_paths if claim_paths is not None else sorted((ROOT / ".agent-runs" / "claims").glob("*.json"))
+    candidates = []
+    for path in paths:
+        data = read_json(path)
+        if not data or data.get("error"):
+            continue
+        claim_id = str(data.get("id") or "")
+        issue = issue_by_id_map.get(claim_id)
+        issue_status = str(issue.get("status") or "") if issue else ""
+        if issue and issue_status == "open":
+            continue
+        reason = "missing-beads-issue" if not issue else f"issue-{issue_status or 'unknown'}"
+        archive_path = unique_archive_path(path, archive_dir)
+        candidates.append(
+            {
+                "id": claim_id,
+                "worker_id": data.get("worker_id"),
+                "claimed_at": data.get("claimed_at"),
+                "path": rel(path),
+                "archive_path": rel(archive_path),
+                "reason": reason,
+                "issue": {
+                    "id": issue.get("id") if issue else claim_id,
+                    "title": issue.get("title") if issue else None,
+                    "status": issue_status or None,
+                    "external_ref": issue.get("external_ref") if issue else None,
+                },
+                "_source_path": path,
+                "_archive_path": archive_path,
+            }
+        )
+    return candidates
+
+
+def public_cleanup_claim_item(candidate: dict[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in candidate.items() if not key.startswith("_")}
+
+
+def parse_worktree_prune_output(text: str) -> list[str]:
+    return [line.strip() for line in text.splitlines() if line.strip()]
+
+
+def worktree_prune_data(write: bool) -> dict[str, Any]:
+    dry_run_proc = run(["git", "worktree", "prune", "--dry-run", "--verbose"])
+    dry_run_output = "\n".join(item for item in [dry_run_proc.stdout.strip(), dry_run_proc.stderr.strip()] if item)
+    data: dict[str, Any] = {
+        "dry_run_command": "git worktree prune --dry-run --verbose",
+        "returncode": dry_run_proc.returncode,
+        "candidates": parse_worktree_prune_output(dry_run_output),
+    }
+    if write:
+        write_proc = run(["git", "worktree", "prune", "--verbose"])
+        write_output = "\n".join(item for item in [write_proc.stdout.strip(), write_proc.stderr.strip()] if item)
+        data["write_command"] = "git worktree prune --verbose"
+        data["write_returncode"] = write_proc.returncode
+        data["pruned"] = parse_worktree_prune_output(write_output)
+    return data
+
+
+def cleanup_work_data(write: bool) -> dict[str, Any]:
+    claim_candidates = obsolete_claim_cleanup_candidates()
+    archived_claims = []
+    errors = []
+    if write:
+        for candidate in claim_candidates:
+            source_path = candidate["_source_path"]
+            archive_path = candidate["_archive_path"]
+            try:
+                archive_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.move(str(source_path), str(archive_path))
+                archived_claims.append(public_cleanup_claim_item(candidate))
+            except OSError as exc:
+                errors.append(
+                    {
+                        "path": candidate["path"],
+                        "archive_path": candidate["archive_path"],
+                        "error": str(exc),
+                    }
+                )
+    worktrees = worktree_prune_data(write=write)
+    write_returncode = worktrees.get("write_returncode", 0)
+    ok = not errors and worktrees["returncode"] == 0 and (not write or write_returncode == 0)
+    archive_candidates = [public_cleanup_claim_item(candidate) for candidate in claim_candidates]
+    worktree_candidates = worktrees["candidates"]
+    pruned_worktrees = worktrees.get("pruned", [])
+    no_cleanup_needed = not archive_candidates and not worktree_candidates and not pruned_worktrees
+    return {
+        "ok": ok,
+        "write": write,
+        "archive_candidates": archive_candidates,
+        "archived_claims": archived_claims,
+        "archive_candidate_count": len(archive_candidates),
+        "archived_claim_count": len(archived_claims),
+        "worktree_prune": worktrees,
+        "errors": errors,
+        "next_action": (
+            "no obsolete active claims or stale worktree pointers found"
+            if ok and no_cleanup_needed
+            else "obsolete active claims archived and stale worktree pointers pruned"
+            if write and ok
+            else "rerun with --write to archive obsolete claims and prune stale worktree pointers"
+            if ok and (archive_candidates or worktree_candidates)
+            else "fix cleanup errors before continuing scheduled work"
+        ),
+    }
+
+
 def claim_work_data(
     worker_id: str,
     write: bool,
@@ -4009,6 +4150,68 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and active_work_summary["blocked"][0]["blocking_dependencies"][0]["id"] == "awf-blocking-summary"
             and "keep assigning unblocked work" in active_work_summary["next_action"],
             "data": {"active_work_summary": active_work_summary},
+        }
+    )
+    with tempfile.TemporaryDirectory(prefix="awf-cleanup-claims-") as cleanup_dir:
+        cleanup_root = Path(cleanup_dir)
+        cleanup_open_claim = cleanup_root / "awf-open.json"
+        cleanup_closed_claim = cleanup_root / "awf-closed.json"
+        cleanup_missing_claim = cleanup_root / "awf-missing.json"
+        cleanup_open_claim.write_text(
+            json.dumps(
+                {
+                    "id": "awf-open",
+                    "worker_id": "worker-open",
+                    "claimed_at": "2026-06-02T00:00:00+00:00",
+                }
+            ),
+            encoding="utf-8",
+        )
+        cleanup_closed_claim.write_text(
+            json.dumps(
+                {
+                    "id": "awf-closed",
+                    "worker_id": "worker-closed",
+                    "claimed_at": "2026-06-02T00:00:00+00:00",
+                }
+            ),
+            encoding="utf-8",
+        )
+        cleanup_missing_claim.write_text(
+            json.dumps(
+                {
+                    "id": "awf-missing",
+                    "worker_id": "worker-missing",
+                    "claimed_at": "2026-06-02T00:00:00+00:00",
+                }
+            ),
+            encoding="utf-8",
+        )
+        cleanup_candidates = obsolete_claim_cleanup_candidates(
+            claim_paths=[cleanup_open_claim, cleanup_closed_claim, cleanup_missing_claim],
+            issues=[
+                {"id": "awf-open", "title": "Open claim", "status": "open"},
+                {"id": "awf-closed", "title": "Closed claim", "status": "closed"},
+            ],
+            checked_at=datetime(2026, 6, 2, tzinfo=timezone.utc),
+        )
+    cleanup_candidate_ids = {candidate["id"] for candidate in cleanup_candidates}
+    worktree_prune_candidates = parse_worktree_prune_output(
+        "Removing worktrees/old-worker: gitdir file points to non-existent location\n\n"
+    )
+    results.append(
+        {
+            "name": "cleanup work preserves history while removing obsolete active pointers",
+            "ok": cleanup_candidate_ids == {"awf-closed", "awf-missing"}
+            and all(candidate["archive_path"].startswith(".agent-runs/claims/archive-2026-06/") for candidate in cleanup_candidates)
+            and {candidate["reason"] for candidate in cleanup_candidates}
+            == {"issue-closed", "missing-beads-issue"}
+            and worktree_prune_candidates
+            == ["Removing worktrees/old-worker: gitdir file points to non-existent location"],
+            "data": {
+                "archive_candidates": [public_cleanup_claim_item(candidate) for candidate in cleanup_candidates],
+                "worktree_prune_candidates": worktree_prune_candidates,
+            },
         }
     )
     blocker_reroute = blocker_reroute_data(

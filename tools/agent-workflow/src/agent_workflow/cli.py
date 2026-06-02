@@ -332,6 +332,25 @@ def claim_work(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("cleanup-work")
+def cleanup_work(
+    write: bool = typer.Option(False, "--write", help="Archive obsolete active claims and prune stale worktree metadata."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Clean obsolete active claim files and old Git worktree pointers."""
+    data = core.cleanup_work_data(write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="cleanup-work",
+            summary=data.get("next_action", "cleanup failed"),
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("complete-work")
 def complete_work(
     issue_id: str | None = typer.Option(None, "--issue-id", help="Beads issue id. Defaults to active claim."),
