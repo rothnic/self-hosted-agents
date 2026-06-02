@@ -18,5 +18,5 @@ Feature: Automated increment orchestration
   Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch
-    Then it presents increment evidence for independent reviewer acceptance without merging to main
+    Then it presents review-agent invocation guidance and increment evidence without merging to main
     And the operational record links the phase evidence, learnings, reviewer, and review status

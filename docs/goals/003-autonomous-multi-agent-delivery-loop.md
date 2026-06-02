@@ -46,6 +46,9 @@ T014 compact verification artifact evidence is recorded in
 T015 integrator worker branch handoff evidence is recorded in
 `.agent-runs/reports/goal-003-t015-integrator-worker-branch-handoff-20260602.md`.
 
+T016 review-agent invocation guidance evidence is recorded in
+`.agent-runs/reports/goal-003-t016-review-agent-invocation-guidance-20260602.md`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
@@ -62,7 +65,7 @@ Backlog sync created the executable Beads tasks below:
 - `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
 - `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
 
-Next implementer claim after T015 closure: `awf-svc` / T016. Use `uv run awf ready-work --json` as the source of truth
+Next implementer claim after T016 closure: `awf-8vh` / T017. Use `uv run awf ready-work --json` as the source of truth
 before claiming, because priorities, blockers, or active claims may change.
 
 ## Scope

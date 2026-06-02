@@ -1897,6 +1897,49 @@ def worktree_path_exists(path: str) -> bool:
     return candidate.exists()
 
 
+def review_agent_invocation_guidance(status: dict[str, Any], handoff_kind: str) -> dict[str, Any]:
+    spec_id = status.get("spec_id") or "003-automated-increment-orchestration"
+    phase = status.get("phase") or "Goal 003"
+    fallback_increment_id = default_increment_id(str(spec_id), str(phase))
+    increment_path_value = status.get("path") or rel(increment_path(fallback_increment_id))
+    feature_branch = status.get("feature_branch") or "<feature-branch>"
+    return {
+        "handoff_kind": handoff_kind,
+        "agent_role": "reviewer",
+        "required_independence": "reviewer agent must be separate from the presenting implementer or integrator",
+        "human_review_policy": (
+            "do not block solely for human review; use human review only when the user explicitly reserves a decision "
+            "or the reviewer finds a product, priority, architecture, or scope question"
+        ),
+        "trigger_before": [
+            "creating or updating a PR as goal or increment evidence",
+            "marking an increment review accepted",
+            "claiming a goal evidence checkpoint complete",
+        ],
+        "prompt": (
+            f"Review {handoff_kind} evidence for spec `{spec_id}` phase `{phase}` on branch `{feature_branch}`. "
+            "Do not edit files. Verify the cited evidence, state `accepted` or `rejected`, list findings ordered by "
+            "severity, and name any required follow-up tickets."
+        ),
+        "evidence_to_include": [
+            str(increment_path_value),
+            "uv run awf verify --profile increment --write --json",
+            "integrator_handoff.worker_branch_reviews",
+            "git status --short --branch",
+            "git diff --stat main...HEAD",
+            "relevant .agent-runs/reports/<goal-or-task-report>.md",
+        ],
+        "durable_outcome_fields": [
+            "reviewer_agent_id",
+            "outcome: accepted|rejected",
+            "evidence_checked",
+            "findings_or_no_findings",
+            "required_follow_up_tickets",
+            "recorded_at",
+        ],
+    }
+
+
 def integrator_handoff_from_claims(
     status: dict[str, Any],
     claims: list[dict[str, Any]],
@@ -1967,7 +2010,7 @@ def integrator_handoff_from_claims(
         )
     ready_to_verify_count = len([item for item in branch_reviews if item.get("review_state") == "ready-to-verify"])
     pending_worker_count = len([item for item in branch_reviews if item.get("review_state") == "worker-in-progress"])
-    return {
+    handoff = {
         "base_branch": base_branch,
         "feature_branch": feature_branch,
         "main_merge_allowed": False,
@@ -1996,6 +2039,8 @@ def integrator_handoff_from_claims(
             else "verify increment evidence and present it for independent reviewer acceptance"
         ),
     }
+    handoff["review_agent_invocation"] = review_agent_invocation_guidance(status, "increment-or-pr-handoff")
+    return handoff
 
 
 def integrator_handoff_data(
@@ -3533,6 +3578,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         ]
         if command
     ]
+    review_invocation = synthetic_integrator_handoff["review_agent_invocation"]
     results.append(
         {
             "name": "integrator handoff verifies worker branches without touching main",
@@ -3550,6 +3596,23 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and synthetic_integrator_handoff["reviewer_evidence"]["increment_verification_command"]
             == "uv run awf verify --profile increment --write --json",
             "data": synthetic_integrator_handoff,
+        }
+    )
+    results.append(
+        {
+            "name": "review-agent invocation guidance precedes PR and increment handoffs",
+            "ok": review_invocation["agent_role"] == "reviewer"
+            and review_invocation["handoff_kind"] == "increment-or-pr-handoff"
+            and "separate from the presenting implementer or integrator"
+            in review_invocation["required_independence"]
+            and "do not block solely for human review" in review_invocation["human_review_policy"]
+            and "creating or updating a PR as goal or increment evidence" in review_invocation["trigger_before"]
+            and "uv run awf verify --profile increment --write --json" in review_invocation["evidence_to_include"]
+            and "integrator_handoff.worker_branch_reviews" in review_invocation["evidence_to_include"]
+            and "reviewer_agent_id" in review_invocation["durable_outcome_fields"]
+            and "outcome: accepted|rejected" in review_invocation["durable_outcome_fields"]
+            and "accepted` or `rejected" in review_invocation["prompt"],
+            "data": review_invocation,
         }
     )
     stale_claims = stale_claims_for_increment(

@@ -106,11 +106,15 @@ must preserve the claim fields so another agent can resume or integrate the bran
 ## Integrator Handoff
 
 `automation-loop --role integrator` returns `integrator_handoff` with the increment feature branch, `main_merge_allowed`,
-`draft_pr_boundary`, worker branch review entries, and reviewer evidence requirements. Each worker branch review includes
-the claim path, worker branch, worktree path, ticket status, branch existence, verification command, diff command, and
-when locally available, the safe command to integrate the worker branch into the feature branch. Integrators verify and
-integrate worker branches only into the increment feature branch, then present evidence for independent reviewer
-acceptance. They do not merge to `main`.
+`draft_pr_boundary`, worker branch review entries, reviewer evidence requirements, and `review_agent_invocation`. Each
+worker branch review includes the claim path, worker branch, worktree path, ticket status, branch existence,
+verification command, diff command, and when locally available, the safe command to integrate the worker branch into the
+feature branch. Integrators verify and integrate worker branches only into the increment feature branch, then use
+`review_agent_invocation` before PR or increment handoff evidence is marked accepted. The reviewer must be a separate
+agent, must receive the increment ledger, written verification artifact, worker branch reviews, git status, feature
+branch diff, and relevant `.agent-runs/reports/` evidence, and must return `accepted` or `rejected` with findings and
+required follow-up tickets. Record the reviewer agent id, outcome, evidence checked, findings, follow-ups, and timestamp
+durably. Do not pause solely because human review might be useful, and do not merge to `main`.
 
 Blocked work does not stop the whole increment unless every remaining task depends on it. A worker that hits a blocker
 records the blocker, comments or marks the Beads ticket, creates a follow-up when actionable, and exits. The

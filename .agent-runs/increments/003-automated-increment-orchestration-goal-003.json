@@ -10,8 +10,8 @@
     "blocked_count": 0,
     "can_continue": true,
     "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-svc",
-    "ready_count": 6
+    "next_unblocked_issue_id": "awf-8vh",
+    "ready_count": 5
   },
   "child_tickets": [
     {
@@ -71,11 +71,11 @@
       "title": "Add integrator verification of worker branches without merging to `main`"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T016",
       "task_id": "T016",
       "ticket_id": "awf-svc",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add review-agent invocation guidance before PR and increment handoffs"
     },
     {
@@ -129,10 +129,10 @@
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 6,
+  "ready_count": 5,
   "review_status": "executing",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T08:20:02.382728+00:00",
+  "updated_at": "2026-06-02T08:52:17.022492+00:00",
   "validation_evidence": []
 }

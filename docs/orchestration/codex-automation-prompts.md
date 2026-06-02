@@ -92,9 +92,13 @@ to `main`; `main_merge_allowed=false` is the expected policy. Run:
   --json
 ```
 
-Then run
-`.venv/bin/awf verify --profile increment --write --json`. Present increment evidence for independent reviewer
-acceptance when ready, record the reviewer outcome durably, and do not merge to `main`.
+Then run `.venv/bin/awf verify --profile increment --write --json`. Before creating or updating a PR as goal or
+increment evidence, use `integrator_handoff.review_agent_invocation` as the reviewer prompt. Send the reviewer the
+increment ledger path, written verification artifact, `integrator_handoff.worker_branch_reviews`, git status, feature
+branch diff, and relevant `.agent-runs/reports/` evidence. The reviewer must be separate from the presenting agent and
+must return `accepted` or `rejected` with findings and required follow-up tickets. Record the reviewer agent id,
+outcome, evidence checked, findings, follow-ups, and timestamp durably. Do not block solely because human review might
+be useful, and do not merge to `main`.
 
 ## Health Loop
 
