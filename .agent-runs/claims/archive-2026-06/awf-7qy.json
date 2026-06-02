@@ -1,0 +1,20 @@
+{
+  "claimed_at": "2026-06-02T05:32:40.524244+00:00",
+  "id": "awf-7qy",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-01T13:07:49.804178Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 004-durable-agent-execution-runtime\nTask: T012\nSource: specs/004-durable-agent-execution-runtime/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T012",
+    "id": "awf-7qy",
+    "issue_type": "task",
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Record reviewer acceptance and follow-up tickets for production hardening gaps",
+    "updated_at": "2026-06-01T13:07:49.804178Z"
+  },
+  "worker_id": "codex-t012"
+}

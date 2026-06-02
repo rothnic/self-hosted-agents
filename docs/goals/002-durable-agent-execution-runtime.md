@@ -85,12 +85,17 @@ Evidence to inspect:
 
 The local durable proof is now sufficient to show that the Pydantic AI plus DBOS candidate can satisfy Goal 002's retry,
 resume, review-wait, side-effect, and evidence-correlation behavior without hosted services or external model providers.
-The remaining Goal 002 work is to record independent reviewer acceptance and create follow-up tickets for production
-hardening gaps.
+Independent Goal 002 review evidence is recorded in `.agent-runs/reports/goal-002-evidence-review-20260602.md`.
 
 Final product-stack promotion remains blocked until a later goal or follow-up spec proves production DBOS storage,
 worker topology, queue behavior, backup/restore, retention, and recovery rehearsal on controlled infrastructure. Treat
 the current DBOS evidence as **tested local durable proof**, not as a production runtime selection.
+
+Follow-up Beads epics:
+
+- `awf-lkr`: DBOS production storage proof.
+- `awf-ygu`: DBOS worker and queue topology proof.
+- `awf-5ae`: DBOS recovery rehearsal and retention proof.
 
 ## Proof Commands
 

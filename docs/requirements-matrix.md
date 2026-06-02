@@ -216,10 +216,9 @@ Local durable proof now exists for:
 
 Production promotion remains blocked until all blockers below have repo-local or self-hosted evidence:
 
-- Production storage path beyond SQLite development mode.
-- Worker topology, queue behavior, and recovery operations.
-- Reset, backup, retention, troubleshooting, and recovery rehearsal for another agent.
-- Final Goal 002 reviewer acceptance and follow-up tickets for the remaining production hardening gaps.
+- `awf-lkr`: production storage path beyond SQLite development mode.
+- `awf-ygu`: worker topology, queue behavior, and recovery operations.
+- `awf-5ae`: reset, backup, retention, troubleshooting, and recovery rehearsal for another agent.
 
 ### Pydantic AI Implementation Scoring Update (T026)
 
@@ -284,8 +283,9 @@ final solution yet.
 
 Promotion blockers before final-solution language:
 
-- Record final Goal 002 reviewer acceptance and follow-up tickets for production hardening gaps.
-- Replace the SQLite DBOS proof with a scored production storage and worker topology.
+- Replace the SQLite DBOS proof with the `awf-lkr` production storage proof.
+- Prove worker topology, queue behavior, and recovery operations through `awf-ygu`.
+- Rehearse restore, retention, and cleanup through `awf-5ae`.
 - Document and rehearse recovery for Langfuse, DBOS storage, secrets, retention, and backups.
 - Add live model/tool traces or explicit simulated equivalents covering tokens, cost, failures, and tool-call context.
 - Expand Pydantic Evals beyond deterministic fixture assertions into datasets, judges, annotation, or regression history.

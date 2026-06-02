@@ -25,4 +25,4 @@
 
 - [X] T010 [US1] Add workflow fixture assertions for the durable evidence shape
 - [X] T011 [US1] Update roadmap, requirements, and promotion gates with the durable proof result
-- [ ] T012 [US1] Record reviewer acceptance and follow-up tickets for production hardening gaps
+- [X] T012 [US1] Record reviewer acceptance and follow-up tickets for production hardening gaps
