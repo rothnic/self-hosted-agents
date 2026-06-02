@@ -158,6 +158,8 @@ include git status, latest commit, active objective/spec, ready work, validation
 Any health or cron issue follows this path:
 
 1. Detect with `health-status`, `cron-tick`, or a failing check.
-2. Record a JSON artifact under `.agent-runs/health/`.
-3. Create a Beads ticket when `--write` is used and `br` is available.
-4. Let planner decompose or prioritize the issue in the next planning cycle.
+2. Record a JSON artifact under `.agent-runs/health/` when the health automation loop runs with `--write`.
+3. Include failed check detail, actionable next step, a recurrence fingerprint, occurrence count, and previous matching
+   health issue paths.
+4. Create a Beads ticket when `--write` is used and `br` is available.
+5. Stop implementation and let planner decompose or prioritize the issue in the next planning cycle.

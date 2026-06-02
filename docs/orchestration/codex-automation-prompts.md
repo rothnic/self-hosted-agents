@@ -115,5 +115,7 @@ Run:
   --json
 ```
 
-If checks fail, log the issue through the workflow output and stop implementation. If checks pass, report only the next
-safe action.
+If checks fail, the `logged` field records repo-local issue evidence under `.agent-runs/health/` when `--write` is used.
+Each record includes the failed check, actionable next step, recurrence fingerprint, occurrence count, previous matching
+health issue paths, and Beads creation result when `br` is available. Stop implementation after logging. If checks pass,
+report only the next safe action.

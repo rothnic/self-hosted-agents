@@ -2545,12 +2545,19 @@ def automation_loop_data(
     status = increment_status_data(increment_id, spec_id, phase)
     if role == "health":
         verify = verify_data("health", write=write)
+        logged = health_loop_issue_records(verify, write=write)
+        next_action = (
+            "health-loop logged repo-local issue evidence and should stop implementation"
+            if logged
+            else verify["next_action"]
+        )
         return {
             "ok": verify["ok"],
             "role": role,
             "increment": status,
             "verify": verify,
-            "next_action": verify["next_action"],
+            "logged": logged,
+            "next_action": next_action,
         }
     health = verify_data("health", write=False)
     if not health["ok"]:
@@ -2775,7 +2782,115 @@ def automation_loop_data(
 
 
 def health_issue_path(issue_id: str) -> Path:
-    return ROOT / ".agent-runs" / "health" / f"{issue_id}.json"
+    safe_id = re.sub(r"[^A-Za-z0-9_.-]", "-", issue_id)
+    return ROOT / ".agent-runs" / "health" / f"{safe_id}.json"
+
+
+def health_issue_fingerprint(title: str, source: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", f"{source}-{title}".lower()).strip("-")
+    return slug[:96] or "workflow-health-failure"
+
+
+def existing_health_issue_records(fingerprint: str) -> list[dict[str, Any]]:
+    records = []
+    for path in sorted((ROOT / ".agent-runs" / "health").glob("*.json")):
+        data = read_json(path)
+        if not data or data.get("error"):
+            continue
+        if data.get("health_fingerprint") == fingerprint:
+            data = dict(data)
+            data.setdefault("path", rel(path))
+            records.append(data)
+    return records
+
+
+def write_health_issue_beads(title: str, severity: str, source: str, details: str) -> dict[str, Any] | None:
+    br = find_br()
+    if not br:
+        return None
+    desc = f"Source: {source}\nSeverity: {severity}\n\n{details}"
+    proc = run(
+        [
+            br,
+            "create",
+            title,
+            "--type",
+            "task",
+            "--priority",
+            "1" if severity == "blocker" else "2",
+            "--description",
+            desc,
+            "--json",
+        ]
+    )
+    run([br, "sync", "--flush-only"])
+    return {
+        "returncode": proc.returncode,
+        "stdout": proc.stdout.strip(),
+        "stderr": proc.stderr.strip(),
+    }
+
+
+def health_loop_issue_records(
+    verify: dict[str, Any],
+    write: bool,
+    existing_records_by_fingerprint: dict[str, list[dict[str, Any]]] | None = None,
+    created_at: str | None = None,
+    issue_path_factory: Callable[[str], Path] = health_issue_path,
+    beads_writer: Callable[[str, str, str, str], dict[str, Any] | None] = write_health_issue_beads,
+) -> list[dict[str, Any]]:
+    records = []
+    for check in verify.get("checks", []):
+        if check.get("ok"):
+            continue
+        source = str(check.get("name") or "health")
+        title = f"Workflow health check failed: {source}"
+        severity = "blocker"
+        fingerprint = health_issue_fingerprint(title, source)
+        previous = (
+            existing_records_by_fingerprint.get(fingerprint, [])
+            if existing_records_by_fingerprint is not None
+            else existing_health_issue_records(fingerprint)
+        )
+        occurrence_count = len(previous) + 1
+        details = {
+            "profile": verify.get("profile", "health"),
+            "failed_check": check,
+            "failed_checks": verify.get("failed_checks", []),
+            "next_action": verify.get("next_action"),
+            "actionable_next_step": (
+                "Stop implementation, inspect the failed health check, and route the issue to health-status or "
+                "pm-review triage before scheduled workers continue."
+            ),
+        }
+        item = {
+            "id": f"{fingerprint}-{now_id('run')}",
+            "created_at": created_at or datetime.now(timezone.utc).isoformat(),
+            "title": title,
+            "severity": severity,
+            "source": source,
+            "health_fingerprint": fingerprint,
+            "recurrence": {
+                "occurrence_count": occurrence_count,
+                "recurring": occurrence_count > 1,
+                "previous_paths": [record.get("path") for record in previous if record.get("path")],
+            },
+            "details": details,
+            "beads": None,
+        }
+        if write:
+            path = issue_path_factory(str(item["id"]))
+            path.parent.mkdir(parents=True, exist_ok=True)
+            item["path"] = rel(path)
+            item["beads"] = beads_writer(
+                title=title,
+                severity=severity,
+                source=source,
+                details=json.dumps(details, indent=2, sort_keys=True),
+            )
+            path.write_text(json.dumps(item, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        records.append(item)
+    return records
 
 
 def issue_log_data(title: str, severity: str, source: str, details: str, write: bool) -> dict[str, Any]:
@@ -2791,31 +2906,10 @@ def issue_log_data(title: str, severity: str, source: str, details: str, write: 
     }
     if write:
         path = health_issue_path(issue_id)
+        path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(item, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         item["path"] = rel(path)
-        br = find_br()
-        if br:
-            desc = f"Source: {source}\nSeverity: {severity}\n\n{details}"
-            proc = run(
-                [
-                    br,
-                    "create",
-                    title,
-                    "--type",
-                    "task",
-                    "--priority",
-                    "1" if severity == "blocker" else "2",
-                    "--description",
-                    desc,
-                    "--json",
-                ]
-            )
-            item["beads"] = {
-                "returncode": proc.returncode,
-                "stdout": proc.stdout.strip(),
-                "stderr": proc.stderr.strip(),
-            }
-            run([br, "sync", "--flush-only"])
+        item["beads"] = write_health_issue_beads(title, severity, source, details)
     return item
 
 
@@ -3704,6 +3798,106 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": {"enriched_ready": enriched_ready},
         }
     )
+    synthetic_failed_health = {
+        "ok": False,
+        "profile": "health",
+        "checks": [
+            {
+                "name": "repo-hygiene",
+                "command": "uv run awf repo-hygiene",
+                "ok": False,
+                "data": {
+                    "ok": False,
+                    "errors": ["unexpected root file: scratch.txt"],
+                },
+            }
+        ],
+        "failed_checks": ["repo-hygiene"],
+        "next_action": "health-loop should log issues and stop implementation",
+    }
+    synthetic_fingerprint = health_issue_fingerprint("Workflow health check failed: repo-hygiene", "repo-hygiene")
+    synthetic_health_records = health_loop_issue_records(
+        synthetic_failed_health,
+        write=False,
+        existing_records_by_fingerprint={
+            synthetic_fingerprint: [
+                {
+                    "path": ".agent-runs/health/existing-repo-hygiene.json",
+                    "health_fingerprint": synthetic_fingerprint,
+                }
+            ]
+        },
+        created_at="2026-06-02T00:00:00+00:00",
+    )
+    synthetic_health_record = synthetic_health_records[0] if synthetic_health_records else {}
+    results.append(
+        {
+            "name": "health loop issue logging records recurring workflow failures",
+            "ok": len(synthetic_health_records) == 1
+            and synthetic_health_record.get("source") == "repo-hygiene"
+            and synthetic_health_record.get("health_fingerprint") == synthetic_fingerprint
+            and synthetic_health_record.get("recurrence", {}).get("occurrence_count") == 2
+            and synthetic_health_record.get("recurrence", {}).get("recurring") is True
+            and ".agent-runs/health/existing-repo-hygiene.json"
+            in synthetic_health_record.get("recurrence", {}).get("previous_paths", [])
+            and "Stop implementation" in synthetic_health_record.get("details", {}).get("actionable_next_step", "")
+            and synthetic_health_record.get("details", {}).get("failed_check", {}).get("data", {}).get("errors")
+            == ["unexpected root file: scratch.txt"]
+            and "path" not in synthetic_health_record
+            and synthetic_health_record.get("beads") is None,
+            "data": {"logged": synthetic_health_records},
+        }
+    )
+    with tempfile.TemporaryDirectory(prefix="awf-health-log-fixture-") as temp_dir:
+        temp_health_dir = Path(temp_dir)
+
+        def fixture_health_issue_path(issue_id: str) -> Path:
+            return temp_health_dir / f"{issue_id}.json"
+
+        def fixture_beads_writer(title: str, severity: str, source: str, details: str) -> dict[str, Any]:
+            return {
+                "returncode": 0,
+                "stdout": json.dumps(
+                    {
+                        "id": "awf-fixture-health",
+                        "title": title,
+                        "priority": 1 if severity == "blocker" else 2,
+                        "source": source,
+                        "details_captured": bool(details),
+                    },
+                    sort_keys=True,
+                ),
+                "stderr": "",
+            }
+
+        written_health_records = health_loop_issue_records(
+            synthetic_failed_health,
+            write=True,
+            existing_records_by_fingerprint={synthetic_fingerprint: []},
+            created_at="2026-06-02T00:00:00+00:00",
+            issue_path_factory=fixture_health_issue_path,
+            beads_writer=fixture_beads_writer,
+        )
+        written_health_record = written_health_records[0] if written_health_records else {}
+        written_health_path = Path(str(written_health_record.get("path", "")))
+        written_health_artifact = (
+            json.loads(written_health_path.read_text(encoding="utf-8")) if written_health_path.exists() else {}
+        )
+        results.append(
+            {
+                "name": "health loop issue logging persists Beads evidence before writing artifact",
+                "ok": len(written_health_records) == 1
+                and written_health_path.exists()
+                and written_health_artifact.get("beads") == written_health_record.get("beads")
+                and written_health_artifact.get("beads", {}).get("returncode") == 0
+                and written_health_artifact.get("path") == written_health_record.get("path")
+                and "awf-fixture-health" in written_health_artifact.get("beads", {}).get("stdout", ""),
+                "data": {
+                    "logged": written_health_records,
+                    "artifact": written_health_artifact,
+                },
+            }
+        )
     if include_orchestration:
         verify_health = verify_data("health", write=False)
         results.append(

@@ -15,6 +15,12 @@ Feature: Automated increment orchestration
     Then it assigns only unclaimed unblocked work to a focused worker branch
     And the operational record keeps blocked work visible for the PM review loop instead of idling the increment
 
+  Scenario: Health loop records recurring workflow failure evidence
+    Given a recurring workflow health check fails during scheduled automation
+    When the health driver evaluates the failed check with write mode
+    Then it records repo-local issue evidence with recurrence context
+    And the operational record stops implementation until planner or health triage handles the issue
+
   Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch
