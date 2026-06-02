@@ -31,12 +31,12 @@ def write_json(path: Path, data: dict[str, Any], pretty: bool) -> None:
 
 def durable_recommendation() -> dict[str, str]:
     return {
-        "linked_task": "T010",
-        "next_slice": "Add workflow fixture assertions for the durable evidence shape.",
+        "linked_task": "T011",
+        "next_slice": "Update roadmap, requirements, and promotion gates with the durable proof result.",
         "reason": (
             "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect "
             "idempotency evidence plus fixture-safe review wait, accepted-review continuation, and durable artifact "
-            "correlation, so the next useful slice is broader fixture shape hardening."
+            "correlation with fixture shape assertions, so the next useful slice is updating promotion gates."
         ),
     }
 
@@ -45,7 +45,7 @@ def durable_prompt(payload: dict[str, Any]) -> str:
     project_context = payload.get("project_context", {})
     return (
         f"Objective: {payload.get('objective', '')}\n"
-        f"Current slice: T009\n"
+        f"Current slice: T010\n"
         f"Active spec: {project_context.get('active_spec', '')}\n"
         "Return the next implementation slice after durable execution smoke evidence."
     )
@@ -430,7 +430,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         {
             "candidate": payload.get("candidate", {}),
             "issue": args.issue_id,
-            "slice": "T009",
+            "slice": "T010",
             "started_at_ns": time.time_ns(),
         },
         length=24,
@@ -747,7 +747,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "accepted_review_workflow_id": accepted_review_workflow_id,
             "issue_id": args.issue_id,
             "pydantic_ai_run_id": pydantic_run_id,
-            "task_id": "T009",
+            "task_id": "T010",
             "trace_id": trace_id,
             "workflow_id": workflow_id,
         },
@@ -784,10 +784,10 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
                 "acceptance_command": "uv run awf workflow-fixture-test",
                 "beads_issue_id": args.issue_id,
                 "evidence_artifact": artifact_output_path,
-                "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T009",
+                "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T010",
                 "objective_id": "agentic-development-foundation",
                 "spec_id": "004-durable-agent-execution-runtime",
-                "task_id": "T009",
+                "task_id": "T010",
             },
             "durable_run": {
                 "durable_run_id": workflow_id,
@@ -981,7 +981,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Reviewer evidence path the accepted-review resume proof links before post-wait continuation.",
     )
     parser.add_argument("--retry-failures", type=int, default=1, help="Transient DBOS retry failures before success.")
-    parser.add_argument("--issue-id", default="awf-r6g", help="Beads issue id linked to the durable evidence.")
+    parser.add_argument("--issue-id", default="awf-75o", help="Beads issue id linked to the durable evidence.")
     parser.add_argument("--side-effect-step-marker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--workflow-id", help="Optional deterministic DBOS workflow id.")
     parser.add_argument("--wait-seconds", type=float, default=300.0, help="Child wait duration before resume.")

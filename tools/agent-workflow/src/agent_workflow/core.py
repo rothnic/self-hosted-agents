@@ -1516,8 +1516,96 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             for step in accepted_review_resume.get("workflow_steps", [])
             if isinstance(step, dict)
         ]
+        expected_top_level_keys = {
+            "acceptance_command",
+            "accepted_review_resume",
+            "candidate_app",
+            "command_used",
+            "correlation",
+            "dbos",
+            "deterministic_validation",
+            "durable_property",
+            "first_attempt",
+            "identity",
+            "issue_id",
+            "passed",
+            "pydantic_ai",
+            "resume_attempt",
+            "retry",
+            "review_wait",
+            "runtime",
+            "side_effect",
+        }
+        expected_durable_keys = {
+            "artifact_correlation_proven",
+            "completed_step_not_duplicated",
+            "controlled_failure",
+            "controlled_retry",
+            "resume_proven",
+            "retry_proven",
+            "review_resume_proven",
+            "review_wait_proven",
+            "run_identity_preserved",
+            "side_effect_idempotency_proven",
+        }
+        expected_correlation_keys = {
+            "accepted_review_resume",
+            "beads",
+            "durable_run",
+            "evaluation",
+            "observability",
+            "proven",
+            "review_wait",
+            "reviewer_acceptance",
+        }
+        expected_review_keys = {
+            "beads_issue_id",
+            "command",
+            "post_wait_side_effect",
+            "proven",
+            "required_evidence_path",
+            "state",
+            "state_path",
+            "workflow_id",
+            "workflow_result",
+            "workflow_status",
+            "workflow_steps",
+        }
         required = {
             "artifact_passed": artifact.get("passed") is True,
+            "evidence_shape_top_level": expected_top_level_keys.issubset(set(artifact)),
+            "evidence_shape_durable_property": expected_durable_keys.issubset(set(durable))
+            and all(isinstance(durable.get(key), bool) for key in expected_durable_keys if key.endswith("_proven"))
+            and isinstance(durable.get("controlled_failure"), str)
+            and isinstance(durable.get("controlled_retry"), str),
+            "evidence_shape_correlation": expected_correlation_keys.issubset(set(correlation))
+            and all(
+                isinstance(correlation.get(key), dict)
+                for key in [
+                    "accepted_review_resume",
+                    "beads",
+                    "durable_run",
+                    "evaluation",
+                    "observability",
+                    "review_wait",
+                    "reviewer_acceptance",
+                ]
+            ),
+            "evidence_shape_review_sections": expected_review_keys.issubset(set(review_wait))
+            and expected_review_keys.issubset(set(accepted_review_resume))
+            and isinstance(review_wait.get("workflow_steps"), list)
+            and isinstance(accepted_review_resume.get("workflow_steps"), list),
+            "evidence_shape_commands": isinstance(artifact.get("command_used"), str)
+            and artifact.get("command_used", "").startswith("uv run python apps/pydantic-ai/durable_smoke.py")
+            and isinstance(review_wait.get("command"), str)
+            and " --child-phase review-wait " in review_wait.get("command", "")
+            and isinstance(accepted_review_resume.get("command"), str)
+            and " --child-phase review-wait " in accepted_review_resume.get("command", ""),
+            "evidence_shape_paths": str(dbos.get("db_path", "")).endswith(".sqlite")
+            and str(artifact.get("candidate_app", "")) == "apps/pydantic-ai"
+            and str(review_wait.get("state_path", "")).endswith(".json")
+            and str(accepted_review_resume.get("state_path", "")).endswith(".json")
+            and str(accepted_review_resume.get("post_wait_side_effect", {}).get("log_path", "")).endswith(".jsonl"),
             "dbos_runtime": artifact.get("runtime", {}).get("selected") == "pydantic_ai_dbos",
             "dbos_workflow_id": bool(dbos.get("workflow_id")),
             "dbos_sqlite": str(dbos.get("system_database_url", "")).startswith("sqlite:///"),
@@ -1554,9 +1642,9 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             and correlation_evaluation.get("run_id") == pydantic_ai.get("run_id")
             and str(correlation_evaluation.get("evaluation_id", "")).startswith("eval-"),
             "correlation_beads": correlation_beads.get("beads_issue_id") == artifact.get("issue_id")
-            and correlation_beads.get("task_id") == "T009"
+            and correlation_beads.get("task_id") == "T010"
             and correlation_beads.get("spec_id") == "004-durable-agent-execution-runtime"
-            and correlation_beads.get("external_ref") == "specs/004-durable-agent-execution-runtime/tasks.md#T009"
+            and correlation_beads.get("external_ref") == "specs/004-durable-agent-execution-runtime/tasks.md#T010"
             and correlation_beads.get("acceptance_command") == artifact.get("acceptance_command"),
             "review_wait_proven": durable.get("review_wait_proven") is True and review_wait.get("proven") is True,
             "review_wait_missing_acceptance": review_wait.get("acceptance_artifact_exists") is False
