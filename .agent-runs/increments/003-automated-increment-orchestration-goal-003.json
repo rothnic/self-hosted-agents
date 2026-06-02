@@ -1,6 +1,7 @@
 {
   "active_claims": [],
   "active_worker_branches": [],
+  "active_worktrees": [],
   "base_branch": "main",
   "beads_epic_id": null,
   "blocked": [],
@@ -9,8 +10,8 @@
     "blocked_count": 0,
     "can_continue": true,
     "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-869",
-    "ready_count": 9
+    "next_unblocked_issue_id": "awf-6wg",
+    "ready_count": 8
   },
   "child_tickets": [
     {
@@ -46,11 +47,11 @@
       "title": "Add blocker rerouting so unrelated ready work can continue"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T013",
       "task_id": "T013",
       "ticket_id": "awf-869",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add deterministic worker branch naming and worktree setup guidance"
     },
     {
@@ -128,10 +129,10 @@
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 9,
+  "ready_count": 8,
   "review_status": "executing",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T07:12:08.103660+00:00",
+  "updated_at": "2026-06-02T07:36:41.540146+00:00",
   "validation_evidence": []
 }

@@ -70,7 +70,8 @@ Run:
   --json
 ```
 
-If one ticket is claimed, work only that ticket on its worker branch, make the smallest coherent change, then run
+If one ticket is claimed, work only that ticket using the claim file's `worker_branch`, `worktree_path`, and
+`worktree_setup` fields. Make the smallest coherent change, then run
 `.venv/bin/awf verify --profile ticket --write --json`. Record evidence on the Beads ticket, push the worker branch,
 and stop. If blocked, record the blocker and release the loop to other work.
 

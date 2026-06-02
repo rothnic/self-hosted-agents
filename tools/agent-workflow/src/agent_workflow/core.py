@@ -1762,6 +1762,13 @@ def active_claims() -> list[dict[str, Any]]:
         if issue and issue.get("status") == "open":
             data["path"] = rel(path)
             data["issue"] = issue
+            assignment = worker_assignment_for_work(
+                issue,
+                feature_branch=data.get("feature_branch") if isinstance(data.get("feature_branch"), str) else None,
+            )
+            data.setdefault("worker_branch", assignment["worker_branch"])
+            data.setdefault("worktree_path", assignment["worktree_path"])
+            data.setdefault("worktree_setup", assignment["setup"])
             claims.append(data)
     return claims
 
@@ -1794,10 +1801,38 @@ def unclaimed_work_items(items: list[dict[str, Any]], claims: list[dict[str, Any
     ]
 
 
+def worker_slug_for_work(work: dict[str, Any], limit: int = 40) -> str:
+    title = str(work.get("title") or work.get("id") or "work")
+    return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")[:limit].strip("-")
+
+
 def worker_branch_for_work(work: dict[str, Any]) -> str:
     work_id = str(work.get("id") or work.get("title") or "work")
-    worker_slug = re.sub(r"[^a-z0-9]+", "-", str(work.get("title") or "work").lower()).strip("-")[:40]
+    worker_slug = worker_slug_for_work(work)
     return f"codex/{work_id}-{worker_slug}" if worker_slug else f"codex/{work_id}"
+
+
+def worker_worktree_path_for_work(work: dict[str, Any]) -> str:
+    work_id = str(work.get("id") or work.get("title") or "work")
+    worker_slug = worker_slug_for_work(work)
+    dirname = f"{work_id}-{worker_slug}" if worker_slug else work_id
+    safe_dirname = re.sub(r"[^A-Za-z0-9_.-]", "-", dirname).strip("-")
+    return f"../self-hosted-agents-worktrees/{safe_dirname}"
+
+
+def worker_assignment_for_work(work: dict[str, Any], feature_branch: str | None = None) -> dict[str, Any]:
+    worker_branch = worker_branch_for_work(work)
+    worktree_path = worker_worktree_path_for_work(work)
+    base = feature_branch or "<feature-branch>"
+    return {
+        "worker_branch": worker_branch,
+        "worktree_path": worktree_path,
+        "feature_branch": feature_branch,
+        "setup": {
+            "add_worktree": f"git worktree add -b {worker_branch} {worktree_path} {base}",
+            "resume": f"cd {worktree_path} && git status --short --branch",
+        },
+    }
 
 
 def current_acceptance_item() -> dict[str, Any] | None:
@@ -2028,9 +2063,12 @@ def stale_claims_for_increment(
             work = claim.get("work") if isinstance(claim.get("work"), dict) else {}
             issue = claim.get("issue") if isinstance(claim.get("issue"), dict) else {}
             issue_context = issue or work
-            worker_branch = claim.get("worker_branch") or worker_branch_for_work(
-                issue_context or {"id": claim.get("id"), "title": "work"}
+            assignment = worker_assignment_for_work(
+                issue_context or {"id": claim.get("id"), "title": "work"},
+                feature_branch=claim.get("feature_branch"),
             )
+            worker_branch = claim.get("worker_branch") or assignment["worker_branch"]
+            worktree_path = claim.get("worktree_path") or assignment["worktree_path"]
             claim_path = str(claim.get("path") or claim_file_path(str(claim.get("id") or "unknown")))
             stale.append(
                 {
@@ -2040,6 +2078,7 @@ def stale_claims_for_increment(
                     "stale_after_hours": stale_hours,
                     "worker_id": claim.get("worker_id"),
                     "worker_branch": worker_branch,
+                    "worktree_path": worktree_path,
                     "feature_branch": claim.get("feature_branch"),
                     "claimed_at": claimed_at,
                     "issue": {
@@ -2051,8 +2090,8 @@ def stale_claims_for_increment(
                     },
                     "handoff": {
                         "resume": (
-                            f"Resume `{claim.get('id')}` as `{claim.get('worker_id')}` on `{worker_branch}` "
-                            f"after reading `{claim_path}` and the linked Beads issue."
+                            f"Resume `{claim.get('id')}` as `{claim.get('worker_id')}` in `{worktree_path}` on "
+                            f"`{worker_branch}` after reading `{claim_path}` and the linked Beads issue."
                         ),
                         "reassign": (
                             "PM/review may assign another worker only after confirming the original worker is "
@@ -2132,6 +2171,9 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         "active_claims": scoped_claims,
         "active_worker_branches": [
             claim.get("worker_branch") for claim in scoped_claims if claim.get("worker_branch")
+        ],
+        "active_worktrees": [
+            claim.get("worktree_path") for claim in scoped_claims if claim.get("worktree_path")
         ],
         "stale_claims": stale_claims_for_increment(scoped_claims),
         "blocked": scoped_blocked,
@@ -2359,7 +2401,15 @@ def automation_loop_data(
             return {"ok": True, "role": role, "increment": status, "next_action": status["next_action"], "claim": None}
         chosen = unclaimed_ready[0]
         worker = worker_id or f"worker-{chosen.get('id', 'unassigned')}"
-        claim = claim_work_data(worker_id=worker, write=write, work_item=chosen, ready_items=scoped_ready)
+        claim = claim_work_data(
+            worker_id=worker,
+            write=write,
+            work_item=chosen,
+            ready_items=scoped_ready,
+            feature_branch=status["feature_branch"],
+            increment_id=status["increment_id"],
+            assigned_by="automation-loop:orchestrator",
+        )
         claimed_work = claim.get("claimed", {}).get("work") if isinstance(claim.get("claimed"), dict) else None
         worker_branch = worker_branch_for_work(claimed_work if isinstance(claimed_work, dict) else chosen)
         if write and claim.get("ok") and claim.get("claimed", {}).get("path"):
@@ -2371,6 +2421,8 @@ def automation_loop_data(
                         "increment_id": status["increment_id"],
                         "feature_branch": status["feature_branch"],
                         "worker_branch": worker_branch,
+                        "worktree_path": claim.get("claimed", {}).get("worktree_path"),
+                        "worktree_setup": claim.get("claimed", {}).get("worktree_setup"),
                         "assigned_by": "automation-loop:orchestrator",
                     }
                 )
@@ -2409,6 +2461,9 @@ def automation_loop_data(
                     write=True,
                     work_item=unclaimed_ready[0],
                     ready_items=scoped_ready,
+                    feature_branch=status["feature_branch"],
+                    increment_id=status["increment_id"],
+                    assigned_by="automation-loop:worker",
                 )
                 next_action = worker_action
             elif status["review_status"] == "ready-for-increment-review":
@@ -2429,9 +2484,18 @@ def automation_loop_data(
                 )
         else:
             if unclaimed_ready:
+                assignment = worker_assignment_for_work(unclaimed_ready[0], feature_branch=status["feature_branch"])
                 claim_result = {
                     "ok": True,
-                    "claimed": {"work": unclaimed_ready[0], "worker_id": worker},
+                    "claimed": {
+                        "work": unclaimed_ready[0],
+                        "worker_id": worker,
+                        "worker_branch": assignment["worker_branch"],
+                        "worktree_path": assignment["worktree_path"],
+                        "worktree_setup": assignment["setup"],
+                        "feature_branch": status["feature_branch"],
+                        "increment_id": status["increment_id"],
+                    },
                     "dry_run": True,
                     "ready_count": len(scoped_ready),
                 }
@@ -2528,6 +2592,9 @@ def claim_work_data(
     write: bool,
     work_item: dict[str, Any] | None = None,
     ready_items: list[dict[str, Any]] | None = None,
+    feature_branch: str | None = None,
+    increment_id: str | None = None,
+    assigned_by: str | None = None,
 ) -> dict[str, Any]:
     ready = ready_items if ready_items is not None else ready_work_data().get("ready", [])
     candidates = [work_item] if work_item is not None else ready
@@ -2536,12 +2603,22 @@ def claim_work_data(
         path = claim_path(str(work_id))
         if path.exists():
             continue
+        assignment = worker_assignment_for_work(item, feature_branch=feature_branch)
         claim = {
             "id": work_id,
             "worker_id": worker_id,
             "claimed_at": datetime.now(timezone.utc).isoformat(),
             "work": item,
+            "worker_branch": assignment["worker_branch"],
+            "worktree_path": assignment["worktree_path"],
+            "worktree_setup": assignment["setup"],
         }
+        if feature_branch:
+            claim["feature_branch"] = feature_branch
+        if increment_id:
+            claim["increment_id"] = increment_id
+        if assigned_by:
+            claim["assigned_by"] = assigned_by
         if write:
             path.write_text(json.dumps(claim, indent=2, sort_keys=True) + "\n", encoding="utf-8")
             claim["path"] = rel(path)
@@ -3108,6 +3185,43 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": {"worker_one_claims": worker_one_claims, "unclaimed_items": unclaimed_items},
         }
     )
+    synthetic_assignment_work = {
+        "id": "awf-fixture",
+        "title": "Add deterministic worker branch naming and worktree setup guidance",
+    }
+    synthetic_assignment = worker_assignment_for_work(
+        synthetic_assignment_work,
+        feature_branch="codex/003-automated-increment-orchestration-goal-003",
+    )
+    synthetic_claim = claim_work_data(
+        "fixture-worker",
+        write=False,
+        work_item=synthetic_assignment_work,
+        ready_items=[synthetic_assignment_work],
+        feature_branch="codex/003-automated-increment-orchestration-goal-003",
+        increment_id="003-automated-increment-orchestration-goal-003",
+        assigned_by="automation-loop:fixture",
+    )
+    synthetic_claim_payload = (
+        synthetic_claim.get("claimed", {}) if isinstance(synthetic_claim.get("claimed"), dict) else {}
+    )
+    results.append(
+        {
+            "name": "worker assignment derives deterministic branch and worktree guidance",
+            "ok": synthetic_assignment["worker_branch"]
+            == "codex/awf-fixture-add-deterministic-worker-branch-naming-a"
+            and synthetic_assignment["worktree_path"]
+            == "../self-hosted-agents-worktrees/awf-fixture-add-deterministic-worker-branch-naming-a"
+            and synthetic_assignment["setup"]["add_worktree"].endswith(
+                "codex/003-automated-increment-orchestration-goal-003"
+            )
+            and synthetic_claim_payload.get("worker_branch") == synthetic_assignment["worker_branch"]
+            and synthetic_claim_payload.get("worktree_path") == synthetic_assignment["worktree_path"]
+            and synthetic_claim_payload.get("increment_id")
+            == "003-automated-increment-orchestration-goal-003",
+            "data": {"assignment": synthetic_assignment, "claim": synthetic_claim},
+        }
+    )
     stale_claims = stale_claims_for_increment(
         [
             {
@@ -3136,6 +3250,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": bool(stale_claims)
             and stale_claim.get("worker_id") == "worker-stale"
             and stale_claim.get("worker_branch") == "codex/awf-stale-stale-claim"
+            and stale_claim.get("worktree_path") == "../self-hosted-agents-worktrees/awf-stale-stale-claim"
             and stale_claim.get("issue", {}).get("acceptance") == "uv run awf verify --profile ticket --json"
             and {"resume", "reassign", "archive"}.issubset(set(stale_claim.get("handoff", {}))),
             "data": {"stale_claims": stale_claims},

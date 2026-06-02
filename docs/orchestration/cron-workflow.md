@@ -88,6 +88,18 @@ Spec `tasks.md` files are planning artifacts. They are not the normal worker que
 `uv run awf ready-work`; ticket planner owns syncing approved tasks into Beads. If ready work is empty but open approved
 tasks exist, the next action is ticket sync, not direct implementation from `tasks.md`.
 
+## Worker Branches And Worktrees
+
+Claim files include deterministic worker assignment fields derived from Beads issue metadata:
+
+- `worker_branch`: `codex/<issue-id>-<title-slug>`
+- `worktree_path`: `../self-hosted-agents-worktrees/<issue-id>-<title-slug>`
+- `worktree_setup.add_worktree`: the exact `git worktree add -b ...` command using the increment feature branch
+- `worktree_setup.resume`: the exact command for another agent to inspect the existing worktree
+
+Workers should use those claim fields instead of inventing branch or worktree names. Orchestrators and worker loops
+must preserve the claim fields so another agent can resume or integrate the branch without hidden local conventions.
+
 Blocked work does not stop the whole increment unless every remaining task depends on it. A worker that hits a blocker
 records the blocker, comments or marks the Beads ticket, creates a follow-up when actionable, and exits. The
 orchestrator keeps assigning other unblocked work. The PM/review loop later reprioritizes, decomposes, or asks a

@@ -29,7 +29,7 @@
 - [X] T010 [US2] Define the minimum safe scheduled loop for one active increment
 - [X] T011 [US3] Add stale-claim status and handoff guidance for abandoned active work
 - [X] T012 [US3] Add blocker rerouting so unrelated ready work can continue
-- [ ] T013 [US3] Add deterministic worker branch naming and worktree setup guidance
+- [X] T013 [US3] Add deterministic worker branch naming and worktree setup guidance
 
 ## Phase 6: Goal 003 Handoff And Recovery Surfaces
 
