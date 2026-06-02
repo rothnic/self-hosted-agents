@@ -11,7 +11,7 @@
 
 ## Phase 2: Failure Recovery Smoke
 
-- [ ] T004 [US2] Extend the Pydantic AI DBOS smoke with a controlled retry proof
+- [X] T004 [US2] Extend the Pydantic AI DBOS smoke with a controlled retry proof
 - [ ] T005 [US2] Harden the restart/resume smoke so run identity survives process interruption
 - [ ] T006 [US2] Record side-effect idempotency evidence across retry and resume in the durable artifact
 

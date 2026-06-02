@@ -1461,6 +1461,7 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         durable = artifact.get("durable_property", {})
         pydantic_ai = artifact.get("pydantic_ai", {})
         dbos = artifact.get("dbos", {})
+        retry = artifact.get("retry", {})
         first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
         workflow_step_names = [
             str(step.get("function_name", ""))
@@ -1473,12 +1474,18 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "dbos_workflow_id": bool(dbos.get("workflow_id")),
             "dbos_sqlite": str(dbos.get("system_database_url", "")).startswith("sqlite:///"),
             "controlled_failure": bool(durable.get("controlled_failure")),
+            "controlled_retry_failure": bool(durable.get("controlled_retry")),
             "first_attempt_killed": first_exit_code is not None and first_exit_code != 0,
             "step_returned_before_kill": artifact.get("first_attempt", {}).get("side_effect_step_returned_before_kill")
             is True,
+            "retry_proven": durable.get("retry_proven") is True,
+            "retry_events": retry.get("failure_count") == 1
+            and retry.get("success_count") == 1
+            and retry.get("line_count") == 2,
             "resume_proven": durable.get("resume_proven") is True,
             "side_effect_not_duplicated": durable.get("completed_step_not_duplicated") is True
             and artifact.get("side_effect", {}).get("line_count") == 1,
+            "dbos_retry_step": workflow_step_names.count("controlled_retry_once") == 1,
             "dbos_side_effect_step_once": workflow_step_names.count("record_side_effect_once") == 1,
             "dbos_agent_step": any(name.endswith("DBOSAgent.run_sync") for name in workflow_step_names),
             "dbos_agent": pydantic_ai.get("agent_class") == "pydantic_ai.durable_exec.dbos.DBOSAgent",
@@ -2670,7 +2677,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     data = pydantic_ai_durable_smoke_result()
     results.append(
         {
-            "name": "pydantic ai dbos durable smoke proves resume",
+            "name": "pydantic ai dbos durable smoke proves retry and resume",
             "ok": data["ok"],
             "data": data,
         }

@@ -56,10 +56,10 @@ Current T023 evidence:
 
 ## DBOS Durable Smoke
 
-T025 uses Pydantic AI's DBOS integration as the first durable execution proof. The smoke uses local SQLite DBOS state,
-starts a workflow in one child process, kills that process after a completed side-effect step, then starts a second
-child process against the same DBOS database. The resumed workflow completes through `DBOSAgent` and proves the
-side-effect step was not duplicated.
+Goal 002 uses Pydantic AI's DBOS integration as the first durable execution proof. The smoke uses local SQLite DBOS
+state, runs a controlled transient failure inside a retry-enabled DBOS step, starts a workflow in one child process,
+kills that process after a completed side-effect step, then starts a second child process against the same DBOS
+database. The resumed workflow completes through `DBOSAgent` and proves the side-effect step was not duplicated.
 
 This is a local proof path, not a production DBOS topology. SQLite is intentionally used for deterministic fixture
 validation. Production storage, worker topology, queues, backups, reset policy, and recovery rehearsal remain Goal 002
@@ -79,15 +79,19 @@ For durable repo evidence, prefer temporary DBOS state paths and keep only the J
 ```bash
 uv run python apps/pydantic-ai/durable_smoke.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json \
-  --db-path /tmp/pydantic-ai-dbos-t025.sqlite \
-  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t025.jsonl \
+  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json \
+  --db-path /tmp/pydantic-ai-dbos-t004.sqlite \
+  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t004.jsonl \
+  --retry-state-log /tmp/pydantic-ai-dbos-retry-t004.jsonl \
+  --workflow-id dbos-workflow-t004-controlled-retry \
+  --issue-id awf-x3q \
   --pretty
 ```
 
-Current T025 evidence:
+Current durable evidence:
 
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json`
 
 ### DBOS Local Setup
 
@@ -117,20 +121,22 @@ check shows the supported local smoke flags.
 The smoke creates local, disposable state:
 
 - `--db-path`: SQLite DBOS system database containing workflow status and completed steps.
+- `--retry-state-log`: JSONL proof that the retry-enabled DBOS step failed once and then completed.
 - `--side-effect-log`: JSONL proof that the side-effect step ran exactly once.
 - `<workflow-id>.side-effect-step-complete.json`: marker written after the DBOS side-effect step returns.
 - `<workflow-id>.child-result.json`: child-process recovery output used to build the final evidence artifact.
 
-Use a fresh `--workflow-id` or delete all four local files before rerunning the same explicit workflow id. Reusing a
+Use a fresh `--workflow-id` or delete all five local files before rerunning the same explicit workflow id. Reusing a
 workflow id with stale SQLite state is useful for recovery inspection, but it is not a clean smoke.
 
-Reset the fixed T025 local paths:
+Reset the fixed T004 local paths:
 
 ```bash
-rm -f /tmp/pydantic-ai-dbos-t025.sqlite \
-  /tmp/pydantic-ai-dbos-side-effect-t025.jsonl \
-  /tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json \
-  /tmp/dbos-workflow-30331114d6a951a1c65019dd.child-result.json
+rm -f /tmp/pydantic-ai-dbos-t004.sqlite \
+  /tmp/pydantic-ai-dbos-side-effect-t004.jsonl \
+  /tmp/pydantic-ai-dbos-retry-t004.jsonl \
+  /tmp/dbos-workflow-t004-controlled-retry.side-effect-step-complete.json \
+  /tmp/dbos-workflow-t004-controlled-retry.child-result.json
 ```
 
 The committed evidence artifact under `.agent-runs/verifications/` is durable review evidence and should not be deleted
@@ -138,35 +144,43 @@ as part of local reset.
 
 ### DBOS Recovery Evidence
 
-The smoke proves recovery by starting the DBOS workflow in a child process, waiting for the explicit side-effect step
-marker, killing that child, and then launching a second child with `PYDANTIC_AI_DBOS_RESUME_READY=1` against the same
-SQLite database.
+The smoke proves retry and recovery by running a DBOS step that fails once and then succeeds on retry, starting the DBOS
+workflow in a child process, waiting for the explicit side-effect step marker, killing that child, and then launching a
+second child with `PYDANTIC_AI_DBOS_RESUME_READY=1` against the same SQLite database.
 
 The evidence artifact should show:
 
+- `durable_property.retry_proven=true`
 - `durable_property.resume_proven=true`
 - `durable_property.completed_step_not_duplicated=true`
+- `retry.failure_count=1`
+- `retry.success_count=1`
+- `retry.line_count=2`
 - `first_attempt.side_effect_step_returned_before_kill=true`
 - `first_attempt.exit_code` is nonzero because the first child was killed
 - `resume_attempt.exit_code=0`
 - `side_effect.line_count=1`
 - `dbos.workflow_status.status=SUCCESS`
 - `dbos.workflow_status.recovery_attempts` is present
-- `dbos.workflow_steps` includes `record_side_effect_once`, `controlled_resume_wait`, and the DBOS agent run
+- `dbos.workflow_steps` includes `controlled_retry_once`, `record_side_effect_once`, `controlled_resume_wait`, and the
+  DBOS agent run
 
-Inspect the current T025 evidence summary:
+Inspect the current T004 evidence summary:
 
 ```bash
 python3 - <<'PY'
 import json
 from pathlib import Path
 
-path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json")
+path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json")
 artifact = json.loads(path.read_text())
 print(json.dumps({
     "workflow_id": artifact["dbos"]["workflow_id"],
+    "retry_proven": artifact["durable_property"]["retry_proven"],
     "resume_proven": artifact["durable_property"]["resume_proven"],
     "completed_step_not_duplicated": artifact["durable_property"]["completed_step_not_duplicated"],
+    "retry_failure_count": artifact["retry"]["failure_count"],
+    "retry_success_count": artifact["retry"]["success_count"],
     "side_effect_count": artifact["side_effect"]["line_count"],
     "workflow_status": artifact["dbos"]["workflow_status"].get("status"),
     "recovery_attempts": artifact["dbos"]["workflow_status"].get("recovery_attempts"),
@@ -180,8 +194,8 @@ PY
   available.
 - SQLite path errors: choose a writable `--db-path`, keep parent directories present, and avoid paths inside read-only
   worktrees.
-- Stale workflow result or unexpected side-effect count: remove the SQLite DB, side-effect log, side-effect marker, and
-  child-result JSON before rerunning the same workflow id.
+- Stale workflow result, missing retry event, or unexpected side-effect count: remove the SQLite DB, retry log,
+  side-effect log, side-effect marker, and child-result JSON before rerunning the same workflow id.
 - Resume timeout: confirm the first child reached the marker file. If it did not, inspect `first_attempt.stderr_excerpt`
   in the output artifact and rerun after reset.
 - `side_effect.line_count` greater than `1`: treat the run as failed evidence. Reset local state and inspect whether the
