@@ -2010,8 +2010,10 @@ def child_ticket_for_task(task: dict[str, Any], issues: list[dict[str, Any]]) ->
     return None
 
 
-def stale_claims_for_increment(claims: list[dict[str, Any]], stale_hours: int = 2) -> list[dict[str, Any]]:
-    now = datetime.now(timezone.utc)
+def stale_claims_for_increment(
+    claims: list[dict[str, Any]], stale_hours: int = 2, now: datetime | None = None
+) -> list[dict[str, Any]]:
+    checked_at = now or datetime.now(timezone.utc)
     stale = []
     for claim in claims:
         claimed_at = str(claim.get("claimed_at", ""))
@@ -2019,9 +2021,51 @@ def stale_claims_for_increment(claims: list[dict[str, Any]], stale_hours: int = 
             timestamp = datetime.fromisoformat(claimed_at)
         except ValueError:
             continue
-        age_hours = (now - timestamp).total_seconds() / 3600
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
+        age_hours = (checked_at - timestamp).total_seconds() / 3600
         if age_hours >= stale_hours:
-            stale.append({"id": claim.get("id"), "path": claim.get("path"), "age_hours": round(age_hours, 2)})
+            work = claim.get("work") if isinstance(claim.get("work"), dict) else {}
+            issue = claim.get("issue") if isinstance(claim.get("issue"), dict) else {}
+            issue_context = issue or work
+            worker_branch = claim.get("worker_branch") or worker_branch_for_work(
+                issue_context or {"id": claim.get("id"), "title": "work"}
+            )
+            claim_path = str(claim.get("path") or claim_file_path(str(claim.get("id") or "unknown")))
+            stale.append(
+                {
+                    "id": claim.get("id"),
+                    "path": claim_path,
+                    "age_hours": round(age_hours, 2),
+                    "stale_after_hours": stale_hours,
+                    "worker_id": claim.get("worker_id"),
+                    "worker_branch": worker_branch,
+                    "feature_branch": claim.get("feature_branch"),
+                    "claimed_at": claimed_at,
+                    "issue": {
+                        "id": issue_context.get("id") or claim.get("id"),
+                        "title": issue_context.get("title"),
+                        "status": issue_context.get("status"),
+                        "external_ref": issue_context.get("external_ref"),
+                        "acceptance": extract_acceptance_command(issue_context),
+                    },
+                    "handoff": {
+                        "resume": (
+                            f"Resume `{claim.get('id')}` as `{claim.get('worker_id')}` on `{worker_branch}` "
+                            f"after reading `{claim_path}` and the linked Beads issue."
+                        ),
+                        "reassign": (
+                            "PM/review may assign another worker only after confirming the original worker is "
+                            "abandoned or unreachable; keep the stale claim visible until the replacement handoff "
+                            "is recorded."
+                        ),
+                        "archive": (
+                            f"Move `{claim_path}` under `.agent-runs/claims/archive-<month>/` only after the "
+                            "Beads issue is closed, blocked with evidence, or explicitly superseded."
+                        ),
+                    },
+                }
+            )
     return stale
 
 
@@ -2049,6 +2093,7 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
     scoped_ready = scoped_issue_items({"child_tickets": child_tickets}, ready.get("ready", []))
     scoped_blocked = scoped_issue_items({"child_tickets": child_tickets}, ready.get("blocked", []))
     claims = active_claims()
+    scoped_claims = active_claims_for_status({"child_tickets": child_tickets}, claims)
     all_children_closed = child_tickets and all(
         item["done"] or item["ticket_status"] in {"closed", "resolved", "done"} for item in child_tickets
     )
@@ -2083,11 +2128,11 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         "base_branch": "main",
         "feature_branch": f"codex/{resolved_id}",
         "child_tickets": child_tickets,
-        "active_claims": claims,
+        "active_claims": scoped_claims,
         "active_worker_branches": [
-            claim.get("worker_branch") for claim in claims if claim.get("worker_branch")
+            claim.get("worker_branch") for claim in scoped_claims if claim.get("worker_branch")
         ],
-        "stale_claims": stale_claims_for_increment(claims),
+        "stale_claims": stale_claims_for_increment(scoped_claims),
         "blocked": scoped_blocked,
         "validation_evidence": state.get("validation_evidence", []),
         "learning_proposals": state.get("learning_proposals", []),
@@ -3023,6 +3068,39 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and worker_one_claims[0]["id"] == "awf-one"
             and [item["id"] for item in unclaimed_items] == ["awf-three"],
             "data": {"worker_one_claims": worker_one_claims, "unclaimed_items": unclaimed_items},
+        }
+    )
+    stale_claims = stale_claims_for_increment(
+        [
+            {
+                "id": "awf-stale",
+                "worker_id": "worker-stale",
+                "worker_branch": "codex/awf-stale-stale-claim",
+                "feature_branch": "codex/increment",
+                "claimed_at": "2026-06-02T00:00:00+00:00",
+                "path": ".agent-runs/claims/awf-stale.json",
+                "issue": {
+                    "id": "awf-stale",
+                    "title": "Stale claim",
+                    "status": "open",
+                    "external_ref": "specs/example/tasks.md#T001",
+                    "description": "Acceptance: uv run awf verify --profile ticket --json",
+                },
+            }
+        ],
+        stale_hours=2,
+        now=datetime(2026, 6, 2, 4, 30, tzinfo=timezone.utc),
+    )
+    stale_claim = stale_claims[0] if stale_claims else {}
+    results.append(
+        {
+            "name": "stale claim status includes handoff guidance",
+            "ok": bool(stale_claims)
+            and stale_claim.get("worker_id") == "worker-stale"
+            and stale_claim.get("worker_branch") == "codex/awf-stale-stale-claim"
+            and stale_claim.get("issue", {}).get("acceptance") == "uv run awf verify --profile ticket --json"
+            and {"resume", "reassign", "archive"}.issubset(set(stale_claim.get("handoff", {}))),
+            "data": {"stale_claims": stale_claims},
         }
     )
     synthetic_full_issues = [

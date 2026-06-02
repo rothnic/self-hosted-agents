@@ -93,6 +93,22 @@ records the blocker, comments or marks the Beads ticket, creates a follow-up whe
 orchestrator keeps assigning other unblocked work. The PM/review loop later reprioritizes, decomposes, or asks a
 targeted human question.
 
+## Stale Claims
+
+`increment-status` exposes stale active claims after the claim age crosses the workflow threshold. Stale claim entries
+include the claim path, worker id, worker branch, feature branch, issue title/status/external ref, acceptance command,
+age, and handoff guidance.
+
+Use the stale-claim handoff fields this way:
+
+1. Resume: another agent may continue the same claim after reading the claim file and linked Beads issue.
+2. Reassign: PM/review may assign a replacement only after confirming the original worker is abandoned or unreachable.
+3. Archive: move the claim under `.agent-runs/claims/archive-<month>/` only after the Beads issue is closed, blocked
+   with evidence, or explicitly superseded.
+
+Do not hide stale claims by deleting active claim files. Leave them visible until the resume, reassign, or archive path
+is recorded in repo state.
+
 ## Session Cadence
 
 Interactive agent sessions should be bounded by workflow phase. A planner session should end with an approved plan,

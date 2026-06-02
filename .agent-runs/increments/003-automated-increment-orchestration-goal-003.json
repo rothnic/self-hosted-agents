@@ -22,11 +22,11 @@
       "title": "Define the minimum safe scheduled loop for one active increment"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T011",
       "task_id": "T011",
       "ticket_id": "awf-h1z",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add stale-claim status and handoff guidance for abandoned active work"
     },
     {
@@ -120,10 +120,10 @@
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 11,
+  "ready_count": 10,
   "review_status": "executing",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T06:30:15.405414+00:00",
+  "updated_at": "2026-06-02T06:51:08.775801+00:00",
   "validation_evidence": []
 }

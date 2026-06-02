@@ -1,0 +1,20 @@
+{
+  "claimed_at": "2026-06-02T06:39:21.470177+00:00",
+  "id": "awf-h1z",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T05:53:39.815566Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 003-automated-increment-orchestration\nTask: T011\nSource: specs/003-automated-increment-orchestration/tasks.md\nAcceptance: uv run awf verify --profile increment --json",
+    "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T011",
+    "id": "awf-h1z",
+    "issue_type": "task",
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add stale-claim status and handoff guidance for abandoned active work",
+    "updated_at": "2026-06-02T05:54:17.687256Z"
+  },
+  "worker_id": "codex-goal003-t011"
+}
