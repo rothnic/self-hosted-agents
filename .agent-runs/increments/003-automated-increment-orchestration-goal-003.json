@@ -6,19 +6,12 @@
     "counts": {
       "active_claims": 0,
       "blocked": 0,
-      "ready": 1,
+      "ready": 0,
       "stale_claims": 0
     },
-    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-60y",
-    "ready": [
-      {
-        "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
-        "id": "awf-60y",
-        "status": "open",
-        "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence"
-      }
-    ],
+    "next_action": "integrator-loop should prepare the phase review PR",
+    "next_unblocked_issue_id": null,
+    "ready": [],
     "stale_claims": [],
     "summary_schema": "awf.active-work.compact.v1"
   },
@@ -30,10 +23,10 @@
   "blocker_reroute": {
     "blocked": [],
     "blocked_count": 0,
-    "can_continue": true,
-    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-60y",
-    "ready_count": 1
+    "can_continue": false,
+    "next_action": "no blocker reroute needed",
+    "next_unblocked_issue_id": null,
+    "ready_count": 0
   },
   "child_tickets": [
     {
@@ -133,11 +126,11 @@
       "title": "Add cleanup commands for obsolete active claims and old worktree pointers"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
       "task_id": "T021",
       "ticket_id": "awf-60y",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence"
     }
   ],
@@ -146,15 +139,15 @@
   "human_required": [],
   "increment_id": "003-automated-increment-orchestration-goal-003",
   "learning_proposals": [],
-  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+  "next_action": "integrator-loop should prepare the phase review PR",
   "objective_id": "agentic-development-foundation",
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 1,
-  "review_status": "executing",
+  "ready_count": 0,
+  "review_status": "ready-for-increment-review",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T10:14:45.432927+00:00",
+  "updated_at": "2026-06-02T10:30:05.441735+00:00",
   "validation_evidence": []
 }

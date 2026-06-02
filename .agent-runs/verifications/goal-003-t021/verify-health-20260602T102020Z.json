@@ -1,0 +1,58 @@
+{
+  "acceptance_command": "uv run awf verify --profile increment --json",
+  "acceptance_source": {
+    "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
+    "id": "awf-60y",
+    "status": "open",
+    "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence"
+  },
+  "artifact_kind": "verification-profile",
+  "artifact_schema": "awf.verify.compact.v1",
+  "check_count": 4,
+  "checks": [
+    {
+      "command": "uv run awf bootstrap",
+      "detail": "",
+      "name": "bootstrap",
+      "ok": true
+    },
+    {
+      "command": "uv run awf review-gate",
+      "detail": "",
+      "name": "review-gate",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-state-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "workflow-state-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf repo-hygiene",
+      "detail": "",
+      "error_count": 0,
+      "name": "repo-hygiene",
+      "ok": true
+    }
+  ],
+  "failed_checks": [],
+  "generated_at": "2026-06-02T10:20:20.927515+00:00",
+  "git": {
+    "branch": "codex/pydantic-ai-fixture-scaffold...origin/codex/pydantic-ai-fixture-scaffold",
+    "changed_files": 1,
+    "clean": false,
+    "summary": "1 changed file(s)"
+  },
+  "next_action": "worker may claim one ready item",
+  "ok": true,
+  "profile": "health",
+  "ready_work": {
+    "blocked_count": 0,
+    "human_required_count": 0,
+    "ready_count": 1,
+    "source": "beads"
+  },
+  "review_gate_ok": true
+}

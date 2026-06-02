@@ -3,7 +3,7 @@
 ## Objective
 
 Make the repo-native PM, orchestrator, worker, integrator, and health loops reliable enough to move meaningful work
-across sessions and scheduled runs without bypassing human review.
+across sessions and scheduled runs without bypassing review evidence.
 
 ## Why This Matters
 
@@ -17,9 +17,9 @@ workers, stale-claim recovery, health checks, verified integration, and compact 
 
 ## Current Status
 
-Goal 003 is now the active roadmap goal. The existing Spec Kit feature
-`specs/003-automated-increment-orchestration/` was reopened for the Goal 003 product iteration after Goal 002 reviewer
-acceptance.
+Goal 003 has accepted evidence for the current roadmap increment. The existing Spec Kit feature
+`specs/003-automated-increment-orchestration/` was reopened for this product iteration after Goal 002 reviewer
+acceptance, and T009 through T021 are now closed.
 
 Planning/backlog evidence was accepted by independent reviewer agent `019e86e6-7ec3-7481-be8e-adda5d7d508a` in
 `.agent-runs/reports/goal-003-backlog-review-20260602.md`.
@@ -61,6 +61,12 @@ T019 active work summary evidence is recorded in
 T020 cleanup work evidence is recorded in
 `.agent-runs/reports/goal-003-t020-cleanup-work-20260602.md`.
 
+T021 end-to-end rehearsal evidence is recorded in
+`.agent-runs/reports/goal-003-t021-end-to-end-rehearsal-20260602.md`.
+
+Goal 003 increment completion evidence was accepted by independent reviewer agent
+`019e87dc-b122-72d1-b3db-af302833dbe1` in `.agent-runs/reports/goal-003-increment-evidence-20260602.md`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
@@ -77,8 +83,9 @@ Backlog sync created the executable Beads tasks below:
 - `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
 - `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
 
-Next implementer claim after T020 closure: `awf-60y` / T021. Use `uv run awf ready-work --json` as the source of truth
-before claiming, because priorities, blockers, or active claims may change.
+Goal 003 has no remaining ready implementation tickets after T021 closure. The next roadmap step is Goal 004 planning;
+use `uv run awf ready-work --json` and `uv run awf next-action --json` as the source of truth before claiming or
+creating follow-on work, because priorities, blockers, or active claims may change.
 
 ## Scope
 
@@ -87,7 +94,9 @@ before claiming, because priorities, blockers, or active claims may change.
 - Improve increment status, assignment, stale-claim handling, and blocker rerouting.
 - Add review-agent support before PRs and increment handoffs.
 - Store compact evidence that another agent can resume from.
-- Keep human approval at architecture, priority, and merge boundaries.
+- Keep explicit approval at architecture, priority, and merge boundaries. Use independent reviewer agents for goal
+  evidence acceptance, and escalate to the human only when a decision is reserved or the evidence is missing or
+  contradictory.
 
 ## Task Backlog
 
@@ -110,7 +119,7 @@ before claiming, because priorities, blockers, or active claims may change.
 ## Definition Of Done
 
 - A scheduled worker can claim, implement, verify, and hand off one ticket in a worktree.
-- The integrator can verify completed worker work and stop at human review.
+- The integrator can verify completed worker work and route evidence to an independent reviewer boundary.
 - Blockers and stale claims are visible and do not idle unrelated work.
 - Health automation logs actionable issues instead of silently failing.
 - The workflow fixture covers the key state transitions.
@@ -141,6 +150,6 @@ uv run awf workflow-fixture-test
 /goal Execute docs/goals/003-autonomous-multi-agent-delivery-loop.md
 in /Users/nroth/workspace/self-hosted-agents. Harden the repo-native automation
 roles so work can move across scheduled sessions using Beads, claims, worktrees,
-verification artifacts, and human review gates. Decompose into spec tasks first,
+verification artifacts, and independent review gates. Decompose into spec tasks first,
 then implement one claimed ticket at a time.
 ```

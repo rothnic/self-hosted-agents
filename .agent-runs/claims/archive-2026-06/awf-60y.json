@@ -1,0 +1,26 @@
+{
+  "claimed_at": "2026-06-02T10:19:21.734683+00:00",
+  "id": "awf-60y",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T05:53:42.835118Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 003-automated-increment-orchestration\nTask: T021\nSource: specs/003-automated-increment-orchestration/tasks.md\nAcceptance: uv run awf verify --profile increment --json",
+    "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
+    "id": "awf-60y",
+    "issue_type": "task",
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence",
+    "updated_at": "2026-06-02T05:53:42.835118Z"
+  },
+  "worker_branch": "codex/awf-60y-run-a-manual-end-to-end-increment-rehear",
+  "worker_id": "codex-goal003-t021",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-60y-run-a-manual-end-to-end-increment-rehear",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-60y-run-a-manual-end-to-end-increment-rehear ../self-hosted-agents-worktrees/awf-60y-run-a-manual-end-to-end-increment-rehear <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-60y-run-a-manual-end-to-end-increment-rehear && git status --short --branch"
+  }
+}

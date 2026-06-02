@@ -43,4 +43,4 @@
 
 - [X] T019 [US3] Add compact active-work summaries for claims, ready work, blockers, and stale work
 - [X] T020 [US3] Add cleanup commands for obsolete active claims and old worktree pointers
-- [ ] T021 [US3] Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence
+- [X] T021 [US3] Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence

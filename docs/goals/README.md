@@ -18,13 +18,13 @@ Umbrella goal: [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-r
 0. [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-roadmap.md)
    - Umbrella. Execute the child goals below in order.
 1. [Self-Hosted Observability And Evaluation Control Plane](001-self-hosted-observability-evaluation-control-plane.md)
-   - Recommended next. Make traces, scores, and run evidence inspectable in a self-hosted LLM observability backend.
+   - Accepted. Make traces, scores, and run evidence inspectable in a self-hosted LLM observability backend.
 2. [Durable Agent Execution Runtime](002-durable-agent-execution-runtime.md)
-   - Planned. Make long-running agent work retry, resume, wait for humans, and avoid duplicate side effects.
+   - Accepted. Make long-running agent work retry, resume, wait for humans, and avoid duplicate side effects.
 3. [Autonomous Multi-Agent Delivery Loop](003-autonomous-multi-agent-delivery-loop.md)
-   - Planned. Let scheduled PM, orchestrator, worker, integrator, and health roles move work safely.
+   - Accepted. Let scheduled PM, orchestrator, worker, integrator, and health roles move work safely.
 4. [Candidate Platform Decision And Product Baseline](004-candidate-platform-decision-product-baseline.md)
-   - Planned. Choose a primary stack from comparable implementation evidence.
+   - Recommended next. Choose a primary stack from comparable implementation evidence.
 5. [Self-Hosted Deployment And Operations Reference](005-self-hosted-deployment-operations-reference.md)
    - Planned. Run the chosen stack on controlled infrastructure with backups, secrets, and recovery.
 6. [Operator Workbench And Review UX](006-operator-workbench-review-ux.md)
@@ -43,17 +43,17 @@ Umbrella goal: [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-r
 
 ## Recommended Kickoff
 
-Start with Goal 000 for the full long-horizon roadmap, or Goal 001 for the first focused product iteration. Goal 001
-directly addresses the current observability correction: generic OpenTelemetry traces are not enough. The project needs
-a self-hosted LLM observability and evaluation control plane, with Langfuse as the default target and Phoenix or Opik
-kept as alternatives if Langfuse proves too heavy.
+Start with Goal 000 for the full long-horizon roadmap, or Goal 004 for the next focused product iteration. Goals 001
+through 003 have accepted evidence for the current roadmap increment. Goal 004 should choose the primary product stack
+from comparable implementation evidence and define the first product baseline.
 
 Copy/paste prompt:
 
 ```text
 /goal Execute docs/goals/000-self-hosted-agent-system-roadmap.md
 in /Users/nroth/workspace/self-hosted-agents. Work through the linked goals in
-order, starting with Goal 001. For each child goal, create or update the focused
+order, starting with the first incomplete child goal. Goals 001 through 003 have
+accepted evidence; the next ordered goal is Goal 004. For each child goal, create or update the focused
 spec/tasks/backlog, then implement one Beads ticket at a time with validation
 evidence before moving to the next child goal.
 ```
