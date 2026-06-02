@@ -1,0 +1,385 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "candidate_app": "apps/pydantic-ai",
+  "command_used": "uv run python apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json --db-path /tmp/pydantic-ai-dbos-t007.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t007.jsonl --retry-state-log /tmp/pydantic-ai-dbos-retry-t007.jsonl --review-wait-state /tmp/pydantic-ai-dbos-review-wait-t007.json --review-acceptance /tmp/pydantic-ai-dbos-review-acceptance-t007.json --post-wait-side-effect-log /tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl --required-review-evidence-path .agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json --workflow-id dbos-workflow-t007-review-wait --issue-id awf-q8d --pretty",
+  "dbos": {
+    "db_path": "/tmp/pydantic-ai-dbos-t007.sqlite",
+    "side_effect_step_marker": "/tmp/dbos-workflow-t007-review-wait.side-effect-step-complete.json",
+    "system_database_url": "sqlite:////tmp/pydantic-ai-dbos-t007.sqlite",
+    "workflow_id": "dbos-workflow-t007-review-wait",
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "goal-002-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780372961005,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/tmp/pydantic-ai-dbos-side-effect-t007.jsonl",
+          300.0,
+          "/tmp/dbos-workflow-t007-review-wait.side-effect-step-complete.json",
+          "/tmp/pydantic-ai-dbos-retry-t007.jsonl",
+          1
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_durable_smoke",
+      "output": {
+        "agent": {
+          "class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+          "model": "pydantic_ai.models.test.TestModel",
+          "network_required": false,
+          "recommendation": {
+            "linked_task": "T008",
+            "next_slice": "Add durable resume from independent reviewer acceptance evidence.",
+            "reason": "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus a fixture-safe review wait, so the next useful slice is accepted review resume."
+          },
+          "usage": {
+            "input_tokens": 77,
+            "output_tokens": 45,
+            "requests": 1
+          }
+        },
+        "pydantic_ai_run_id": "run-7f065eb0b6ef14b6723a9002",
+        "retry": {
+          "attempt": 2,
+          "failures_before_success": 1,
+          "line_count_after": 2,
+          "line_count_before": 1,
+          "log_path": "/tmp/pydantic-ai-dbos-retry-t007.jsonl"
+        },
+        "side_effect": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-t007-review-wait"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/tmp/pydantic-ai-dbos-side-effect-t007.jsonl"
+        },
+        "trace_id": "trace-daa839224711f408f48eb7ee",
+        "wait": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "workflow_id": "dbos-workflow-t007-review-wait"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 2,
+      "status": "SUCCESS",
+      "updated_at": 1780372967000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-t007-review-wait",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780372961127,
+        "error": null,
+        "function_id": 1,
+        "function_name": "controlled_retry_once",
+        "output": {
+          "attempt": 2,
+          "failures_before_success": 1,
+          "line_count_after": 2,
+          "line_count_before": 1,
+          "log_path": "/tmp/pydantic-ai-dbos-retry-t007.jsonl"
+        },
+        "started_at_epoch_ms": 1780372961008
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780372961135,
+        "error": null,
+        "function_id": 2,
+        "function_name": "record_side_effect_once",
+        "output": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-t007-review-wait"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/tmp/pydantic-ai-dbos-side-effect-t007.jsonl"
+        },
+        "started_at_epoch_ms": 1780372961133
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780372967724,
+        "error": null,
+        "function_id": 3,
+        "function_name": "controlled_resume_wait",
+        "output": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "started_at_epoch_ms": 1780372967723
+      },
+      {
+        "child_workflow_id": "dbos-workflow-t007-review-wait-4",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 4,
+        "function_name": "DecisionSliceDBOSAgent.run_sync",
+        "output": null,
+        "started_at_epoch_ms": null
+      },
+      {
+        "child_workflow_id": "dbos-workflow-t007-review-wait-4",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 5,
+        "function_name": "DBOS.getResult",
+        "output": "AgentRunResult(output=DecisionRecommendation(next_slice='Add durable resume from independent reviewer acceptance evidence.', reason='The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus a fixture-safe review wait, so the next useful slice is accepted review resume.', linked_task='T008'))",
+        "started_at_epoch_ms": null
+      }
+    ]
+  },
+  "deterministic_validation": {
+    "external_model_required": false,
+    "hosted_credentials_required": false,
+    "service_count": 0
+  },
+  "durable_property": {
+    "completed_step_not_duplicated": true,
+    "controlled_failure": "first child process killed after DBOS side-effect step returned",
+    "controlled_retry": "DBOS step controlled_retry_once failed 1 time(s), then retried and completed",
+    "resume_proven": true,
+    "retry_proven": true,
+    "review_wait_proven": true,
+    "run_identity_preserved": true,
+    "side_effect_idempotency_proven": true
+  },
+  "first_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /tmp/pydantic-ai-dbos-t007.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t007.jsonl --retry-state-log /tmp/pydantic-ai-dbos-retry-t007.jsonl --side-effect-step-marker /tmp/dbos-workflow-t007-review-wait.side-effect-step-complete.json --workflow-id dbos-workflow-t007-review-wait --wait-seconds 300.0 --retry-failures 1 --issue-id awf-q8d --child-phase start",
+    "exit_code": -9,
+    "side_effect_step_returned_before_kill": true,
+    "stderr_excerpt": "40 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 32\n23:02:40 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version goal-002-durable-smoke\n23:02:40 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:02:40 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:02:40 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n23:02:41 [ WARNING] (dbos:_core.py:1641) Step being automatically retried (attempt 1 of 3)\nTraceback (most recent call last):\n  File \"/Users/nroth/workspace/self-hosted-agents/.venv/lib/python3.14/site-packages/dbos/_outcome.py\", line 143, in _retry\n    return func()\n  File \"/Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py\", line 95, in controlled_retry_once\n    raise RuntimeError(f\"controlled DBOS retry attempt {attempt}\")\nRuntimeError: controlled DBOS retry attempt 1\n",
+    "stdout_excerpt": "{\"phase\": \"start\", \"workflow_id\": \"dbos-workflow-t007-review-wait\"}\n"
+  },
+  "identity": {
+    "first_attempt_phase": "start",
+    "first_attempt_workflow_id": "dbos-workflow-t007-review-wait",
+    "requested_workflow_id": "dbos-workflow-t007-review-wait",
+    "resume_attempt_phase": "resume",
+    "resume_attempt_status": "complete",
+    "resume_attempt_workflow_id": "dbos-workflow-t007-review-wait",
+    "retry_event_workflow_ids": [
+      "dbos-workflow-t007-review-wait"
+    ],
+    "side_effect_event_workflow_ids": [
+      "dbos-workflow-t007-review-wait"
+    ],
+    "workflow_result_workflow_id": "dbos-workflow-t007-review-wait",
+    "workflow_status_output_workflow_id": "dbos-workflow-t007-review-wait",
+    "workflow_status_workflow_id": "dbos-workflow-t007-review-wait"
+  },
+  "issue_id": "awf-q8d",
+  "passed": true,
+  "pydantic_ai": {
+    "agent_class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+    "model_class": "pydantic_ai.models.test.TestModel",
+    "network_required": false,
+    "recommendation": {
+      "linked_task": "T008",
+      "next_slice": "Add durable resume from independent reviewer acceptance evidence.",
+      "reason": "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus a fixture-safe review wait, so the next useful slice is accepted review resume."
+    },
+    "run_id": "run-7f065eb0b6ef14b6723a9002",
+    "trace_id": "trace-daa839224711f408f48eb7ee"
+  },
+  "resume_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /tmp/pydantic-ai-dbos-t007.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t007.jsonl --retry-state-log /tmp/pydantic-ai-dbos-retry-t007.jsonl --side-effect-step-marker /tmp/dbos-workflow-t007-review-wait.side-effect-step-complete.json --workflow-id dbos-workflow-t007-review-wait --wait-seconds 300.0 --retry-failures 1 --issue-id awf-q8d --child-phase resume --child-result-output /tmp/dbos-workflow-t007-review-wait.child-result.json",
+    "exit_code": 0,
+    "stderr_excerpt": "23:02:47 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n23:02:47 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n23:02:47 [    INFO] (dbos:_dbos.py:534) Application version: goal-002-durable-smoke\n23:02:47 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////tmp/pydantic-ai-dbos-t007.sqlite (schema: dbos)\n23:02:47 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n23:02:47 [    INFO] (dbos:_dbos.py:611) Recovering 1 workflows from application version goal-002-durable-smoke\n23:02:47 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:02:47 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:02:47 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"resume\", \"workflow_id\": \"dbos-workflow-t007-review-wait\", \"status\": \"complete\"}\n"
+  },
+  "retry": {
+    "events": [
+      {
+        "attempt": 1,
+        "event": "controlled-retry",
+        "will_fail": true,
+        "workflow_id": "dbos-workflow-t007-review-wait"
+      },
+      {
+        "attempt": 2,
+        "event": "controlled-retry",
+        "will_fail": false,
+        "workflow_id": "dbos-workflow-t007-review-wait"
+      }
+    ],
+    "failure_count": 1,
+    "line_count": 2,
+    "log_path": "/tmp/pydantic-ai-dbos-retry-t007.jsonl",
+    "success_count": 1
+  },
+  "review_wait": {
+    "acceptance_artifact_exists": false,
+    "acceptance_path": "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+    "beads_issue_id": "awf-q8d",
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /tmp/pydantic-ai-dbos-t007.sqlite --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t007.jsonl --retry-state-log /tmp/pydantic-ai-dbos-retry-t007.jsonl --workflow-id dbos-workflow-t007-review-wait-review-wait --wait-seconds 300.0 --retry-failures 1 --issue-id awf-q8d --review-wait-state /tmp/pydantic-ai-dbos-review-wait-t007.json --review-acceptance /tmp/pydantic-ai-dbos-review-acceptance-t007.json --post-wait-side-effect-log /tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl --required-review-evidence-path .agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json --child-phase review-wait --child-result-output /tmp/dbos-workflow-t007-review-wait-review-wait.child-result.json",
+    "exit_code": 0,
+    "post_wait_side_effect": {
+      "events": [],
+      "line_count": 0,
+      "log_path": "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl"
+    },
+    "proven": true,
+    "required_evidence_path": ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json",
+    "state": {
+      "acceptance_path": "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+      "beads_issue_id": "awf-q8d",
+      "event": "review-wait",
+      "post_wait_side_effect_log": "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl",
+      "post_wait_side_effects_allowed": false,
+      "required_evidence_path": ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json",
+      "status": "waiting-for-reviewer-acceptance",
+      "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+    },
+    "state_path": "/tmp/pydantic-ai-dbos-review-wait-t007.json",
+    "stderr_excerpt": "23:02:54 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n23:02:54 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n23:02:54 [    INFO] (dbos:_dbos.py:534) Application version: goal-002-durable-smoke\n23:02:54 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////tmp/pydantic-ai-dbos-t007.sqlite (schema: dbos)\n23:02:54 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n23:02:54 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version goal-002-durable-smoke\n23:02:54 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:02:54 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:02:54 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"review-wait\", \"status\": \"waiting-for-reviewer-acceptance\", \"workflow_id\": \"dbos-workflow-t007-review-wait-review-wait\"}\n",
+    "workflow_id": "dbos-workflow-t007-review-wait-review-wait",
+    "workflow_result": {
+      "post_wait_side_effect": {
+        "reason": "reviewer acceptance missing",
+        "skipped": true
+      },
+      "review_wait": {
+        "acceptance_path": "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+        "beads_issue_id": "awf-q8d",
+        "event": "review-wait",
+        "post_wait_side_effect_log": "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl",
+        "post_wait_side_effects_allowed": false,
+        "required_evidence_path": ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json",
+        "status": "waiting-for-reviewer-acceptance",
+        "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+      },
+      "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+    },
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "goal-002-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780372974797,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/tmp/pydantic-ai-dbos-review-wait-t007.json",
+          "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+          "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl",
+          "awf-q8d",
+          ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json"
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_review_wait_smoke",
+      "output": {
+        "post_wait_side_effect": {
+          "reason": "reviewer acceptance missing",
+          "skipped": true
+        },
+        "review_wait": {
+          "acceptance_path": "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+          "beads_issue_id": "awf-q8d",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl",
+          "post_wait_side_effects_allowed": false,
+          "required_evidence_path": ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json",
+          "status": "waiting-for-reviewer-acceptance",
+          "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+        },
+        "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 1,
+      "status": "SUCCESS",
+      "updated_at": 1780372974000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-t007-review-wait-review-wait",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780372974804,
+        "error": null,
+        "function_id": 1,
+        "function_name": "record_review_wait_state",
+        "output": {
+          "acceptance_path": "/tmp/pydantic-ai-dbos-review-acceptance-t007.json",
+          "beads_issue_id": "awf-q8d",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/tmp/pydantic-ai-dbos-post-wait-side-effect-t007.jsonl",
+          "post_wait_side_effects_allowed": false,
+          "required_evidence_path": ".agent-runs/reviews/awf-q8d-dbos-workflow-t007-review-wait-acceptance.json",
+          "status": "waiting-for-reviewer-acceptance",
+          "workflow_id": "dbos-workflow-t007-review-wait-review-wait"
+        },
+        "started_at_epoch_ms": 1780372974800
+      }
+    ]
+  },
+  "runtime": {
+    "selected": "pydantic_ai_dbos",
+    "sqlite_development_mode": true
+  },
+  "side_effect": {
+    "events": [
+      {
+        "event": "side-effect",
+        "sequence": 1,
+        "workflow_id": "dbos-workflow-t007-review-wait"
+      }
+    ],
+    "idempotency": {
+      "after_resume_line_count": 1,
+      "before_resume_line_count": 1,
+      "event_keys": [
+        "dbos-workflow-t007-review-wait:side-effect:1"
+      ],
+      "events_unchanged_after_resume": true,
+      "proven": true,
+      "resume_duplicate_count": 0,
+      "retry_failure_count_before_side_effect": 1,
+      "retry_line_count_before_side_effect": 2,
+      "retry_success_count_before_side_effect": 1,
+      "workflow_result_event_matches_log": true,
+      "workflow_result_line_count_after": 1,
+      "workflow_result_line_count_before": 0
+    },
+    "line_count": 1,
+    "log_path": "/tmp/pydantic-ai-dbos-side-effect-t007.jsonl"
+  }
+}

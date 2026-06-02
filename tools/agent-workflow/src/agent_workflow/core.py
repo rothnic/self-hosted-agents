@@ -1464,10 +1464,17 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         identity = artifact.get("identity", {})
         retry = artifact.get("retry", {})
         side_effect_idempotency = artifact.get("side_effect", {}).get("idempotency", {})
+        review_wait = artifact.get("review_wait", {})
+        review_wait_state = review_wait.get("state", {}) if isinstance(review_wait.get("state"), dict) else {}
         first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
         workflow_step_names = [
             str(step.get("function_name", ""))
             for step in dbos.get("workflow_steps", [])
+            if isinstance(step, dict)
+        ]
+        review_wait_step_names = [
+            str(step.get("function_name", ""))
+            for step in review_wait.get("workflow_steps", [])
             if isinstance(step, dict)
         ]
         required = {
@@ -1494,6 +1501,17 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "retry_events": retry.get("failure_count") == 1
             and retry.get("success_count") == 1
             and retry.get("line_count") == 2,
+            "review_wait_proven": durable.get("review_wait_proven") is True and review_wait.get("proven") is True,
+            "review_wait_missing_acceptance": review_wait.get("acceptance_artifact_exists") is False
+            and review_wait_state.get("status") == "waiting-for-reviewer-acceptance"
+            and review_wait_state.get("post_wait_side_effects_allowed") is False,
+            "review_wait_links": review_wait_state.get("beads_issue_id") == artifact.get("issue_id")
+            and bool(review_wait_state.get("required_evidence_path"))
+            and review_wait_state.get("required_evidence_path") == review_wait.get("required_evidence_path"),
+            "review_wait_no_post_side_effect": review_wait.get("post_wait_side_effect", {}).get("line_count") == 0
+            and review_wait.get("workflow_result", {}).get("post_wait_side_effect", {}).get("skipped") is True,
+            "review_wait_step": review_wait_step_names.count("record_review_wait_state") == 1
+            and "record_post_wait_side_effect" not in review_wait_step_names,
             "resume_proven": durable.get("resume_proven") is True,
             "side_effect_idempotency_proven": durable.get("side_effect_idempotency_proven") is True
             and side_effect_idempotency.get("proven") is True,
