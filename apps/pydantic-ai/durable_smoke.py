@@ -31,11 +31,11 @@ def write_json(path: Path, data: dict[str, Any], pretty: bool) -> None:
 
 def durable_recommendation() -> dict[str, str]:
     return {
-        "linked_task": "T006",
-        "next_slice": "Record side-effect idempotency evidence across retry and resume in the durable artifact.",
+        "linked_task": "T007",
+        "next_slice": "Add a fixture-safe review wait that stops without reviewer acceptance evidence.",
         "reason": (
-            "The Pydantic AI DBOS lane now has deterministic retry, resume, and run identity preservation evidence, "
-            "so the next useful slice is deeper side-effect idempotency across retry and resume."
+            "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect "
+            "idempotency evidence, so the next useful slice is review-safe waiting."
         ),
     }
 
@@ -44,7 +44,7 @@ def durable_prompt(payload: dict[str, Any]) -> str:
     project_context = payload.get("project_context", {})
     return (
         f"Objective: {payload.get('objective', '')}\n"
-        f"Current slice: T005\n"
+        f"Current slice: T006\n"
         f"Active spec: {project_context.get('active_spec', '')}\n"
         "Return the next implementation slice after durable execution smoke evidence."
     )
@@ -277,6 +277,18 @@ def workflow_ids_from_events(events: list[dict[str, Any]]) -> list[str]:
     return sorted({str(event.get("workflow_id", "")) for event in events if event.get("workflow_id")})
 
 
+def read_jsonl_events(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def side_effect_event_keys(events: list[dict[str, Any]]) -> list[str]:
+    return sorted(
+        f"{event.get('workflow_id', '')}:{event.get('event', '')}:{event.get('sequence', '')}" for event in events
+    )
+
+
 def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
     payload = read_json(args.fixture)
     output_dir = args.output.parent if args.output is not None else Path(tempfile.mkdtemp())
@@ -286,7 +298,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         {
             "candidate": payload.get("candidate", {}),
             "issue": args.issue_id,
-            "slice": "T005",
+            "slice": "T006",
             "started_at_ns": time.time_ns(),
         },
         length=24,
@@ -336,6 +348,8 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         first_proc.kill()
         first_stdout, first_stderr = first_proc.communicate(timeout=10)
 
+    retry_events_before_resume = read_jsonl_events(retry_state_log)
+    side_effect_events_before_resume = read_jsonl_events(side_effect_log)
     resume_env = os.environ.copy()
     resume_env["PYDANTIC_AI_DBOS_RESUME_READY"] = "1"
     resume_command = [
@@ -354,13 +368,14 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         timeout=60,
     )
     child_output = read_json(child_result_output) if child_result_output.exists() else {}
-    retry_lines = retry_state_log.read_text(encoding="utf-8").splitlines() if retry_state_log.exists() else []
-    retry_events = [json.loads(line) for line in retry_lines if line.strip()]
-    side_effect_lines = side_effect_log.read_text(encoding="utf-8").splitlines() if side_effect_log.exists() else []
-    side_effect_events = [json.loads(line) for line in side_effect_lines if line.strip()]
+    retry_events = read_jsonl_events(retry_state_log)
+    side_effect_events = read_jsonl_events(side_effect_log)
     workflow_result = child_output.get("workflow_result", {})
     retry_failures = [event for event in retry_events if event.get("will_fail") is True]
     retry_successes = [event for event in retry_events if event.get("will_fail") is False]
+    retry_failures_before_resume = [event for event in retry_events_before_resume if event.get("will_fail") is True]
+    retry_successes_before_resume = [event for event in retry_events_before_resume if event.get("will_fail") is False]
+    workflow_result_side_effect = workflow_result.get("side_effect", {})
     first_identity = parse_child_stdout(first_stdout)
     resume_identity = parse_child_stdout(resume_proc.stdout)
     workflow_status = child_output.get("workflow_status", {})
@@ -403,6 +418,33 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         and len(retry_successes) == 1
         and workflow_result.get("retry", {}).get("attempt") == args.retry_failures + 1
     )
+    side_effect_idempotency_proven = (
+        retry_proven
+        and len(retry_failures_before_resume) == args.retry_failures
+        and len(retry_successes_before_resume) == 1
+        and len(side_effect_events_before_resume) == 1
+        and len(side_effect_events) == 1
+        and side_effect_events == side_effect_events_before_resume
+        and workflow_result_side_effect.get("line_count_before") == 0
+        and workflow_result_side_effect.get("line_count_after") == 1
+        and workflow_result_side_effect.get("event") == side_effect_events[0]
+    )
+    side_effect_idempotency = {
+        "after_resume_line_count": len(side_effect_events),
+        "before_resume_line_count": len(side_effect_events_before_resume),
+        "event_keys": side_effect_event_keys(side_effect_events),
+        "events_unchanged_after_resume": side_effect_events == side_effect_events_before_resume,
+        "proven": side_effect_idempotency_proven,
+        "resume_duplicate_count": max(len(side_effect_events) - len(side_effect_events_before_resume), 0),
+        "retry_failure_count_before_side_effect": len(retry_failures_before_resume),
+        "retry_line_count_before_side_effect": len(retry_events_before_resume),
+        "retry_success_count_before_side_effect": len(retry_successes_before_resume),
+        "workflow_result_event_matches_log": workflow_result_side_effect.get("event") == (
+            side_effect_events[0] if side_effect_events else {}
+        ),
+        "workflow_result_line_count_after": workflow_result_side_effect.get("line_count_after"),
+        "workflow_result_line_count_before": workflow_result_side_effect.get("line_count_before"),
+    }
     artifact = {
         "acceptance_command": "uv run awf workflow-fixture-test",
         "candidate_app": "apps/pydantic-ai",
@@ -431,6 +473,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "run_identity_preserved": identity_proven,
             "retry_proven": retry_proven,
             "resume_proven": resume_proc.returncode == 0 and bool(workflow_result),
+            "side_effect_idempotency_proven": side_effect_idempotency_proven,
         },
         "first_attempt": {
             "command": command_text(first_command),
@@ -468,6 +511,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         },
         "side_effect": {
             "events": side_effect_events,
+            "idempotency": side_effect_idempotency,
             "line_count": len(side_effect_events),
             "log_path": str(side_effect_log),
         },
@@ -478,6 +522,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         and artifact["durable_property"]["run_identity_preserved"]
         and artifact["durable_property"]["retry_proven"]
         and artifact["durable_property"]["resume_proven"]
+        and artifact["durable_property"]["side_effect_idempotency_proven"]
         and artifact["first_attempt"]["side_effect_step_returned_before_kill"]
         and first_exit_code is not None
         and first_exit_code != 0
@@ -499,7 +544,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--side-effect-log", type=Path, help="Optional side-effect proof log path.")
     parser.add_argument("--retry-state-log", type=Path, help="Optional controlled retry proof log path.")
     parser.add_argument("--retry-failures", type=int, default=1, help="Transient DBOS retry failures before success.")
-    parser.add_argument("--issue-id", default="awf-yuz", help="Beads issue id linked to the durable evidence.")
+    parser.add_argument("--issue-id", default="awf-9cq", help="Beads issue id linked to the durable evidence.")
     parser.add_argument("--side-effect-step-marker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--workflow-id", help="Optional deterministic DBOS workflow id.")
     parser.add_argument("--wait-seconds", type=float, default=300.0, help="Child wait duration before resume.")

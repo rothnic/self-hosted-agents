@@ -1463,6 +1463,7 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         dbos = artifact.get("dbos", {})
         identity = artifact.get("identity", {})
         retry = artifact.get("retry", {})
+        side_effect_idempotency = artifact.get("side_effect", {}).get("idempotency", {})
         first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
         workflow_step_names = [
             str(step.get("function_name", ""))
@@ -1494,6 +1495,18 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             and retry.get("success_count") == 1
             and retry.get("line_count") == 2,
             "resume_proven": durable.get("resume_proven") is True,
+            "side_effect_idempotency_proven": durable.get("side_effect_idempotency_proven") is True
+            and side_effect_idempotency.get("proven") is True,
+            "side_effect_retry_resume_counts": side_effect_idempotency.get("retry_failure_count_before_side_effect")
+            == 1
+            and side_effect_idempotency.get("retry_success_count_before_side_effect") == 1
+            and side_effect_idempotency.get("before_resume_line_count") == 1
+            and side_effect_idempotency.get("after_resume_line_count") == 1
+            and side_effect_idempotency.get("resume_duplicate_count") == 0,
+            "side_effect_result_matches_log": side_effect_idempotency.get("events_unchanged_after_resume") is True
+            and side_effect_idempotency.get("workflow_result_event_matches_log") is True
+            and side_effect_idempotency.get("workflow_result_line_count_before") == 0
+            and side_effect_idempotency.get("workflow_result_line_count_after") == 1,
             "side_effect_not_duplicated": durable.get("completed_step_not_duplicated") is True
             and artifact.get("side_effect", {}).get("line_count") == 1,
             "dbos_retry_step": workflow_step_names.count("controlled_retry_once") == 1,

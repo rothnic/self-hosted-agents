@@ -13,7 +13,7 @@
 
 - [X] T004 [US2] Extend the Pydantic AI DBOS smoke with a controlled retry proof
 - [X] T005 [US2] Harden the restart/resume smoke so run identity survives process interruption
-- [ ] T006 [US2] Record side-effect idempotency evidence across retry and resume in the durable artifact
+- [X] T006 [US2] Record side-effect idempotency evidence across retry and resume in the durable artifact
 
 ## Phase 3: Review-Safe Review Wait
 

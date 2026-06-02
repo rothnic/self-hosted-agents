@@ -79,12 +79,12 @@ For durable repo evidence, prefer temporary DBOS state paths and keep only the J
 ```bash
 uv run python apps/pydantic-ai/durable_smoke.py \
   --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json \
-  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json \
-  --db-path /tmp/pydantic-ai-dbos-t005.sqlite \
-  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t005.jsonl \
-  --retry-state-log /tmp/pydantic-ai-dbos-retry-t005.jsonl \
-  --workflow-id dbos-workflow-t005-identity-resume \
-  --issue-id awf-yuz \
+  --output .agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json \
+  --db-path /tmp/pydantic-ai-dbos-t006.sqlite \
+  --side-effect-log /tmp/pydantic-ai-dbos-side-effect-t006.jsonl \
+  --retry-state-log /tmp/pydantic-ai-dbos-retry-t006.jsonl \
+  --workflow-id dbos-workflow-t006-side-effect-idempotency \
+  --issue-id awf-9cq \
   --pretty
 ```
 
@@ -93,6 +93,7 @@ Current durable evidence:
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json`
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json`
 
 ### DBOS Local Setup
 
@@ -130,14 +131,14 @@ The smoke creates local, disposable state:
 Use a fresh `--workflow-id` or delete all five local files before rerunning the same explicit workflow id. Reusing a
 workflow id with stale SQLite state is useful for recovery inspection, but it is not a clean smoke.
 
-Reset the fixed T005 local paths:
+Reset the fixed T006 local paths:
 
 ```bash
-rm -f /tmp/pydantic-ai-dbos-t005.sqlite \
-  /tmp/pydantic-ai-dbos-side-effect-t005.jsonl \
-  /tmp/pydantic-ai-dbos-retry-t005.jsonl \
-  /tmp/dbos-workflow-t005-identity-resume.side-effect-step-complete.json \
-  /tmp/dbos-workflow-t005-identity-resume.child-result.json
+rm -f /tmp/pydantic-ai-dbos-t006.sqlite \
+  /tmp/pydantic-ai-dbos-side-effect-t006.jsonl \
+  /tmp/pydantic-ai-dbos-retry-t006.jsonl \
+  /tmp/dbos-workflow-t006-side-effect-idempotency.side-effect-step-complete.json \
+  /tmp/dbos-workflow-t006-side-effect-idempotency.child-result.json
 ```
 
 The committed evidence artifact under `.agent-runs/verifications/` is durable review evidence and should not be deleted
@@ -154,9 +155,16 @@ The evidence artifact should show:
 - `durable_property.retry_proven=true`
 - `durable_property.resume_proven=true`
 - `durable_property.run_identity_preserved=true`
+- `durable_property.side_effect_idempotency_proven=true`
 - `durable_property.completed_step_not_duplicated=true`
 - `identity.requested_workflow_id`, `identity.first_attempt_workflow_id`, `identity.resume_attempt_workflow_id`,
   `identity.workflow_status_workflow_id`, and `identity.workflow_result_workflow_id` are the same value
+- `side_effect.idempotency.before_resume_line_count=1`
+- `side_effect.idempotency.after_resume_line_count=1`
+- `side_effect.idempotency.resume_duplicate_count=0`
+- `side_effect.idempotency.retry_failure_count_before_side_effect=1`
+- `side_effect.idempotency.retry_success_count_before_side_effect=1`
+- `side_effect.idempotency.workflow_result_event_matches_log=true`
 - `retry.failure_count=1`
 - `retry.success_count=1`
 - `retry.line_count=2`
@@ -169,26 +177,30 @@ The evidence artifact should show:
 - `dbos.workflow_steps` includes `controlled_retry_once`, `record_side_effect_once`, `controlled_resume_wait`, and the
   DBOS agent run
 
-Inspect the current T005 evidence summary:
+Inspect the current T006 evidence summary:
 
 ```bash
 python3 - <<'PY'
 import json
 from pathlib import Path
 
-path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json")
+path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json")
 artifact = json.loads(path.read_text())
 print(json.dumps({
     "workflow_id": artifact["dbos"]["workflow_id"],
     "retry_proven": artifact["durable_property"]["retry_proven"],
     "resume_proven": artifact["durable_property"]["resume_proven"],
     "run_identity_preserved": artifact["durable_property"]["run_identity_preserved"],
+    "side_effect_idempotency_proven": artifact["durable_property"]["side_effect_idempotency_proven"],
     "first_attempt_workflow_id": artifact["identity"]["first_attempt_workflow_id"],
     "resume_attempt_workflow_id": artifact["identity"]["resume_attempt_workflow_id"],
     "completed_step_not_duplicated": artifact["durable_property"]["completed_step_not_duplicated"],
     "retry_failure_count": artifact["retry"]["failure_count"],
     "retry_success_count": artifact["retry"]["success_count"],
     "side_effect_count": artifact["side_effect"]["line_count"],
+    "side_effect_before_resume_count": artifact["side_effect"]["idempotency"]["before_resume_line_count"],
+    "side_effect_after_resume_count": artifact["side_effect"]["idempotency"]["after_resume_line_count"],
+    "resume_duplicate_count": artifact["side_effect"]["idempotency"]["resume_duplicate_count"],
     "workflow_status": artifact["dbos"]["workflow_status"].get("status"),
     "recovery_attempts": artifact["dbos"]["workflow_status"].get("recovery_attempts"),
 }, indent=2))
