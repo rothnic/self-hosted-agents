@@ -1,0 +1,41 @@
+{
+  "claimed_at": "2026-06-02T10:58:08.536725+00:00",
+  "id": "awf-uy0",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:33.737374Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:24.792582Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-uy0",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T001\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T001",
+    "id": "awf-uy0",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Audit current LangGraph Python, Pydantic AI, and Mastra TypeScript evidence against `docs/comparison-evidence.md`",
+    "updated_at": "2026-06-02T10:48:25.697160Z"
+  },
+  "worker_branch": "codex/awf-uy0-audit-current-langgraph-python-pydantic",
+  "worker_id": "codex-goal004-t001",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-uy0-audit-current-langgraph-python-pydantic",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-uy0-audit-current-langgraph-python-pydantic ../self-hosted-agents-worktrees/awf-uy0-audit-current-langgraph-python-pydantic <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-uy0-audit-current-langgraph-python-pydantic && git status --short --branch"
+  }
+}

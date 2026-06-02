@@ -67,18 +67,12 @@
     "counts": {
       "active_claims": 0,
       "blocked": 12,
-      "ready": 2,
+      "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-uy0",
+    "next_unblocked_issue_id": "awf-8nb",
     "ready": [
-      {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T001",
-        "id": "awf-uy0",
-        "status": "open",
-        "title": "Audit current LangGraph Python, Pydantic AI, and Mastra TypeScript evidence against `docs/comparison-evidence.md`"
-      },
       {
         "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T002",
         "id": "awf-8nb",
@@ -769,16 +763,16 @@
     "blocked_count": 12,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-uy0",
-    "ready_count": 2
+    "next_unblocked_issue_id": "awf-8nb",
+    "ready_count": 1
   },
   "child_tickets": [
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T001",
       "task_id": "T001",
       "ticket_id": "awf-uy0",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Audit current LangGraph Python, Pydantic AI, and Mastra TypeScript evidence against `docs/comparison-evidence.md`"
     },
     {
@@ -896,10 +890,10 @@
   "ok": true,
   "path": ".agent-runs/increments/005-candidate-platform-decision-product-baseline-goal-004.json",
   "phase": "Goal 004",
-  "ready_count": 2,
+  "ready_count": 1,
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-02T10:49:35.651182+00:00",
+  "updated_at": "2026-06-02T11:07:01.216620+00:00",
   "validation_evidence": []
 }
