@@ -1,0 +1,93 @@
+{
+  "acceptance_command": "uv run awf verify --profile increment --json",
+  "acceptance_source": {
+    "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T014",
+    "id": "awf-6wg",
+    "status": "open",
+    "title": "Add compact verification artifacts for ticket and increment profiles"
+  },
+  "artifact_kind": "verification-profile",
+  "artifact_schema": "awf.verify.compact.v1",
+  "check_count": 9,
+  "checks": [
+    {
+      "command": "uv run awf bootstrap",
+      "detail": "",
+      "name": "bootstrap",
+      "ok": true
+    },
+    {
+      "command": "uv run awf spec-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf spec-kit-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "spec-kit-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf bdd-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "bdd-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf bdd-run --driver fixture",
+      "detail": "",
+      "name": "bdd-run-fixture",
+      "ok": true
+    },
+    {
+      "command": "uv run awf review-gate",
+      "detail": "",
+      "name": "review-gate",
+      "ok": true
+    },
+    {
+      "command": "uv run awf repo-hygiene",
+      "detail": "",
+      "error_count": 0,
+      "name": "repo-hygiene",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-state-lint",
+      "detail": "",
+      "error_count": 0,
+      "name": "workflow-state-lint",
+      "ok": true
+    },
+    {
+      "command": "uv run awf workflow-fixture-test",
+      "detail": "",
+      "failed_results": [],
+      "name": "workflow-fixture-test",
+      "ok": true,
+      "result_count": 27
+    }
+  ],
+  "failed_checks": [],
+  "generated_at": "2026-06-02T07:46:17.885261+00:00",
+  "git": {
+    "branch": "codex/pydantic-ai-fixture-scaffold...origin/codex/pydantic-ai-fixture-scaffold",
+    "changed_files": 5,
+    "clean": false,
+    "summary": "5 changed file(s)"
+  },
+  "next_action": "orchestrator-loop should continue assigning unblocked work",
+  "ok": true,
+  "profile": "increment",
+  "ready_work": {
+    "blocked_count": 0,
+    "human_required_count": 0,
+    "ready_count": 8,
+    "source": "beads"
+  },
+  "review_gate_ok": true
+}

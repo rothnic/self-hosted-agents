@@ -1903,6 +1903,27 @@ def compact_acceptance_source(item: dict[str, Any] | None) -> dict[str, Any] | N
     }
 
 
+def compact_verify_artifact(data: dict[str, Any], generated_at: str | None = None) -> dict[str, Any]:
+    checks = data.get("checks", [])
+    compact_checks = [compact_check_result(check) for check in checks if isinstance(check, dict)]
+    return {
+        "artifact_schema": "awf.verify.compact.v1",
+        "artifact_kind": "verification-profile",
+        "generated_at": generated_at or datetime.now(timezone.utc).isoformat(),
+        "ok": data.get("ok"),
+        "profile": data.get("profile"),
+        "failed_checks": data.get("failed_checks", []),
+        "acceptance_command": data.get("acceptance_command"),
+        "acceptance_source": compact_acceptance_source(data.get("acceptance_source")),
+        "git": data.get("git", {}),
+        "ready_work": data.get("ready_work", {}),
+        "review_gate_ok": data.get("review_gate", {}).get("ok"),
+        "next_action": data.get("next_action"),
+        "check_count": len(compact_checks),
+        "checks": compact_checks,
+    }
+
+
 VERIFY_PROFILES = {
     "health": ["bootstrap", "review-gate", "workflow-state-lint", "repo-hygiene"],
     "ticket": ["spec-lint", "spec-kit-lint", "bdd-lint", "review-gate", "repo-hygiene", "workflow-state-lint", "acceptance"],
@@ -1978,18 +1999,7 @@ def verify_data(profile: str, write: bool) -> dict[str, Any]:
         "next_action": verify_next_action(profile, checks, ready),
     }
     if write:
-        artifact = {
-            "ok": data["ok"],
-            "profile": profile,
-            "failed_checks": data["failed_checks"],
-            "acceptance_command": acceptance_command,
-            "acceptance_source": compact_acceptance_source(acceptance_item),
-            "git": data["git"],
-            "ready_work": data["ready_work"],
-            "review_gate_ok": data["review_gate"].get("ok"),
-            "next_action": data["next_action"],
-            "checks": [compact_check_result(check) for check in checks],
-        }
+        artifact = compact_verify_artifact(data)
         data["path"] = write_json_artifact("verifications", f"verify-{profile}", artifact)
     return data
 
@@ -3165,6 +3175,81 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "name": "workflow fixture summary exposes failed check detail",
             "ok": synthetic_summary["failed_results"][0]["detail"] == "clear failure detail",
             "data": synthetic_summary,
+        }
+    )
+    synthetic_ticket_artifact = compact_verify_artifact(
+        {
+            "ok": True,
+            "profile": "ticket",
+            "checks": [
+                {
+                    "name": "acceptance",
+                    "command": "uv run awf verify --profile increment --json",
+                    "ok": True,
+                    "data": {
+                        "returncode": 0,
+                        "stdout": "large nested verification output should not be stored",
+                        "stderr": "",
+                    },
+                }
+            ],
+            "failed_checks": [],
+            "acceptance_command": "uv run awf verify --profile increment --json",
+            "acceptance_source": {
+                "work": {
+                    "id": "awf-ticket",
+                    "title": "Ticket verification",
+                    "status": "open",
+                    "external_ref": "specs/example/tasks.md#T001",
+                }
+            },
+            "git": {"clean": False, "changed_files": 1},
+            "ready_work": {"ready_count": 1, "blocked_count": 0, "human_required_count": 0, "source": "beads"},
+            "review_gate": {"ok": True},
+            "next_action": "record evidence and close the ticket if scope is complete",
+        },
+        generated_at="2026-06-02T00:00:00+00:00",
+    )
+    synthetic_increment_artifact = compact_verify_artifact(
+        {
+            "ok": True,
+            "profile": "increment",
+            "checks": [
+                {
+                    "name": "workflow-fixture-test",
+                    "command": "uv run awf workflow-fixture-test",
+                    "ok": True,
+                    "data": {"results": [{"name": "fixture passes", "ok": True}]},
+                }
+            ],
+            "failed_checks": [],
+            "acceptance_command": None,
+            "acceptance_source": None,
+            "git": {"clean": True, "changed_files": 0},
+            "ready_work": {"ready_count": 0, "blocked_count": 0, "human_required_count": 0, "source": "beads"},
+            "review_gate": {"ok": True},
+            "next_action": "integrator-loop should prepare the increment review gate",
+        },
+        generated_at="2026-06-02T00:00:00+00:00",
+    )
+    ticket_check = synthetic_ticket_artifact["checks"][0]
+    increment_check = synthetic_increment_artifact["checks"][0]
+    results.append(
+        {
+            "name": "verify write artifacts stay compact for ticket and increment profiles",
+            "ok": synthetic_ticket_artifact["artifact_schema"] == "awf.verify.compact.v1"
+            and synthetic_ticket_artifact["profile"] == "ticket"
+            and synthetic_ticket_artifact["check_count"] == 1
+            and "stdout" not in ticket_check
+            and "stderr" not in ticket_check
+            and synthetic_ticket_artifact["acceptance_source"]["id"] == "awf-ticket"
+            and synthetic_increment_artifact["profile"] == "increment"
+            and increment_check.get("result_count") == 1
+            and increment_check.get("failed_results") == [],
+            "data": {
+                "ticket_artifact": synthetic_ticket_artifact,
+                "increment_artifact": synthetic_increment_artifact,
+            },
         }
     )
     synthetic_claims = [

@@ -40,7 +40,9 @@ uv run awf verify --profile pre-merge --json
 
 `verify` runs the checks for the selected context, includes acceptance evidence when ticket work is active, summarizes
 git status, Beads readiness, review-gate state, failures, and returns one `next_action`. Pass `--write` to store the
-result under `.agent-runs/verifications/`.
+result under `.agent-runs/verifications/`. Written artifacts use compact schema `awf.verify.compact.v1`: they keep
+check names, commands, statuses, counts, short failure details, git/ready-work/review-gate summaries, acceptance source,
+and the next safe action without embedding full nested command stdout or stderr.
 
 ## Increment State
 
