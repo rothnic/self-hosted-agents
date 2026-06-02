@@ -3,8 +3,16 @@
 The workflow can run from Codex app automations, local cron, or another scheduler because coordination state lives in
 repo artifacts and Beads Rust. The scheduler is replaceable; the repo remains authoritative.
 
-The default increment boundary is one Spec Kit phase. For the solution-comparison roadmap, the active target increment
-is Phase 6 of `002-solution-comparison-roadmap`.
+The default increment boundary is one Spec Kit phase. The current active scheduled increment is Goal 003:
+
+- spec: `003-automated-increment-orchestration`
+- phase: `Goal 003`
+- increment id: `003-automated-increment-orchestration-goal-003`
+- ledger: `.agent-runs/increments/003-automated-increment-orchestration-goal-003.json`
+
+Scheduled Goal 003 runs must pass `--spec-id 003-automated-increment-orchestration --phase "Goal 003"`. The no-arg
+`automation-loop` defaults still target the older solution-comparison Phase 6 increment, so they are not the safe
+scheduler surface for Goal 003 until the default active-increment routing is hardened.
 
 ## Roles
 
@@ -14,8 +22,10 @@ is Phase 6 of `002-solution-comparison-roadmap`.
 - Integrator: reviews completed worker branches, integrates safe work into the feature branch, and prepares review.
 - Health: runs lightweight checks and logs issues before automation silently stalls.
 
-Routine worker branches target the feature branch for the increment. Agents must not merge to `main`; the normal human
-gate is the final feature-branch PR to `main` or an explicit architecture, product, priority, or scope decision.
+Routine worker branches target the feature branch for the increment. Agents must not merge to `main`; explicit
+architecture, product, priority, scope, and final merge decisions remain human decisions. Goal or increment evidence
+review is handled by one agent presenting evidence and an independent reviewer agent accepting or rejecting it in a
+durable artifact, so automation does not pause solely because a human review label exists.
 
 ## Verification Surface
 
@@ -46,12 +56,23 @@ fork: `increment:<id>`, `role:<role>`, `scope:<area>`, and `branch:<name>`.
 Local cron can use `uv run awf`. Codex app automations should use `.venv/bin/awf` directly because `uv` can need cache
 or temp filesystem access before `awf` starts.
 
+Minimum safe Goal 003 loop:
+
+1. Health verifies the repo first and logs an issue before implementation work if checks fail.
+2. PM/review reads the explicit Goal 003 ledger, backlog, claims, blockers, and evidence.
+3. Orchestrator assigns only unclaimed, unblocked Goal 003 Beads work.
+4. Each worker uses a stable worker id, acts on one claimed ticket, runs ticket verification, records evidence, pushes,
+   and stops.
+5. Integrator verifies completed worker branches and increment evidence, routes goal evidence to an independent reviewer
+   agent, and does not merge to `main`.
+
 ```cron
-0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review --write
-*/15 * * * * cd /repo && uv run awf automation-loop --role orchestrator --write
-*/30 * * * * cd /repo && uv run awf automation-loop --role worker --worker-id worker-1 --write
-10 * * * * cd /repo && uv run awf automation-loop --role integrator --write
-*/20 * * * * cd /repo && uv run awf automation-loop --role health --write
+SCOPE='--spec-id 003-automated-increment-orchestration --phase "Goal 003"'
+0 */4 * * * cd /repo && uv run awf automation-loop --role pm-review $SCOPE --write
+*/15 * * * * cd /repo && uv run awf automation-loop --role orchestrator $SCOPE --write
+*/30 * * * * cd /repo && uv run awf automation-loop --role worker --worker-id worker-1 $SCOPE --write
+10 * * * * cd /repo && uv run awf automation-loop --role integrator $SCOPE --write
+*/20 * * * * cd /repo && uv run awf automation-loop --role health $SCOPE --write
 ```
 
 Codex app automation prompts for these roles live in

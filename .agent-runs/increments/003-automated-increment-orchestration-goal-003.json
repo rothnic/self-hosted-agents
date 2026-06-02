@@ -1,0 +1,129 @@
+{
+  "active_claims": [],
+  "active_worker_branches": [],
+  "base_branch": "main",
+  "beads_epic_id": null,
+  "blocked": [],
+  "child_tickets": [
+    {
+      "done": true,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T009",
+      "task_id": "T009",
+      "ticket_id": "awf-1oz",
+      "ticket_status": "closed",
+      "title": "Audit current PM, orchestrator, worker, integrator, and health automation-loop behavior"
+    },
+    {
+      "done": true,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T010",
+      "task_id": "T010",
+      "ticket_id": "awf-7e8",
+      "ticket_status": "closed",
+      "title": "Define the minimum safe scheduled loop for one active increment"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T011",
+      "task_id": "T011",
+      "ticket_id": "awf-h1z",
+      "ticket_status": "open",
+      "title": "Add stale-claim status and handoff guidance for abandoned active work"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T012",
+      "task_id": "T012",
+      "ticket_id": "awf-j69",
+      "ticket_status": "open",
+      "title": "Add blocker rerouting so unrelated ready work can continue"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T013",
+      "task_id": "T013",
+      "ticket_id": "awf-869",
+      "ticket_status": "open",
+      "title": "Add deterministic worker branch naming and worktree setup guidance"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T014",
+      "task_id": "T014",
+      "ticket_id": "awf-6wg",
+      "ticket_status": "open",
+      "title": "Add compact verification artifacts for ticket and increment profiles"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T015",
+      "task_id": "T015",
+      "ticket_id": "awf-l2j",
+      "ticket_status": "open",
+      "title": "Add integrator verification of worker branches without merging to `main`"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T016",
+      "task_id": "T016",
+      "ticket_id": "awf-svc",
+      "ticket_status": "open",
+      "title": "Add review-agent invocation guidance before PR and increment handoffs"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T017",
+      "task_id": "T017",
+      "ticket_id": "awf-8vh",
+      "ticket_status": "open",
+      "title": "Add health-loop issue logging for recurring workflow failures"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T018",
+      "task_id": "T018",
+      "ticket_id": "awf-j3t",
+      "ticket_status": "open",
+      "title": "Add dry-run fixtures for role transitions and blocked-state recovery"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T019",
+      "task_id": "T019",
+      "ticket_id": "awf-urx",
+      "ticket_status": "open",
+      "title": "Add compact active-work summaries for claims, ready work, blockers, and stale work"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T020",
+      "task_id": "T020",
+      "ticket_id": "awf-rgg",
+      "ticket_status": "open",
+      "title": "Add cleanup commands for obsolete active claims and old worktree pointers"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T021",
+      "task_id": "T021",
+      "ticket_id": "awf-60y",
+      "ticket_status": "open",
+      "title": "Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence"
+    }
+  ],
+  "exists": true,
+  "feature_branch": "codex/003-automated-increment-orchestration-goal-003",
+  "human_required": [],
+  "increment_id": "003-automated-increment-orchestration-goal-003",
+  "learning_proposals": [],
+  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+  "objective_id": "agentic-development-foundation",
+  "ok": true,
+  "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
+  "phase": "Goal 003",
+  "ready_count": 11,
+  "review_status": "executing",
+  "spec_id": "003-automated-increment-orchestration",
+  "stale_claims": [],
+  "updated_at": "2026-06-02T06:30:15.405414+00:00",
+  "validation_evidence": []
+}

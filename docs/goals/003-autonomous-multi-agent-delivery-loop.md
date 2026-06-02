@@ -27,6 +27,10 @@ Planning/backlog evidence was accepted by independent reviewer agent `019e86e6-7
 T009 automation-loop behavior audit evidence is recorded in
 `.agent-runs/reports/goal-003-t009-automation-loop-audit-20260602.md`.
 
+T010 safe scheduled loop evidence is recorded in
+`.agent-runs/reports/goal-003-t010-safe-scheduled-loop-20260602.md`; the active increment ledger is
+`.agent-runs/increments/003-automated-increment-orchestration-goal-003.json`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
@@ -43,8 +47,8 @@ Backlog sync created the executable Beads tasks below:
 - `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
 - `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
 
-Next implementer claim: `awf-1oz` / T009. Use `uv run awf ready-work --json` as the source of truth before claiming,
-because priorities, blockers, or active claims may change.
+Next implementer claim after T010 closure: `awf-h1z` / T011. Use `uv run awf ready-work --json` as the source of truth
+before claiming, because priorities, blockers, or active claims may change.
 
 ## Scope
 
