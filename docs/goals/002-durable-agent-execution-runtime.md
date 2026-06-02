@@ -63,8 +63,11 @@ Evidence to inspect:
 - `docs/research/durable-execution-selection-2026-05-31.md`
 - `.agent-runs/verifications/verify-durable-options-t024-20260531.json`
 
-Remaining Goal 002 proofs: extend the DBOS smoke beyond resume and side-effect non-duplication to cover retry, human
-wait, production storage, worker topology, and recovery behavior.
+Goal 002 T004-T010 extend this DBOS proof beyond the first smoke. The local fixture now proves controlled retry, stable
+run identity across resume, side-effect idempotency, review wait without acceptance, accepted-review continuation, and
+correlation across durable run id, Pydantic AI run id, trace id, eval id, reviewer evidence, Beads issue, spec, and task.
+This still does not promote DBOS as the production runtime; production storage, worker topology, and operational
+recovery remain explicit follow-up gates.
 
 ## Current Smoke Evidence
 
@@ -76,6 +79,18 @@ Pydantic AI run id and trace id, and proves the side-effect log still contains e
 Evidence to inspect:
 
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json`
+
+## Current Promotion Gate
+
+The local durable proof is now sufficient to show that the Pydantic AI plus DBOS candidate can satisfy Goal 002's retry,
+resume, review-wait, side-effect, and evidence-correlation behavior without hosted services or external model providers.
+The remaining Goal 002 work is to record independent reviewer acceptance and create follow-up tickets for production
+hardening gaps.
+
+Final product-stack promotion remains blocked until a later goal or follow-up spec proves production DBOS storage,
+worker topology, queue behavior, backup/restore, retention, and recovery rehearsal on controlled infrastructure. Treat
+the current DBOS evidence as **tested local durable proof**, not as a production runtime selection.
 
 ## Proof Commands
 

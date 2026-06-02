@@ -107,13 +107,18 @@ spec, tasks, and Beads tickets before implementation.
 Latest CEO-level review: `docs/roadmap-review-2026-05-31.md`.
 
 Phase 6 is implementation-complete and independently reviewed. `apps/pydantic-ai/` now has tested evidence for
-self-hosted-compatible observability, Pydantic Evals, DBOS durable smoke behavior, and requirements-matrix scoring.
-Neither Pydantic AI nor DBOS is a final platform winner.
+self-hosted-compatible observability, Pydantic Evals, DBOS durable behavior, and requirements-matrix scoring. Neither
+Pydantic AI nor DBOS is a final platform winner.
 
-Accepted next direction: Goal 001 is complete for the current roadmap increment, and Goal 002 starts next.
-Goal 001 has the required self-hosted Langfuse proof, repo-local trace fallback, Pydantic Evals output, fixture-safe
-service-unavailable behavior, setup docs, and matrix scoring. The remaining final-solution blockers are concentrated in
-Goal 002 durable execution work: retry, human wait, production DBOS storage, worker topology, and recovery.
+Accepted next direction: Goal 001 is complete for the current roadmap increment, and Goal 002 is the active durable
+execution goal. Goal 001 has the required self-hosted Langfuse proof, repo-local trace fallback, Pydantic Evals output,
+fixture-safe service-unavailable behavior, setup docs, and matrix scoring.
+
+Goal 002 local DBOS proof is complete through T010. The committed durable artifact proves controlled retry, process
+resume with stable identity, side-effect idempotency, review wait without acceptance, accepted-review continuation, and
+correlation across durable run, Pydantic AI run, trace, eval, reviewer, Beads, spec, and task ids. The remaining Goal 002
+closeout work is to record independent reviewer acceptance and follow-up tickets for production storage, worker
+topology, queue behavior, backup/restore, retention, and recovery rehearsal.
 
 Goal 001 follow-up Beads epics are recorded for the remaining non-blocking gaps: `awf-eas` for Langfuse production
 operations, `awf-2du` for richer Langfuse evaluation workflows, and `awf-4t2` for Phoenix or Opik fallback comparison if
@@ -126,5 +131,5 @@ The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candida
 that same decision-ready workflow before roadmap review compares platform quality.
 
 There are no remaining Phase 6 worker tickets. Independent review accepted Goal 001 evidence in
-`.agent-runs/reports/goal-001-evidence-review-20260601.md`; PM/review can now decompose Goal 002 into spec tasks and
-Beads tickets. For long-horizon work, use the goal backlog instead of selecting isolated tasks.
+`.agent-runs/reports/goal-001-evidence-review-20260601.md`. Goal 002 has a focused Spec Kit feature and Beads backlog;
+workers should continue from `uv run awf ready-work` rather than selecting isolated roadmap tasks.

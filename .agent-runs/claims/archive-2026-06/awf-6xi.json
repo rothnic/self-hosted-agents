@@ -1,0 +1,20 @@
+{
+  "claimed_at": "2026-06-02T05:09:25.128752+00:00",
+  "id": "awf-6xi",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-01T13:07:49.523933Z",
+    "created_by": "nroth",
+    "description": "Objective: agentic-development-foundation\nSpec: 004-durable-agent-execution-runtime\nTask: T011\nSource: specs/004-durable-agent-execution-runtime/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T011",
+    "id": "awf-6xi",
+    "issue_type": "task",
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Update roadmap, requirements, and promotion gates with the durable proof result",
+    "updated_at": "2026-06-01T13:07:49.523933Z"
+  },
+  "worker_id": "codex-t011"
+}
