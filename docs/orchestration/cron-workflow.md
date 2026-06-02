@@ -93,6 +93,11 @@ records the blocker, comments or marks the Beads ticket, creates a follow-up whe
 orchestrator keeps assigning other unblocked work. The PM/review loop later reprioritizes, decomposes, or asks a
 targeted human question.
 
+`increment-status` includes `blocker_reroute` for this decision. When blocked and ready work exist together,
+`blocker_reroute.can_continue=true`, `next_unblocked_issue_id` names the next assignable ticket, and blocked entries
+preserve their blocking dependency context for PM/review. Orchestrators should keep assigning the unblocked ticket;
+PM/review should triage the blockers in parallel.
+
 ## Stale Claims
 
 `increment-status` exposes stale active claims after the claim age crosses the workflow threshold. Stale claim entries

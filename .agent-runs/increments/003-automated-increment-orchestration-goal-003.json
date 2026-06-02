@@ -4,6 +4,14 @@
   "base_branch": "main",
   "beads_epic_id": null,
   "blocked": [],
+  "blocker_reroute": {
+    "blocked": [],
+    "blocked_count": 0,
+    "can_continue": true,
+    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+    "next_unblocked_issue_id": "awf-869",
+    "ready_count": 9
+  },
   "child_tickets": [
     {
       "done": true,
@@ -30,11 +38,11 @@
       "title": "Add stale-claim status and handoff guidance for abandoned active work"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T012",
       "task_id": "T012",
       "ticket_id": "awf-j69",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add blocker rerouting so unrelated ready work can continue"
     },
     {
@@ -120,10 +128,10 @@
   "ok": true,
   "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
   "phase": "Goal 003",
-  "ready_count": 10,
+  "ready_count": 9,
   "review_status": "executing",
   "spec_id": "003-automated-increment-orchestration",
   "stale_claims": [],
-  "updated_at": "2026-06-02T06:51:08.775801+00:00",
+  "updated_at": "2026-06-02T07:12:08.103660+00:00",
   "validation_evidence": []
 }

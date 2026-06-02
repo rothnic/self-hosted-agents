@@ -34,6 +34,9 @@ T010 safe scheduled loop evidence is recorded in
 T011 stale-claim handoff evidence is recorded in
 `.agent-runs/reports/goal-003-t011-stale-claim-handoff-20260602.md`.
 
+T012 blocker reroute evidence is recorded in
+`.agent-runs/reports/goal-003-t012-blocker-reroute-20260602.md`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
@@ -50,7 +53,7 @@ Backlog sync created the executable Beads tasks below:
 - `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
 - `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
 
-Next implementer claim after T011 closure: `awf-j69` / T012. Use `uv run awf ready-work --json` as the source of truth
+Next implementer claim after T012 closure: `awf-869` / T013. Use `uv run awf ready-work --json` as the source of truth
 before claiming, because priorities, blockers, or active claims may change.
 
 ## Scope

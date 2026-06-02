@@ -2092,6 +2092,7 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
     ready = ready_work_data()
     scoped_ready = scoped_issue_items({"child_tickets": child_tickets}, ready.get("ready", []))
     scoped_blocked = scoped_issue_items({"child_tickets": child_tickets}, ready.get("blocked", []))
+    blocker_reroute = blocker_reroute_data(scoped_ready, scoped_blocked)
     claims = active_claims()
     scoped_claims = active_claims_for_status({"child_tickets": child_tickets}, claims)
     all_children_closed = child_tickets and all(
@@ -2109,7 +2110,7 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         next_action = "pm-review-loop should triage blockers or decompose follow-up work"
     elif scoped_ready:
         review_status = "executing"
-        next_action = "orchestrator-loop should assign unclaimed unblocked work"
+        next_action = blocker_reroute["next_action"]
     elif all_children_closed:
         review_status = "ready-for-increment-review"
         next_action = "integrator-loop should prepare the phase review PR"
@@ -2134,6 +2135,7 @@ def increment_status_data(increment_id: str | None, spec_id: str, phase: str) ->
         ],
         "stale_claims": stale_claims_for_increment(scoped_claims),
         "blocked": scoped_blocked,
+        "blocker_reroute": blocker_reroute,
         "validation_evidence": state.get("validation_evidence", []),
         "learning_proposals": state.get("learning_proposals", []),
         "ready_count": len(scoped_ready),
@@ -2221,6 +2223,42 @@ def scoped_issue_items(status: dict[str, Any], items: list[dict[str, Any]]) -> l
         for item in items
         if item.get("external_ref") in child_refs or item.get("id") in child_ids
     ]
+
+
+def blocker_reroute_data(scoped_ready: list[dict[str, Any]], scoped_blocked: list[dict[str, Any]]) -> dict[str, Any]:
+    blocked = []
+    for issue in scoped_blocked:
+        blocked.append(
+            {
+                "id": issue.get("id"),
+                "title": issue.get("title"),
+                "external_ref": issue.get("external_ref"),
+                "blocking_dependencies": [
+                    {
+                        "id": dep.get("depends_on_id") or dep.get("id"),
+                        "type": dep.get("type"),
+                        "status": dep.get("status"),
+                    }
+                    for dep in issue_open_dependencies(issue)
+                ],
+            }
+        )
+    return {
+        "can_continue": bool(scoped_ready),
+        "ready_count": len(scoped_ready),
+        "blocked_count": len(scoped_blocked),
+        "next_unblocked_issue_id": scoped_ready[0].get("id") if scoped_ready else None,
+        "blocked": blocked,
+        "next_action": (
+            "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers"
+            if scoped_ready and scoped_blocked
+            else "orchestrator-loop should assign unclaimed unblocked work"
+            if scoped_ready
+            else "pm-review-loop should triage blockers or decompose follow-up work"
+            if scoped_blocked
+            else "no blocker reroute needed"
+        ),
+    }
 
 
 def automation_loop_data(
@@ -3101,6 +3139,33 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and stale_claim.get("issue", {}).get("acceptance") == "uv run awf verify --profile ticket --json"
             and {"resume", "reassign", "archive"}.issubset(set(stale_claim.get("handoff", {}))),
             "data": {"stale_claims": stale_claims},
+        }
+    )
+    blocker_reroute = blocker_reroute_data(
+        [{"id": "awf-ready", "title": "Unblocked work", "external_ref": "specs/example/tasks.md#T002"}],
+        [
+            {
+                "id": "awf-blocked",
+                "title": "Blocked work",
+                "external_ref": "specs/example/tasks.md#T001",
+                "dependencies": [
+                    {
+                        "depends_on_id": "awf-gate",
+                        "type": "blocks",
+                        "status": "open",
+                    }
+                ],
+            }
+        ],
+    )
+    results.append(
+        {
+            "name": "blocker reroute keeps unrelated ready work moving",
+            "ok": blocker_reroute["can_continue"]
+            and blocker_reroute["next_unblocked_issue_id"] == "awf-ready"
+            and blocker_reroute["blocked"][0]["blocking_dependencies"][0]["id"] == "awf-gate"
+            and "keep assigning unblocked work" in blocker_reroute["next_action"],
+            "data": {"blocker_reroute": blocker_reroute},
         }
     )
     synthetic_full_issues = [
