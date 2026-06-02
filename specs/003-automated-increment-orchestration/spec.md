@@ -85,6 +85,18 @@ branches while independent reviewer acceptance remains at the increment evidence
   explicitly reserved the decision.
 - **FR-012**: The workflow fixture MUST cover verification, backlog creation behavior, work selection, evidence
   recording, reviewer acceptance routing, and blocker rerouting.
+- **FR-013**: The automation loops MUST expose stale active claims with enough age, worker, branch, and issue context
+  for another agent to resume, reassign, or archive them.
+- **FR-014**: Worker branch and worktree guidance MUST be deterministic from issue metadata so scheduled workers do not
+  depend on hidden local branch naming conventions.
+- **FR-015**: Integrator output MUST verify worker branches and prepare reviewer-facing evidence without merging to
+  `main` or bypassing the draft PR review boundary.
+- **FR-016**: Health loops MUST create actionable repo-local issue evidence for recurring workflow failures instead of
+  only printing transient command output.
+- **FR-017**: Operators MUST be able to inspect active claims, stale claims, blockers, ready work, and next actions from
+  one compact status surface.
+- **FR-018**: Cleanup behavior MUST preserve historical evidence while removing obsolete active claims and worktree
+  pointers that would misroute future scheduled workers.
 
 ### Key Entities
 
@@ -109,3 +121,20 @@ branches while independent reviewer acceptance remains at the increment evidence
 - Repo state, Beads, and `.agent-runs/` remain authoritative over any specific runner.
 - Subagents may help with read-heavy review or research but are not required for orchestration.
 - Actual scheduling of Codex app automations happens after this repo-native command surface passes manual validation.
+
+## Goal 003 Product Iteration Alignment
+
+The first eight tasks established the orchestration command surface. Goal 003 now reopens this feature for the next
+product iteration: making the scheduled PM, orchestrator, worker, integrator, and health loops reliable enough for real
+cross-session delivery on controlled infrastructure.
+
+This iteration is complete only when the repo can prove:
+
+- a scheduled worker can claim, verify, and hand off one ticket from a deterministic worker branch/worktree path;
+- stale and blocked work stay visible while unrelated ready work can continue;
+- integrator output prepares independent reviewer evidence without merging to `main`;
+- health automation records durable, actionable issue evidence for recurring failures;
+- another agent can inspect compact active-work status and resume without hidden local context;
+- the workflow fixture covers the key role transitions and blocked-state recovery paths.
+
+The remaining Goal 003 work is decomposed in `specs/003-automated-increment-orchestration/tasks.md` beginning at T009.

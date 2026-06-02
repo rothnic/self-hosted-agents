@@ -15,6 +15,34 @@ recover from blockers, integrate evidence, and stop at the right review boundari
 This goal turns the existing workflow foundation into a practical autonomous delivery loop. It should support multiple
 workers, stale-claim recovery, health checks, verified integration, and compact handoffs.
 
+## Current Status
+
+Goal 003 is now the active roadmap goal. The existing Spec Kit feature
+`specs/003-automated-increment-orchestration/` was reopened for the Goal 003 product iteration after Goal 002 reviewer
+acceptance.
+
+Planning/backlog evidence was accepted by independent reviewer agent `019e86e6-7ec3-7481-be8e-adda5d7d508a` in
+`.agent-runs/reports/goal-003-backlog-review-20260602.md`.
+
+Backlog sync created the executable Beads tasks below:
+
+- `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.
+- `awf-7e8` / T010: define the minimum safe scheduled loop for one active increment.
+- `awf-h1z` / T011: add stale-claim status and handoff guidance for abandoned active work.
+- `awf-j69` / T012: add blocker rerouting so unrelated ready work can continue.
+- `awf-869` / T013: add deterministic worker branch naming and worktree setup guidance.
+- `awf-6wg` / T014: add compact verification artifacts for ticket and increment profiles.
+- `awf-l2j` / T015: add integrator verification of worker branches without merging to `main`.
+- `awf-svc` / T016: add review-agent invocation guidance before PR and increment handoffs.
+- `awf-8vh` / T017: add health-loop issue logging for recurring workflow failures.
+- `awf-j3t` / T018: add dry-run fixtures for role transitions and blocked-state recovery.
+- `awf-urx` / T019: add compact active-work summaries for claims, ready work, blockers, and stale work.
+- `awf-rgg` / T020: add cleanup commands for obsolete active claims and old worktree pointers.
+- `awf-60y` / T021: run a manual end-to-end increment rehearsal and record reviewer-accepted evidence.
+
+Next implementer claim: `awf-1oz` / T009. Use `uv run awf ready-work --json` as the source of truth before claiming,
+because priorities, blockers, or active claims may change.
+
 ## Scope
 
 - Harden `awf automation-loop` roles for real scheduled use.

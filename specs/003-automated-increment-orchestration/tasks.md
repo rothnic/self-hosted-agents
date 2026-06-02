@@ -22,3 +22,25 @@
 
 - [X] T007 [US3] Draft Codex app automation prompts for the five scheduled roles
 - [X] T008 [US3] Run one manual worktree dry run before scheduling background automations
+
+## Phase 5: Goal 003 Scheduled Delivery Baseline
+
+- [ ] T009 [US2] Audit current PM, orchestrator, worker, integrator, and health automation-loop behavior
+- [ ] T010 [US2] Define the minimum safe scheduled loop for one active increment
+- [ ] T011 [US3] Add stale-claim status and handoff guidance for abandoned active work
+- [ ] T012 [US3] Add blocker rerouting so unrelated ready work can continue
+- [ ] T013 [US3] Add deterministic worker branch naming and worktree setup guidance
+
+## Phase 6: Goal 003 Handoff And Recovery Surfaces
+
+- [ ] T014 [US1] Add compact verification artifacts for ticket and increment profiles
+- [ ] T015 [US3] Add integrator verification of worker branches without merging to `main`
+- [ ] T016 [US3] Add review-agent invocation guidance before PR and increment handoffs
+- [ ] T017 [US3] Add health-loop issue logging for recurring workflow failures
+- [ ] T018 [US3] Add dry-run fixtures for role transitions and blocked-state recovery
+
+## Phase 7: Goal 003 Operator Visibility And Acceptance
+
+- [ ] T019 [US3] Add compact active-work summaries for claims, ready work, blockers, and stale work
+- [ ] T020 [US3] Add cleanup commands for obsolete active claims and old worktree pointers
+- [ ] T021 [US3] Run a manual end-to-end increment rehearsal and record reviewer-accepted evidence

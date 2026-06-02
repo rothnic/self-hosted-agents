@@ -138,3 +138,10 @@ There are no remaining Phase 6 worker tickets. Independent review accepted Goal 
 `.agent-runs/reports/goal-001-evidence-review-20260601.md` and Goal 002 evidence in
 `.agent-runs/reports/goal-002-evidence-review-20260602.md`. After T012 closure, the next ordered roadmap goal is
 Goal 003, autonomous multi-agent delivery loop.
+
+Goal 003 is now decomposed into executable work under `specs/003-automated-increment-orchestration/`. The first
+Beads-ready task is `awf-1oz` / T009, auditing current PM, orchestrator, worker, integrator, and health
+`automation-loop` behavior. The current Goal 003 backlog runs through `awf-60y` / T021 and covers scheduled loop
+baselines, stale claims, blocker rerouting, worker branch/worktree guidance, compact verification, integrator handoff,
+review-agent guidance, health issue logging, dry-run fixtures, active-work summaries, cleanup, and an end-to-end
+rehearsal with reviewer-accepted evidence.
