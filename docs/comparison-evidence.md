@@ -62,7 +62,7 @@ The minimum demo can be fixture-backed, but final solution promotion requires mo
 - Trace evidence must come from the tested candidate app and be inspectable from repo-local artifacts or a self-hosted
   OpenTelemetry-compatible backend, not only provider documentation, screenshots, cloud-only links, fixture-only exports,
   or a disconnected sample run.
-- Durable execution must be proven for the final solution, including retry, resume, human wait, and side-effect
+- Durable execution must be proven for the final solution, including retry, resume, review wait, and side-effect
   behavior. The durable runtime should be selected through evidence rather than assumed.
 - Durable execution evidence must explain the selected runtime or the comparison basis for selecting it, including why
   it is easy enough to start, understand, recover, and scale for this project.
@@ -120,7 +120,7 @@ Capture the operating burden for one engineer:
 Capture whether the candidate can become a final solution for long-running agent work:
 
 - Durable runtime or framework integration evaluated.
-- Scenario covering retry, resume, human wait, and side-effect behavior.
+- Scenario covering retry, resume, review wait, and side-effect behavior.
 - Command, run artifact, trace, or log proving the durable behavior.
 - Recovery semantics in terms another agent can inspect and explain.
 - Setup, service, storage, and operator complexity for the durable path.
@@ -147,7 +147,7 @@ A candidate app is not ready to be described as a final solution unless it has:
 - Repo-local trace and run artifacts that preserve deterministic validation.
 - Evaluation evidence tied to the same behavior run.
 - Setup and operating notes sufficient for another agent or engineer to rerun the slice.
-- Durable execution evidence for retry, resume, human wait, and side-effect behavior.
+- Durable execution evidence for retry, resume, review wait, and side-effect behavior.
 - Explicit gap notes for missing evidence and custom critical infrastructure risk.
 
 Missing evidence should be recorded as a gap, not silently inferred. If self-hosted-compatible observability or durable

@@ -7,7 +7,7 @@
 
 - [X] T001 [US1] Add a durable execution BDD contract for retry, resume, wait, and side-effect evidence
 - [X] T002 [US1] Update DBOS selection scoring and final-promotion blockers in `docs/requirements-matrix.md`
-- [ ] T003 [US1] Document local DBOS setup, storage reset, recovery, and troubleshooting for another agent
+- [X] T003 [US1] Document local DBOS setup, storage reset, recovery, and troubleshooting for another agent
 
 ## Phase 2: Failure Recovery Smoke
 

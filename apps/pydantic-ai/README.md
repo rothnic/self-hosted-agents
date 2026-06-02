@@ -61,6 +61,10 @@ starts a workflow in one child process, kills that process after a completed sid
 child process against the same DBOS database. The resumed workflow completes through `DBOSAgent` and proves the
 side-effect step was not duplicated.
 
+This is a local proof path, not a production DBOS topology. SQLite is intentionally used for deterministic fixture
+validation. Production storage, worker topology, queues, backups, reset policy, and recovery rehearsal remain Goal 002
+follow-up work before DBOS can be considered production-ready.
+
 Run it from the repo root:
 
 ```bash
@@ -84,6 +88,107 @@ uv run python apps/pydantic-ai/durable_smoke.py \
 Current T025 evidence:
 
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+
+### DBOS Local Setup
+
+The DBOS smoke is run through the repo `uv` environment. No DBOS server, queue worker, model provider, Langfuse
+service, Logfire project, or cloud credential is required.
+
+Local prerequisites:
+
+- Run from the repo root so imports resolve through the app package boundary.
+- Keep dependencies installed through the repo `uv` environment.
+- Use a writable SQLite path for `--db-path`.
+- Use a writable JSONL path for `--side-effect-log`.
+- Keep DBOS state paths outside git, usually under `/tmp`.
+
+Useful setup checks:
+
+```bash
+uv run python -c "from pydantic_ai.durable_exec.dbos import DBOSAgent; print(DBOSAgent.__name__)"
+uv run python apps/pydantic-ai/durable_smoke.py --help
+```
+
+The first check proves the optional DBOS dependency is installed and the Pydantic AI DBOS wrapper imports. The second
+check shows the supported local smoke flags.
+
+### DBOS State And Reset
+
+The smoke creates local, disposable state:
+
+- `--db-path`: SQLite DBOS system database containing workflow status and completed steps.
+- `--side-effect-log`: JSONL proof that the side-effect step ran exactly once.
+- `<workflow-id>.side-effect-step-complete.json`: marker written after the DBOS side-effect step returns.
+- `<workflow-id>.child-result.json`: child-process recovery output used to build the final evidence artifact.
+
+Use a fresh `--workflow-id` or delete all four local files before rerunning the same explicit workflow id. Reusing a
+workflow id with stale SQLite state is useful for recovery inspection, but it is not a clean smoke.
+
+Reset the fixed T025 local paths:
+
+```bash
+rm -f /tmp/pydantic-ai-dbos-t025.sqlite \
+  /tmp/pydantic-ai-dbos-side-effect-t025.jsonl \
+  /tmp/dbos-workflow-30331114d6a951a1c65019dd.side-effect-step-complete.json \
+  /tmp/dbos-workflow-30331114d6a951a1c65019dd.child-result.json
+```
+
+The committed evidence artifact under `.agent-runs/verifications/` is durable review evidence and should not be deleted
+as part of local reset.
+
+### DBOS Recovery Evidence
+
+The smoke proves recovery by starting the DBOS workflow in a child process, waiting for the explicit side-effect step
+marker, killing that child, and then launching a second child with `PYDANTIC_AI_DBOS_RESUME_READY=1` against the same
+SQLite database.
+
+The evidence artifact should show:
+
+- `durable_property.resume_proven=true`
+- `durable_property.completed_step_not_duplicated=true`
+- `first_attempt.side_effect_step_returned_before_kill=true`
+- `first_attempt.exit_code` is nonzero because the first child was killed
+- `resume_attempt.exit_code=0`
+- `side_effect.line_count=1`
+- `dbos.workflow_status.status=SUCCESS`
+- `dbos.workflow_status.recovery_attempts` is present
+- `dbos.workflow_steps` includes `record_side_effect_once`, `controlled_resume_wait`, and the DBOS agent run
+
+Inspect the current T025 evidence summary:
+
+```bash
+python3 - <<'PY'
+import json
+from pathlib import Path
+
+path = Path(".agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json")
+artifact = json.loads(path.read_text())
+print(json.dumps({
+    "workflow_id": artifact["dbos"]["workflow_id"],
+    "resume_proven": artifact["durable_property"]["resume_proven"],
+    "completed_step_not_duplicated": artifact["durable_property"]["completed_step_not_duplicated"],
+    "side_effect_count": artifact["side_effect"]["line_count"],
+    "workflow_status": artifact["dbos"]["workflow_status"].get("status"),
+    "recovery_attempts": artifact["dbos"]["workflow_status"].get("recovery_attempts"),
+}, indent=2))
+PY
+```
+
+### DBOS Troubleshooting
+
+- `ModuleNotFoundError: No module named 'dbos'`: run through `uv` from this repo so the locked optional dependency is
+  available.
+- SQLite path errors: choose a writable `--db-path`, keep parent directories present, and avoid paths inside read-only
+  worktrees.
+- Stale workflow result or unexpected side-effect count: remove the SQLite DB, side-effect log, side-effect marker, and
+  child-result JSON before rerunning the same workflow id.
+- Resume timeout: confirm the first child reached the marker file. If it did not, inspect `first_attempt.stderr_excerpt`
+  in the output artifact and rerun after reset.
+- `side_effect.line_count` greater than `1`: treat the run as failed evidence. Reset local state and inspect whether the
+  side-effect step is still protected by the DBOS step boundary before closing durable work.
+- DBOS logs mention DBOS Conductor: the local smoke does not require the hosted console URL printed by DBOS logs.
+- SQLite production warning: expected for this smoke. Goal 002 must still document and prove a production storage path
+  before final runtime promotion.
 
 ## Local Setup
 
@@ -158,8 +263,8 @@ Common deterministic-run failures:
 - Missing output directory permission: choose a writable `--output` path under `.agent-runs/verifications/`.
 - Missing Langfuse service or keys: omit `--require-langfuse-ingestion` for deterministic fixture validation, or start
   the self-hosted Langfuse profile and export `LANGFUSE_BASE_URL`, `LANGFUSE_PUBLIC_KEY`, and `LANGFUSE_SECRET_KEY`.
-- Durable smoke failure before resume: remove the temporary DBOS SQLite file and side-effect log, then rerun the smoke
-  command so it starts with a fresh workflow id and local DBOS state.
+- Durable smoke failure before resume: remove the temporary DBOS SQLite file, side-effect log, marker, and child-result
+  JSON, then rerun the smoke command so it starts with a fresh workflow id and local DBOS state.
 
 ## Evidence Required
 
@@ -177,6 +282,6 @@ Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation
 
 ## Non-Goals
 
-Do not prove cloud-hosted Logfire, live model or model-judge evals, production DBOS storage, human-wait workflows, or
+Do not prove cloud-hosted Logfire, live model or model-judge evals, production DBOS storage, review-wait workflows, or
 worker scaling in this scaffold. Do not declare Pydantic AI plus Langfuse/OpenTelemetry plus DBOS as the final
 architecture until comparable implementation evidence exists.
