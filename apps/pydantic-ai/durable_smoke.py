@@ -31,11 +31,11 @@ def write_json(path: Path, data: dict[str, Any], pretty: bool) -> None:
 
 def durable_recommendation() -> dict[str, str]:
     return {
-        "linked_task": "T005",
-        "next_slice": "Harden the restart/resume smoke so run identity survives process interruption.",
+        "linked_task": "T006",
+        "next_slice": "Record side-effect idempotency evidence across retry and resume in the durable artifact.",
         "reason": (
-            "The Pydantic AI DBOS lane now has deterministic retry and resume smoke evidence, so the next useful "
-            "slice is preserving run identity across interruption."
+            "The Pydantic AI DBOS lane now has deterministic retry, resume, and run identity preservation evidence, "
+            "so the next useful slice is deeper side-effect idempotency across retry and resume."
         ),
     }
 
@@ -44,7 +44,7 @@ def durable_prompt(payload: dict[str, Any]) -> str:
     project_context = payload.get("project_context", {})
     return (
         f"Objective: {payload.get('objective', '')}\n"
-        f"Current slice: T004\n"
+        f"Current slice: T005\n"
         f"Active spec: {project_context.get('active_spec', '')}\n"
         "Return the next implementation slice after durable execution smoke evidence."
     )
@@ -259,6 +259,24 @@ def command_text(parts: list[str]) -> str:
     return " ".join(shlex.quote(part) for part in parts)
 
 
+def parse_child_stdout(stdout: str) -> dict[str, Any]:
+    for line in stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict) and value.get("workflow_id"):
+            return value
+    return {}
+
+
+def workflow_ids_from_events(events: list[dict[str, Any]]) -> list[str]:
+    return sorted({str(event.get("workflow_id", "")) for event in events if event.get("workflow_id")})
+
+
 def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
     payload = read_json(args.fixture)
     output_dir = args.output.parent if args.output is not None else Path(tempfile.mkdtemp())
@@ -267,8 +285,8 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         "dbos-workflow",
         {
             "candidate": payload.get("candidate", {}),
-            "issue": "awf-4wg",
-            "slice": "T025",
+            "issue": args.issue_id,
+            "slice": "T005",
             "started_at_ns": time.time_ns(),
         },
         length=24,
@@ -343,6 +361,41 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
     workflow_result = child_output.get("workflow_result", {})
     retry_failures = [event for event in retry_events if event.get("will_fail") is True]
     retry_successes = [event for event in retry_events if event.get("will_fail") is False]
+    first_identity = parse_child_stdout(first_stdout)
+    resume_identity = parse_child_stdout(resume_proc.stdout)
+    workflow_status = child_output.get("workflow_status", {})
+    status_output = workflow_status.get("output", {}) if isinstance(workflow_status.get("output"), dict) else {}
+    identity = {
+        "first_attempt_phase": first_identity.get("phase", ""),
+        "first_attempt_workflow_id": first_identity.get("workflow_id", ""),
+        "requested_workflow_id": workflow_id,
+        "resume_attempt_phase": resume_identity.get("phase", ""),
+        "resume_attempt_status": resume_identity.get("status", ""),
+        "resume_attempt_workflow_id": resume_identity.get("workflow_id", ""),
+        "retry_event_workflow_ids": workflow_ids_from_events(retry_events),
+        "side_effect_event_workflow_ids": workflow_ids_from_events(side_effect_events),
+        "workflow_result_workflow_id": workflow_result.get("workflow_id", ""),
+        "workflow_status_workflow_id": workflow_status.get("workflow_id", ""),
+        "workflow_status_output_workflow_id": status_output.get("workflow_id", ""),
+    }
+    identity_values = [
+        identity["first_attempt_workflow_id"],
+        identity["requested_workflow_id"],
+        identity["resume_attempt_workflow_id"],
+        identity["workflow_result_workflow_id"],
+        identity["workflow_status_workflow_id"],
+        identity["workflow_status_output_workflow_id"],
+        *identity["retry_event_workflow_ids"],
+        *identity["side_effect_event_workflow_ids"],
+    ]
+    identity_proven = (
+        resume_proc.returncode == 0
+        and bool(workflow_result)
+        and identity["first_attempt_phase"] == "start"
+        and identity["resume_attempt_phase"] == "resume"
+        and identity["resume_attempt_status"] == "complete"
+        and all(value == workflow_id for value in identity_values)
+    )
     retry_proven = (
         resume_proc.returncode == 0
         and bool(workflow_result)
@@ -375,6 +428,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "controlled_retry": (
                 f"DBOS step controlled_retry_once failed {args.retry_failures} time(s), then retried and completed"
             ),
+            "run_identity_preserved": identity_proven,
             "retry_proven": retry_proven,
             "resume_proven": resume_proc.returncode == 0 and bool(workflow_result),
         },
@@ -385,6 +439,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "stderr_excerpt": first_stderr[-1000:],
             "stdout_excerpt": first_stdout[-1000:],
         },
+        "identity": identity,
         "issue_id": args.issue_id,
         "pydantic_ai": {
             "agent_class": workflow_result.get("agent", {}).get("class"),
@@ -420,6 +475,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
     first_exit_code = artifact["first_attempt"]["exit_code"]
     artifact["passed"] = (
         artifact["durable_property"]["completed_step_not_duplicated"]
+        and artifact["durable_property"]["run_identity_preserved"]
         and artifact["durable_property"]["retry_proven"]
         and artifact["durable_property"]["resume_proven"]
         and artifact["first_attempt"]["side_effect_step_returned_before_kill"]
@@ -443,7 +499,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--side-effect-log", type=Path, help="Optional side-effect proof log path.")
     parser.add_argument("--retry-state-log", type=Path, help="Optional controlled retry proof log path.")
     parser.add_argument("--retry-failures", type=int, default=1, help="Transient DBOS retry failures before success.")
-    parser.add_argument("--issue-id", default="awf-x3q", help="Beads issue id linked to the durable evidence.")
+    parser.add_argument("--issue-id", default="awf-yuz", help="Beads issue id linked to the durable evidence.")
     parser.add_argument("--side-effect-step-marker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--workflow-id", help="Optional deterministic DBOS workflow id.")
     parser.add_argument("--wait-seconds", type=float, default=300.0, help="Child wait duration before resume.")

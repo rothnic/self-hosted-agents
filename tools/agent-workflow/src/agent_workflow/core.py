@@ -1461,6 +1461,7 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         durable = artifact.get("durable_property", {})
         pydantic_ai = artifact.get("pydantic_ai", {})
         dbos = artifact.get("dbos", {})
+        identity = artifact.get("identity", {})
         retry = artifact.get("retry", {})
         first_exit_code = artifact.get("first_attempt", {}).get("exit_code")
         workflow_step_names = [
@@ -1478,6 +1479,16 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "first_attempt_killed": first_exit_code is not None and first_exit_code != 0,
             "step_returned_before_kill": artifact.get("first_attempt", {}).get("side_effect_step_returned_before_kill")
             is True,
+            "run_identity_preserved": durable.get("run_identity_preserved") is True,
+            "identity_first_resume": identity.get("requested_workflow_id")
+            == identity.get("first_attempt_workflow_id")
+            == identity.get("resume_attempt_workflow_id"),
+            "identity_status_result": identity.get("requested_workflow_id")
+            == identity.get("workflow_status_workflow_id")
+            == identity.get("workflow_result_workflow_id")
+            == identity.get("workflow_status_output_workflow_id"),
+            "identity_events": identity.get("retry_event_workflow_ids") == [identity.get("requested_workflow_id")]
+            and identity.get("side_effect_event_workflow_ids") == [identity.get("requested_workflow_id")],
             "retry_proven": durable.get("retry_proven") is True,
             "retry_events": retry.get("failure_count") == 1
             and retry.get("success_count") == 1
