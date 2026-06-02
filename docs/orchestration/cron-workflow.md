@@ -65,8 +65,9 @@ Minimum safe Goal 003 loop:
 3. Orchestrator assigns only unclaimed, unblocked Goal 003 Beads work.
 4. Each worker uses a stable worker id, acts on one claimed ticket, runs ticket verification, records evidence, pushes,
    and stops.
-5. Integrator verifies completed worker branches and increment evidence, routes goal evidence to an independent reviewer
-   agent, and does not merge to `main`.
+5. Integrator reads `integrator_handoff.worker_branch_reviews`, verifies completed worker branches against the feature
+   branch, verifies increment evidence, routes goal evidence to an independent reviewer agent, and does not merge to
+   `main`.
 
 ```cron
 SCOPE='--spec-id 003-automated-increment-orchestration --phase "Goal 003"'
@@ -101,6 +102,15 @@ Claim files include deterministic worker assignment fields derived from Beads is
 
 Workers should use those claim fields instead of inventing branch or worktree names. Orchestrators and worker loops
 must preserve the claim fields so another agent can resume or integrate the branch without hidden local conventions.
+
+## Integrator Handoff
+
+`automation-loop --role integrator` returns `integrator_handoff` with the increment feature branch, `main_merge_allowed`,
+`draft_pr_boundary`, worker branch review entries, and reviewer evidence requirements. Each worker branch review includes
+the claim path, worker branch, worktree path, ticket status, branch existence, verification command, diff command, and
+when locally available, the safe command to integrate the worker branch into the feature branch. Integrators verify and
+integrate worker branches only into the increment feature branch, then present evidence for independent reviewer
+acceptance. They do not merge to `main`.
 
 Blocked work does not stop the whole increment unless every remaining task depends on it. A worker that hits a blocker
 records the blocker, comments or marks the Beads ticket, creates a follow-up when actionable, and exits. The

@@ -34,7 +34,7 @@
 ## Phase 6: Goal 003 Handoff And Recovery Surfaces
 
 - [X] T014 [US1] Add compact verification artifacts for ticket and increment profiles
-- [ ] T015 [US3] Add integrator verification of worker branches without merging to `main`
+- [X] T015 [US3] Add integrator verification of worker branches without merging to `main`
 - [ ] T016 [US3] Add review-agent invocation guidance before PR and increment handoffs
 - [ ] T017 [US3] Add health-loop issue logging for recurring workflow failures
 - [ ] T018 [US3] Add dry-run fixtures for role transitions and blocked-state recovery

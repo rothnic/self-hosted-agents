@@ -79,8 +79,9 @@ and stop. If blocked, record the blocker and release the loop to other work.
 
 Run the integrator automation loop for this repo.
 
-Review completed worker branches for the active increment. Merge only clean, verified worker branches into the feature
-branch. Run:
+Review the command output's `integrator_handoff.worker_branch_reviews`. For each completed worker branch, run the
+reported verification and diff commands before integrating it into the feature branch. Integrator output must not merge
+to `main`; `main_merge_allowed=false` is the expected policy. Run:
 
 ```bash
 .venv/bin/awf automation-loop \

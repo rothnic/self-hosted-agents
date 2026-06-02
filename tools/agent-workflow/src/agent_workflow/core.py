@@ -14,7 +14,7 @@ import tempfile
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 def find_repo_root(start: Path) -> Path:
@@ -1792,6 +1792,54 @@ def claims_for_worker(claims: list[dict[str, Any]], worker_id: str | None) -> li
     return [claim for claim in claims if claim.get("worker_id") == worker]
 
 
+def claim_history_for_status(status: dict[str, Any]) -> list[dict[str, Any]]:
+    child_ticket_ids = {
+        str(item.get("ticket_id")) for item in status.get("child_tickets", []) if item.get("ticket_id")
+    }
+    child_by_ticket_id = {
+        str(item.get("ticket_id")): item for item in status.get("child_tickets", []) if item.get("ticket_id")
+    }
+    issues_by_id = {str(issue.get("id")): issue for issue in beads_issues()}
+    paths = [
+        *sorted((ROOT / ".agent-runs" / "claims").glob("*.json")),
+        *sorted((ROOT / ".agent-runs" / "claims").glob("archive-*/*.json")),
+    ]
+    claims = []
+    seen_paths: set[Path] = set()
+    for path in paths:
+        if path in seen_paths:
+            continue
+        seen_paths.add(path)
+        data = read_json(path)
+        if not data or data.get("error"):
+            continue
+        claim_id = str(data.get("id", ""))
+        if claim_id not in child_ticket_ids:
+            continue
+        issue = issues_by_id.get(claim_id)
+        child = child_by_ticket_id.get(claim_id, {})
+        active = path.parent == ROOT / ".agent-runs" / "claims"
+        data = dict(data)
+        data["path"] = rel(path)
+        data["active"] = active
+        data["archived"] = not active
+        data["issue"] = issue or {}
+        data["task_id"] = child.get("task_id")
+        data["ticket_status"] = (issue or {}).get("status") or child.get("ticket_status")
+        claim_work = data.get("work") if isinstance(data.get("work"), dict) else {}
+        assignment_work = issue or claim_work
+        if isinstance(assignment_work, dict) and assignment_work:
+            assignment = worker_assignment_for_work(
+                assignment_work,
+                feature_branch=data.get("feature_branch") if isinstance(data.get("feature_branch"), str) else None,
+            )
+            data.setdefault("worker_branch", assignment["worker_branch"])
+            data.setdefault("worktree_path", assignment["worktree_path"])
+            data.setdefault("worktree_setup", assignment["setup"])
+        claims.append(data)
+    return sorted(claims, key=lambda item: str(item.get("claimed_at", "")))
+
+
 def unclaimed_work_items(items: list[dict[str, Any]], claims: list[dict[str, Any]]) -> list[dict[str, Any]]:
     claimed_ids = {str(claim.get("id")) for claim in claims}
     return [
@@ -1833,6 +1881,128 @@ def worker_assignment_for_work(work: dict[str, Any], feature_branch: str | None 
             "resume": f"cd {worktree_path} && git status --short --branch",
         },
     }
+
+
+def git_ref_exists(ref: str) -> bool:
+    if not ref:
+        return False
+    proc = run(["git", "rev-parse", "--verify", "--quiet", ref])
+    return proc.returncode == 0
+
+
+def worktree_path_exists(path: str) -> bool:
+    candidate = Path(path)
+    if not candidate.is_absolute():
+        candidate = ROOT / candidate
+    return candidate.exists()
+
+
+def integrator_handoff_from_claims(
+    status: dict[str, Any],
+    claims: list[dict[str, Any]],
+    ref_exists: Callable[[str], bool] | None = None,
+    path_exists: Callable[[str], bool] | None = None,
+) -> dict[str, Any]:
+    exists = ref_exists or git_ref_exists
+    path_exists_fn = path_exists or worktree_path_exists
+    feature_branch = status.get("feature_branch") or "<feature-branch>"
+    base_branch = status.get("base_branch") or "main"
+    branch_reviews = []
+    closed_statuses = {"closed", "resolved", "done"}
+    for claim in claims:
+        worker_branch = claim.get("worker_branch")
+        local_ref = str(worker_branch) if worker_branch and exists(str(worker_branch)) else None
+        remote_ref = f"origin/{worker_branch}" if worker_branch and exists(f"origin/{worker_branch}") else None
+        resolved_ref = local_ref or remote_ref
+        branch_exists = bool(resolved_ref)
+        ticket_status = str(claim.get("ticket_status") or "")
+        if ticket_status in closed_statuses:
+            review_state = "ready-to-verify" if branch_exists else "closed-without-local-branch"
+        elif claim.get("active"):
+            review_state = "worker-in-progress"
+        else:
+            review_state = "historical-open-claim"
+        worktree_path = claim.get("worktree_path")
+        worktree_exists = bool(worktree_path) and path_exists_fn(str(worktree_path))
+        verify_command = (
+            f"cd {shlex.quote(str(worktree_path))} && uv run awf verify --profile ticket --json"
+            if worktree_exists
+            else (
+                f"git worktree add --detach {shlex.quote(str(worktree_path))} {shlex.quote(str(resolved_ref))} && "
+                f"cd {shlex.quote(str(worktree_path))} && uv run awf verify --profile ticket --json"
+            )
+            if worktree_path and resolved_ref
+            else f"git switch --detach {shlex.quote(str(resolved_ref))} && uv run awf verify --profile ticket --json"
+            if resolved_ref
+            else None
+        )
+        branch_reviews.append(
+            {
+                "issue_id": claim.get("id"),
+                "task_id": claim.get("task_id"),
+                "worker_id": claim.get("worker_id"),
+                "ticket_status": ticket_status,
+                "claim_path": claim.get("path"),
+                "active": claim.get("active"),
+                "archived": claim.get("archived"),
+                "worker_branch": worker_branch,
+                "resolved_ref": resolved_ref,
+                "worktree_path": worktree_path,
+                "worktree_exists": worktree_exists,
+                "branch_exists": branch_exists,
+                "review_state": review_state,
+                "verify_command": verify_command,
+                "diff_command": (
+                    f"git diff --stat {shlex.quote(str(feature_branch))}...{shlex.quote(str(resolved_ref))}"
+                    if resolved_ref
+                    else None
+                ),
+                "integrate_to_feature_branch_command": (
+                    f"git switch {shlex.quote(str(feature_branch))} && "
+                    f"git merge --ff-only {shlex.quote(str(resolved_ref))}"
+                    if resolved_ref and ticket_status in closed_statuses
+                    else None
+                ),
+            }
+        )
+    ready_to_verify_count = len([item for item in branch_reviews if item.get("review_state") == "ready-to-verify"])
+    pending_worker_count = len([item for item in branch_reviews if item.get("review_state") == "worker-in-progress"])
+    return {
+        "base_branch": base_branch,
+        "feature_branch": feature_branch,
+        "main_merge_allowed": False,
+        "draft_pr_boundary": True,
+        "review_boundary": "independent-reviewer-acceptance",
+        "worker_branch_reviews": branch_reviews,
+        "worker_branch_count": len(branch_reviews),
+        "ready_to_verify_count": ready_to_verify_count,
+        "pending_worker_count": pending_worker_count,
+        "reviewer_evidence": {
+            "increment_verification_command": "uv run awf verify --profile increment --write --json",
+            "increment_ledger": status.get("path"),
+            "required_before_acceptance": [
+                "all child tickets closed with evidence",
+                "worker branch reviews complete or explained",
+                "independent reviewer accepts or rejects the presented evidence",
+            ],
+        },
+        "safe_next_action": (
+            "verify ready worker branches against the feature branch, then present reviewer-facing evidence"
+            if ready_to_verify_count
+            else "wait for active workers to finish before integrating their branches"
+            if pending_worker_count
+            else "explain completed worker branches without local branch refs, then verify increment evidence"
+            if branch_reviews
+            else "verify increment evidence and present it for independent reviewer acceptance"
+        ),
+    }
+
+
+def integrator_handoff_data(
+    status: dict[str, Any],
+    ref_exists: Callable[[str], bool] | None = None,
+) -> dict[str, Any]:
+    return integrator_handoff_from_claims(status, claim_history_for_status(status), ref_exists=ref_exists)
 
 
 def current_acceptance_item() -> dict[str, Any] | None:
@@ -2534,17 +2704,29 @@ def automation_loop_data(
             "next_action": next_action,
         }
     verify = verify_data("increment", write=write)
+    handoff = integrator_handoff_data(status)
     if status["review_status"] == "accepted" and verify["ok"]:
         next_action = "pm-review-loop should start next roadmap goal"
     elif status["review_status"] == "human-review-required" and verify["ok"]:
         next_action = "pm-review-loop should present the human gate"
     elif status["review_status"] == "ready-for-increment-review" and verify["ok"]:
-        next_action = "prepare the feature branch for human review against main"
+        next_action = "prepare reviewer-facing increment evidence on the draft PR boundary"
     elif status["blocked"]:
         next_action = "route blockers to pm-review-loop before integrating"
+    elif handoff["pending_worker_count"]:
+        next_action = "wait for active workers to finish before integrating their branches"
+    elif handoff["ready_to_verify_count"]:
+        next_action = "verify completed worker branches against the feature branch"
     else:
         next_action = "wait for workers or continue orchestrating ready work"
-    return {"ok": verify["ok"], "role": role, "increment": status, "verify": verify, "next_action": next_action}
+    return {
+        "ok": verify["ok"],
+        "role": role,
+        "increment": status,
+        "verify": verify,
+        "integrator_handoff": handoff,
+        "next_action": next_action,
+    }
 
 
 def health_issue_path(issue_id: str) -> Path:
@@ -3305,6 +3487,69 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and synthetic_claim_payload.get("increment_id")
             == "003-automated-increment-orchestration-goal-003",
             "data": {"assignment": synthetic_assignment, "claim": synthetic_claim},
+        }
+    )
+    synthetic_integrator_status = {
+        "path": ".agent-runs/increments/003-automated-increment-orchestration-goal-003.json",
+        "base_branch": "main",
+        "feature_branch": "codex/003-automated-increment-orchestration-goal-003",
+    }
+    synthetic_integrator_handoff = integrator_handoff_from_claims(
+        synthetic_integrator_status,
+        [
+            {
+                "id": "awf-done",
+                "task_id": "T099",
+                "worker_id": "worker-done",
+                "ticket_status": "closed",
+                "path": ".agent-runs/claims/archive-2026-06/awf-done.json",
+                "active": False,
+                "archived": True,
+                "worker_branch": "codex/awf-done-closed-worker-ticket",
+                "worktree_path": "../self-hosted-agents-worktrees/awf-done-closed-worker-ticket",
+            },
+            {
+                "id": "awf-active",
+                "task_id": "T100",
+                "worker_id": "worker-active",
+                "ticket_status": "open",
+                "path": ".agent-runs/claims/awf-active.json",
+                "active": True,
+                "archived": False,
+                "worker_branch": "codex/awf-active-open-worker-ticket",
+                "worktree_path": "../self-hosted-agents-worktrees/awf-active-open-worker-ticket",
+            },
+        ],
+        ref_exists=lambda ref: ref == "origin/codex/awf-done-closed-worker-ticket",
+        path_exists=lambda path: False,
+    )
+    handoff_commands = [
+        command
+        for review in synthetic_integrator_handoff["worker_branch_reviews"]
+        for command in [
+            review.get("verify_command"),
+            review.get("diff_command"),
+            review.get("integrate_to_feature_branch_command"),
+        ]
+        if command
+    ]
+    results.append(
+        {
+            "name": "integrator handoff verifies worker branches without touching main",
+            "ok": synthetic_integrator_handoff["main_merge_allowed"] is False
+            and synthetic_integrator_handoff["draft_pr_boundary"] is True
+            and synthetic_integrator_handoff["ready_to_verify_count"] == 1
+            and synthetic_integrator_handoff["pending_worker_count"] == 1
+            and all(" main" not in command and "main " not in command for command in handoff_commands)
+            and any("git merge --ff-only origin/codex/awf-done-closed-worker-ticket" in command for command in handoff_commands)
+            and any(
+                "git worktree add --detach ../self-hosted-agents-worktrees/awf-done-closed-worker-ticket "
+                "origin/codex/awf-done-closed-worker-ticket" in command
+                for command in handoff_commands
+            )
+            and synthetic_integrator_handoff["reviewer_evidence"]["increment_verification_command"]
+            == "uv run awf verify --profile increment --write --json",
+            "data": synthetic_integrator_handoff,
         }
     )
     stale_claims = stale_claims_for_increment(
