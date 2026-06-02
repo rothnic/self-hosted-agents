@@ -24,6 +24,9 @@ acceptance.
 Planning/backlog evidence was accepted by independent reviewer agent `019e86e6-7ec3-7481-be8e-adda5d7d508a` in
 `.agent-runs/reports/goal-003-backlog-review-20260602.md`.
 
+T009 automation-loop behavior audit evidence is recorded in
+`.agent-runs/reports/goal-003-t009-automation-loop-audit-20260602.md`.
+
 Backlog sync created the executable Beads tasks below:
 
 - `awf-1oz` / T009: audit current PM, orchestrator, worker, integrator, and health automation-loop behavior.

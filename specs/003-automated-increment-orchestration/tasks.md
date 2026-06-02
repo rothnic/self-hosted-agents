@@ -25,7 +25,7 @@
 
 ## Phase 5: Goal 003 Scheduled Delivery Baseline
 
-- [ ] T009 [US2] Audit current PM, orchestrator, worker, integrator, and health automation-loop behavior
+- [X] T009 [US2] Audit current PM, orchestrator, worker, integrator, and health automation-loop behavior
 - [ ] T010 [US2] Define the minimum safe scheduled loop for one active increment
 - [ ] T011 [US3] Add stale-claim status and handoff guidance for abandoned active work
 - [ ] T012 [US3] Add blocker rerouting so unrelated ready work can continue
