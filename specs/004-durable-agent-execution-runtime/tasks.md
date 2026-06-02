@@ -6,7 +6,7 @@
 ## Phase 1: Durable Contract And Review Model
 
 - [X] T001 [US1] Add a durable execution BDD contract for retry, resume, wait, and side-effect evidence
-- [ ] T002 [US1] Update DBOS selection scoring and final-promotion blockers in `docs/requirements-matrix.md`
+- [X] T002 [US1] Update DBOS selection scoring and final-promotion blockers in `docs/requirements-matrix.md`
 - [ ] T003 [US1] Document local DBOS setup, storage reset, recovery, and troubleshooting for another agent
 
 ## Phase 2: Failure Recovery Smoke
@@ -15,7 +15,7 @@
 - [ ] T005 [US2] Harden the restart/resume smoke so run identity survives process interruption
 - [ ] T006 [US2] Record side-effect idempotency evidence across retry and resume in the durable artifact
 
-## Phase 3: Review-Safe Human Wait
+## Phase 3: Review-Safe Review Wait
 
 - [ ] T007 [US3] Add a fixture-safe review wait that stops without reviewer acceptance evidence
 - [ ] T008 [US3] Add durable resume from independent reviewer acceptance evidence

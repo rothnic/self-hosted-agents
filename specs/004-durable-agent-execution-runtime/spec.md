@@ -21,7 +21,7 @@ selected only for the next proof and alternatives remain visible.
 1. **Given** the durable runtime options, **When** the selection evidence is reviewed, **Then** DBOS, Prefect, Restate,
    Temporal, and Hatchet are scored against local setup, operator burden, recovery behavior, and scale path.
 2. **Given** DBOS is selected for the next proof, **When** matrix scoring is updated, **Then** final-solution promotion
-   remains blocked until retry, human wait, production storage, workers, and recovery are proven.
+   remains blocked until retry, review wait, production storage, workers, and recovery are proven.
 
 ---
 
@@ -44,14 +44,14 @@ resume identity, one side-effect record, Pydantic AI run id, trace id, and evalu
 
 ---
 
-### User Story 3 - Durable Human Wait Is Review-Safe (Priority: P1)
+### User Story 3 - Durable Review Wait Is Review-Safe (Priority: P1)
 
 As an automation operator, I can pause a durable agent workflow for review and resume it only after reviewer acceptance
 is recorded in repo state.
 
 **Why this priority**: Scheduled agents must not bypass review gates while trying to be durable.
 
-**Independent Test**: Run a fixture-safe human-wait smoke and confirm the waiting state, reviewer acceptance artifact,
+**Independent Test**: Run a fixture-safe review-wait smoke and confirm the waiting state, reviewer acceptance artifact,
 resume event, and final run artifact are linked.
 
 **Acceptance Scenarios**:

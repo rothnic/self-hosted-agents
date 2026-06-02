@@ -1,7 +1,7 @@
 # Requirements Matrix
 
 Date: 2026-05-10
-Last updated: 2026-05-31
+Last updated: 2026-06-02
 
 ## Purpose
 
@@ -35,7 +35,7 @@ The first user is the project owner as an engineer. The working assumptions are:
 | R8 | Roadmap learning loop | Requirements should evolve as prototypes reveal issues | Review notes update specs and backlog |
 | R9 | Low custom critical infrastructure | Avoid rebuilding platform capabilities mature tools normally provide | Platform capabilities are provided or intentionally owned |
 | R10 | LLM-aware observability | Full solutions need product trace review, not only local exports | Self-hosted trace evidence correlated to run artifacts |
-| R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison with retry/resume/human-wait/side-effect evidence |
+| R11 | Durable execution before final promotion | Long-running agent workflows must recover without duplicate side effects | Runtime comparison with retry/resume/review-wait/side-effect evidence |
 
 ## Functional Needs Map
 
@@ -50,7 +50,7 @@ or a small amount of app-local glue. The comparison should name those provider c
 | Observability | Inspect model/tool/state behavior | Langfuse, Logfire, Phoenix, MLflow, OTel, or traces | Self-hosted trace UI, cost tracking, failure views, eval dashboards, or OTel export |
 | Evaluation | Rerun and score comparable behavior | Deterministic checks, eval datasets, framework evals, or custom scorer | Regression history, trace-linked scores, judges, or annotation workflows |
 | Evidence storage | Preserve run, trace, eval, setup, and gaps | Repo artifacts, observability backend, eval store, or exports | Cross-run comparison UI, searchable evidence, or reports |
-| Durable execution | Recover or resume long-running workflows | Pydantic integrations, Hatchet, Temporal, DBOS, Prefect, Restate, or queues | Retries, human waits, workers, or replay UI |
+| Durable execution | Recover or resume long-running workflows | Pydantic integrations, Hatchet, Temporal, DBOS, Prefect, Restate, or queues | Retries, review waits, workers, or replay UI |
 | Operator experience | Keep setup and debugging manageable | Bootstrap scripts, service topology, local UI, documented recovery | Single-command local stack, low service count, or diagnostics |
 | Scalability path | Show how the slice becomes a durable service | Deployment target, storage model, runtime model, and boundaries | Microservice deployment, tenancy controls, or supported hosting |
 
@@ -65,7 +65,7 @@ missing provider component, record that as a custom critical infrastructure warn
 | LangGraph Python plus Langfuse | Strong Python orchestration plus self-hostable LLM observability | Trace quality, eval workflow, setup effort | Integration depth must be proven |
 | LangGraph Python plus Phoenix | Strong Python and OpenInference-style observability path | Local tracing, eval quality, app instrumentation | Deferred until dev experience is better understood |
 | Python app plus MLflow tracing | Strong Python lifecycle and broader experiment tracking | Trace/eval ergonomics for agent workflows | Less specialized LLM observability UX |
-| Pydantic AI + Langfuse/DBOS | Tested typed Python slice with evals and durable smoke | OTel, evals, runtime fit | Production DBOS, human wait, and workers are unscored |
+| Pydantic AI + Langfuse/DBOS | Tested typed Python slice with evals and durable smoke | OTel, evals, runtime fit | Production DBOS, review wait, and workers are unscored |
 | Mastra TypeScript plus shared contracts | Useful contrast with a TypeScript-native agent framework | Cross-language cost and feature parity | Lower fit with Python preference |
 | LangSmith baseline | Best-known LangChain/LangGraph comparison point | Feature expectations and integration baseline | Self-hosted access may require Enterprise |
 
@@ -109,7 +109,7 @@ Use "final solution" language only when both of these are true:
 
 - Self-hosted-compatible observability is stack evidence from the tested candidate app, correlated to repo-local run and
   evaluation artifacts.
-- Durable execution is proven for retry, resume, human wait, and side-effect behavior through an evaluated runtime.
+- Durable execution is proven for retry, resume, review wait, and side-effect behavior through an evaluated runtime.
 
 Deterministic repo-local artifacts remain mandatory in both cases so agents can rerun validation without hidden hosted
 state. Missing self-hosted-compatible observability or durable execution evidence blocks final-solution acceptance
@@ -162,13 +162,62 @@ Evidence:
 - `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
 
 This upgrades durable execution from selection evidence to candidate smoke evidence, but final-solution language still
-remains blocked until human wait behavior, production DBOS storage, worker topology, and operating recovery are scored.
+remains blocked until retry, review wait behavior, production DBOS storage, worker topology, and operating recovery are
+scored.
+
+### Goal 002 Durable Runtime Scoring Update - 2026-06-02
+
+Goal 002 starts by deepening the existing **Pydantic AI plus DBOS** lane. This is a proof-path decision, not a final
+runtime decision. The matrix now distinguishes the local SQLite smoke from production-ready durable operations so DBOS
+cannot be promoted by implication.
+
+Evidence inspected:
+
+- `docs/research/durable-execution-selection-2026-05-31.md`
+- `.agent-runs/verifications/verify-durable-options-t024-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json`
+- `specs/004-durable-agent-execution-runtime/spec.md`
+- `tests/workflow/features/durable_agent_execution_runtime.feature`
+
+#### Durable Runtime Option Scores
+
+| Runtime | First-Proof Fit | Local Setup | Operator Burden | Recovery Evidence | Final Promotion Blocker |
+| --- | --- | --- | --- | --- | --- |
+| Pydantic AI plus DBOS | 4 | 4 | 3 | 2 | Needs retry, review wait, Postgres/storage, workers, recovery docs |
+| Pydantic AI plus Prefect | 3 | 3 | 3 | 1 | Needs proof that agent/tool durability stays simple |
+| Pydantic AI plus Restate | 2 | 2 | 2 | 1 | Installed candidate package does not expose the integration |
+| Pydantic AI plus Temporal | 3 | 2 | 2 | 1 | Strong scale path, but setup and worker complexity are high |
+| Hatchet | 3 | 2 | 2 | 1 | Self-hostable platform, but no native Pydantic AI durable wrapper |
+
+Scoring interpretation:
+
+- **First-proof fit** scores whether the runtime should be used for the next evidence slice.
+- **Local setup** scores deterministic fixture friendliness without hosted services or external model providers.
+- **Operator burden** scores one-engineer comprehension, service count, and setup complexity.
+- **Recovery evidence** scores current repo evidence only; DBOS has resume and side-effect evidence, but not retry or
+  review-wait evidence yet.
+
+#### DBOS Promotion Boundary
+
+DBOS remains the selected Goal 002 proof path because it has the best current combination of native Pydantic AI fit,
+local SQLite smokeability, and low service count. It is still capped at **tested durable smoke**, not production runtime,
+until all blockers below have repo-local or self-hosted evidence:
+
+- Controlled retry after transient failure.
+- Process restart or resume with stable durable run identity.
+- Review wait that stops without reviewer acceptance evidence.
+- Resume only after independent reviewer acceptance is recorded in repo state.
+- Side-effect idempotency across retry and resume.
+- Durable run artifact linking DBOS workflow id, Pydantic AI run id, trace id, eval id, and Beads evidence.
+- Production storage path beyond SQLite development mode.
+- Worker topology, queue behavior, and recovery operations.
+- Reset, backup, retention, troubleshooting, and recovery documentation for another agent.
 
 ### Pydantic AI Implementation Scoring Update (T026)
 
 Evidence status: `apps/pydantic-ai` is now a tested candidate slice, not only a research candidate. It has deterministic
 repo-local run, trace, evaluation, and durable smoke artifacts, plus one service-backed self-hosted Langfuse proof. This
-does not make it a final solution because durable retry, human wait, production DBOS storage, worker topology, recovery
+does not make it a final solution because durable retry, review wait, production DBOS storage, worker topology, recovery
 operations, live model/tool traces, and broader evaluation workflows remain unproven.
 
 Evidence inspected on 2026-05-31:
@@ -199,7 +248,7 @@ Evidence inspected on 2026-05-31:
 | Observability | Repo-local OTel export and self-hosted Langfuse ingestion are proven | 4 | Live model/tool token, cost, failure, and retrieval traces remain gaps |
 | Evaluation | Pydantic Evals assertions score 5/5 and correlate to run and trace artifacts | 3 | Datasets, judges, annotation, and Langfuse eval UI are not proven |
 | Evidence storage | Run, trace, eval, setup, durable selection, and smoke artifacts are committed | 3 | Cross-run search, reporting UI, and retention policy are not implemented |
-| Durable execution | DBOS SQLite smoke proves resume without duplicating the side-effect step | 3 | Retry, human wait, production storage, workers, and recovery are not proven |
+| Durable execution | DBOS SQLite smoke proves resume without duplicating the side-effect step | 3 | Retry, review wait, production storage, workers, and recovery are not proven |
 | Operator experience | Fixture mode is zero-service; Langfuse and DBOS have documented commands | 2 | Langfuse used several services and secrets; production DBOS setup is unknown |
 | Scalability path | Pydantic AI OTel, Pydantic Evals, and DBOS provide a low-glue Python path | 2 | DBOS storage, workers, queues, retention, backups, and deployment are unscored |
 
@@ -212,7 +261,7 @@ These are implementation-slice scores. Final-solution promotion caps still apply
 | Infrastructure ownership | 3 | Pydantic AI, Evals, Langfuse, and DBOS provide major platform functions | Compare Langfuse and DBOS operations before deeper selection |
 | Observability | 4 | Tested app emits repo-local traces and verifies the same trace in Langfuse | Live model/tool traces, token and cost views, and failure traces remain gaps |
 | Evaluation | 3 | Pydantic Evals produces repeatable 5/5 scoring tied to run and trace ids | Dataset, judge, annotation, regression history, and Langfuse eval UI remain gaps |
-| Durable execution | 3 | DBOS smoke proves resume and side-effect non-duplication with workflow steps | Cap final-solution language until retry, human wait, production DBOS, and workers |
+| Durable execution | 3 | DBOS smoke proves resume and side-effect non-duplication with workflow steps | Cap final-solution language until retry, review wait, production DBOS, and workers |
 | Scalability | 2 | Official OTel, eval, and DBOS paths suggest a scale route without custom core infra | Production topology, storage, queues, recovery, and deployment are not implemented |
 | Operating effort | 2 | Fixture mode is simple, but the service-backed proof used services and secrets | Needs deployment docs, backups, reset, and recovery rehearsal |
 
@@ -223,7 +272,7 @@ final solution yet.
 
 Promotion blockers before final-solution language:
 
-- Prove durable retry and human wait behavior, not only resume and side-effect safety.
+- Prove durable retry and review wait behavior, not only resume and side-effect safety.
 - Replace the SQLite DBOS smoke with a scored production storage and worker topology.
 - Document and rehearse recovery for Langfuse, DBOS storage, secrets, retention, and backups.
 - Add live model/tool traces or explicit simulated equivalents covering tokens, cost, failures, and tool-call context.
