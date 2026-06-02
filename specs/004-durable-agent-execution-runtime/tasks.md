@@ -19,7 +19,7 @@
 
 - [X] T007 [US3] Add a fixture-safe review wait that stops without reviewer acceptance evidence
 - [X] T008 [US3] Add durable resume from independent reviewer acceptance evidence
-- [ ] T009 [US3] Link wait, reviewer, resume, trace, eval, and Beads ids in the durable run artifact
+- [X] T009 [US3] Link wait, reviewer, resume, trace, eval, and Beads ids in the durable run artifact
 
 ## Phase 4: Promotion Evidence And Follow-Ups
 

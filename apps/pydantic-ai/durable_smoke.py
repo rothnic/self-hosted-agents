@@ -31,12 +31,12 @@ def write_json(path: Path, data: dict[str, Any], pretty: bool) -> None:
 
 def durable_recommendation() -> dict[str, str]:
     return {
-        "linked_task": "T009",
-        "next_slice": "Link wait, reviewer, resume, trace, eval, and Beads ids in the durable run artifact.",
+        "linked_task": "T010",
+        "next_slice": "Add workflow fixture assertions for the durable evidence shape.",
         "reason": (
             "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect "
-            "idempotency evidence plus fixture-safe review wait and accepted-review continuation, so the next useful "
-            "slice is full artifact correlation."
+            "idempotency evidence plus fixture-safe review wait, accepted-review continuation, and durable artifact "
+            "correlation, so the next useful slice is broader fixture shape hardening."
         ),
     }
 
@@ -45,7 +45,7 @@ def durable_prompt(payload: dict[str, Any]) -> str:
     project_context = payload.get("project_context", {})
     return (
         f"Objective: {payload.get('objective', '')}\n"
-        f"Current slice: T008\n"
+        f"Current slice: T009\n"
         f"Active spec: {project_context.get('active_spec', '')}\n"
         "Return the next implementation slice after durable execution smoke evidence."
     )
@@ -402,7 +402,7 @@ def write_review_acceptance_artifact(
 ) -> dict[str, Any]:
     artifact = {
         "accepted": True,
-        "accepted_at": "fixture-deterministic-t008",
+        "accepted_at": "fixture-deterministic-review-acceptance",
         "beads_issue_id": issue_id,
         "decision": "accepted",
         "event": "independent-reviewer-acceptance",
@@ -430,7 +430,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         {
             "candidate": payload.get("candidate", {}),
             "issue": args.issue_id,
-            "slice": "T008",
+            "slice": "T009",
             "started_at_ns": time.time_ns(),
         },
         length=24,
@@ -739,12 +739,86 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
         and accepted_post_wait_side_effect.get("event") == accepted_post_wait_event
         and accepted_post_wait_event.get("workflow_id") == accepted_review_workflow_id
     )
+    pydantic_run_id = workflow_result.get("pydantic_ai_run_id", "")
+    trace_id = workflow_result.get("trace_id", "")
+    evaluation_id = stable_id(
+        "eval",
+        {
+            "accepted_review_workflow_id": accepted_review_workflow_id,
+            "issue_id": args.issue_id,
+            "pydantic_ai_run_id": pydantic_run_id,
+            "task_id": "T009",
+            "trace_id": trace_id,
+            "workflow_id": workflow_id,
+        },
+    )
+    artifact_output_path = str(args.output) if args.output is not None else ""
+    correlation_proven = (
+        bool(pydantic_run_id)
+        and bool(trace_id)
+        and evaluation_id.startswith("eval-")
+        and identity_proven
+        and review_wait_state_data.get("workflow_id") == review_wait_workflow_id
+        and review_wait_state_data.get("beads_issue_id") == args.issue_id
+        and accepted_review_acceptance_data.get("reviewer_agent_id") == "fixture-independent-reviewer"
+        and accepted_review_acceptance_data.get("workflow_id") == accepted_review_workflow_id
+        and accepted_review_acceptance_data.get("beads_issue_id") == args.issue_id
+        and accepted_review_wait_state_data.get("workflow_id") == accepted_review_workflow_id
+        and accepted_review_wait_state_data.get("beads_issue_id") == args.issue_id
+        and accepted_post_wait_event.get("workflow_id") == accepted_review_workflow_id
+    )
     artifact = {
         "acceptance_command": "uv run awf workflow-fixture-test",
         "candidate_app": "apps/pydantic-ai",
         "command_used": command_text(
             ["uv", "run", "python", "apps/pydantic-ai/durable_smoke.py", *(argv if argv is not None else sys.argv[1:])]
         ),
+        "correlation": {
+            "accepted_review_resume": {
+                "post_wait_event_workflow_id": accepted_post_wait_event.get("workflow_id", ""),
+                "post_wait_side_effect_log": str(accepted_post_wait_side_effect_log),
+                "state_path": str(accepted_review_wait_state),
+                "workflow_id": accepted_review_workflow_id,
+            },
+            "beads": {
+                "acceptance_command": "uv run awf workflow-fixture-test",
+                "beads_issue_id": args.issue_id,
+                "evidence_artifact": artifact_output_path,
+                "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T009",
+                "objective_id": "agentic-development-foundation",
+                "spec_id": "004-durable-agent-execution-runtime",
+                "task_id": "T009",
+            },
+            "durable_run": {
+                "durable_run_id": workflow_id,
+                "resume_attempt_workflow_id": identity.get("resume_attempt_workflow_id", ""),
+                "workflow_result_workflow_id": identity.get("workflow_result_workflow_id", ""),
+                "workflow_status_workflow_id": identity.get("workflow_status_workflow_id", ""),
+            },
+            "evaluation": {
+                "evaluation_id": evaluation_id,
+                "provider": "deterministic-fixture-correlation",
+                "run_id": pydantic_run_id,
+                "trace_id": trace_id,
+            },
+            "observability": {
+                "pydantic_ai_run_id": pydantic_run_id,
+                "trace_id": trace_id,
+            },
+            "proven": correlation_proven,
+            "review_wait": {
+                "required_evidence_path": required_review_evidence_path,
+                "state_path": str(review_wait_state),
+                "workflow_id": review_wait_workflow_id,
+            },
+            "reviewer_acceptance": {
+                "acceptance_path": str(accepted_review_acceptance),
+                "accepted": accepted_review_acceptance_data.get("accepted", False),
+                "required_evidence_path": accepted_required_review_evidence_path,
+                "reviewer_agent_id": accepted_review_acceptance_data.get("reviewer_agent_id", ""),
+                "workflow_id": accepted_review_acceptance_data.get("workflow_id", ""),
+            },
+        },
         "dbos": {
             "db_path": str(db_path),
             "side_effect_step_marker": str(side_effect_step_marker),
@@ -764,6 +838,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "controlled_retry": (
                 f"DBOS step controlled_retry_once failed {args.retry_failures} time(s), then retried and completed"
             ),
+            "artifact_correlation_proven": correlation_proven,
             "run_identity_preserved": identity_proven,
             "retry_proven": retry_proven,
             "review_wait_proven": review_wait_proven,
@@ -785,8 +860,8 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
             "model_class": workflow_result.get("agent", {}).get("model"),
             "network_required": workflow_result.get("agent", {}).get("network_required"),
             "recommendation": workflow_result.get("agent", {}).get("recommendation", {}),
-            "run_id": workflow_result.get("pydantic_ai_run_id", ""),
-            "trace_id": workflow_result.get("trace_id", ""),
+            "run_id": pydantic_run_id,
+            "trace_id": trace_id,
         },
         "resume_attempt": {
             "command": command_text(resume_command),
@@ -860,6 +935,7 @@ def run_parent(args: argparse.Namespace, argv: list[str] | None) -> int:
     first_exit_code = artifact["first_attempt"]["exit_code"]
     artifact["passed"] = (
         artifact["durable_property"]["completed_step_not_duplicated"]
+        and artifact["durable_property"]["artifact_correlation_proven"]
         and artifact["durable_property"]["run_identity_preserved"]
         and artifact["durable_property"]["retry_proven"]
         and artifact["durable_property"]["review_resume_proven"]
@@ -905,7 +981,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Reviewer evidence path the accepted-review resume proof links before post-wait continuation.",
     )
     parser.add_argument("--retry-failures", type=int, default=1, help="Transient DBOS retry failures before success.")
-    parser.add_argument("--issue-id", default="awf-vpi", help="Beads issue id linked to the durable evidence.")
+    parser.add_argument("--issue-id", default="awf-r6g", help="Beads issue id linked to the durable evidence.")
     parser.add_argument("--side-effect-step-marker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--workflow-id", help="Optional deterministic DBOS workflow id.")
     parser.add_argument("--wait-seconds", type=float, default=300.0, help="Child wait duration before resume.")

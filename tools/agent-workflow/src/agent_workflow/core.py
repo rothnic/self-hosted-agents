@@ -1464,6 +1464,26 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
         identity = artifact.get("identity", {})
         retry = artifact.get("retry", {})
         side_effect_idempotency = artifact.get("side_effect", {}).get("idempotency", {})
+        correlation = artifact.get("correlation", {})
+        correlation_durable = correlation.get("durable_run", {}) if isinstance(correlation.get("durable_run"), dict) else {}
+        correlation_observability = (
+            correlation.get("observability", {}) if isinstance(correlation.get("observability"), dict) else {}
+        )
+        correlation_evaluation = (
+            correlation.get("evaluation", {}) if isinstance(correlation.get("evaluation"), dict) else {}
+        )
+        correlation_beads = correlation.get("beads", {}) if isinstance(correlation.get("beads"), dict) else {}
+        correlation_wait = correlation.get("review_wait", {}) if isinstance(correlation.get("review_wait"), dict) else {}
+        correlation_acceptance = (
+            correlation.get("reviewer_acceptance", {})
+            if isinstance(correlation.get("reviewer_acceptance"), dict)
+            else {}
+        )
+        correlation_resume = (
+            correlation.get("accepted_review_resume", {})
+            if isinstance(correlation.get("accepted_review_resume"), dict)
+            else {}
+        )
         review_wait = artifact.get("review_wait", {})
         review_wait_state = review_wait.get("state", {}) if isinstance(review_wait.get("state"), dict) else {}
         accepted_review_resume = artifact.get("accepted_review_resume", {})
@@ -1520,6 +1540,24 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "retry_events": retry.get("failure_count") == 1
             and retry.get("success_count") == 1
             and retry.get("line_count") == 2,
+            "artifact_correlation_proven": durable.get("artifact_correlation_proven") is True
+            and correlation.get("proven") is True,
+            "correlation_durable_ids": correlation_durable.get("durable_run_id")
+            == dbos.get("workflow_id")
+            == identity.get("requested_workflow_id")
+            == correlation_durable.get("resume_attempt_workflow_id")
+            == correlation_durable.get("workflow_result_workflow_id")
+            == correlation_durable.get("workflow_status_workflow_id"),
+            "correlation_trace_eval": correlation_observability.get("trace_id") == pydantic_ai.get("trace_id")
+            and correlation_observability.get("pydantic_ai_run_id") == pydantic_ai.get("run_id")
+            and correlation_evaluation.get("trace_id") == pydantic_ai.get("trace_id")
+            and correlation_evaluation.get("run_id") == pydantic_ai.get("run_id")
+            and str(correlation_evaluation.get("evaluation_id", "")).startswith("eval-"),
+            "correlation_beads": correlation_beads.get("beads_issue_id") == artifact.get("issue_id")
+            and correlation_beads.get("task_id") == "T009"
+            and correlation_beads.get("spec_id") == "004-durable-agent-execution-runtime"
+            and correlation_beads.get("external_ref") == "specs/004-durable-agent-execution-runtime/tasks.md#T009"
+            and correlation_beads.get("acceptance_command") == artifact.get("acceptance_command"),
             "review_wait_proven": durable.get("review_wait_proven") is True and review_wait.get("proven") is True,
             "review_wait_missing_acceptance": review_wait.get("acceptance_artifact_exists") is False
             and review_wait_state.get("status") == "waiting-for-reviewer-acceptance"
@@ -1548,6 +1586,16 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             == accepted_review_acceptance.get("workflow_id")
             == accepted_workflow_result.get("workflow_id")
             == accepted_post_wait_event.get("workflow_id"),
+            "correlation_review_links": correlation_wait.get("workflow_id") == review_wait.get("workflow_id")
+            and correlation_wait.get("state_path") == review_wait.get("state_path")
+            and correlation_wait.get("required_evidence_path") == review_wait.get("required_evidence_path")
+            and correlation_acceptance.get("workflow_id") == accepted_review_acceptance.get("workflow_id")
+            and correlation_acceptance.get("reviewer_agent_id")
+            == accepted_review_acceptance.get("reviewer_agent_id")
+            and correlation_acceptance.get("required_evidence_path")
+            == accepted_review_acceptance.get("required_evidence_path")
+            and correlation_resume.get("workflow_id") == accepted_review_resume.get("workflow_id")
+            and correlation_resume.get("post_wait_event_workflow_id") == accepted_post_wait_event.get("workflow_id"),
             "review_resume_post_side_effect": accepted_review_resume.get("post_wait_side_effect", {}).get("line_count")
             == 1
             and accepted_workflow_result.get("post_wait_side_effect", {}).get("line_count_before") == 0
