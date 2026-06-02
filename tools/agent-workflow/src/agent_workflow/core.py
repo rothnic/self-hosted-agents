@@ -2893,6 +2893,116 @@ def health_loop_issue_records(
     return records
 
 
+def dry_run_role_transition_fixture() -> dict[str, Any]:
+    increment_id = "003-automated-increment-orchestration-goal-003"
+    feature_branch = "codex/003-automated-increment-orchestration-goal-003"
+    ready_work = {
+        "id": "awf-transition",
+        "title": "Add dry-run role transition coverage",
+        "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T018",
+        "status": "open",
+        "issue_type": "task",
+    }
+    blocked_work = {
+        "id": "awf-blocked-transition",
+        "title": "Blocked transition work",
+        "external_ref": "specs/003-automated-increment-orchestration/tasks.md#T999",
+        "status": "open",
+        "issue_type": "task",
+        "dependencies": [
+            {
+                "depends_on_id": "awf-blocking-gate",
+                "type": "blocks",
+                "status": "open",
+            }
+        ],
+    }
+    blocker_reroute = blocker_reroute_data([ready_work], [blocked_work])
+    claim = claim_work_data(
+        worker_id="fixture-transition-worker",
+        write=False,
+        work_item=ready_work,
+        ready_items=[ready_work],
+        feature_branch=feature_branch,
+        increment_id=increment_id,
+        assigned_by="automation-loop:orchestrator:dry-run",
+    )
+    claimed = claim.get("claimed") if isinstance(claim.get("claimed"), dict) else {}
+    handoff = integrator_handoff_from_claims(
+        {"path": f".agent-runs/increments/{increment_id}.json", "base_branch": "main", "feature_branch": feature_branch},
+        [
+            {
+                "id": "awf-transition-done",
+                "task_id": "T018",
+                "worker_id": "fixture-transition-worker",
+                "ticket_status": "closed",
+                "path": ".agent-runs/claims/archive-2026-06/awf-transition-done.json",
+                "active": False,
+                "archived": True,
+                "worker_branch": "codex/awf-transition-done-role-transition-fixture",
+                "worktree_path": "../self-hosted-agents-worktrees/awf-transition-done-role-transition-fixture",
+            }
+        ],
+        ref_exists=lambda ref: ref == "origin/codex/awf-transition-done-role-transition-fixture",
+        path_exists=lambda path: False,
+    )
+    synthetic_health = {
+        "ok": False,
+        "profile": "health",
+        "checks": [{"name": "workflow-fixture-test", "command": "uv run awf workflow-fixture-test", "ok": False}],
+        "failed_checks": ["workflow-fixture-test"],
+        "next_action": "health-loop should log issues and stop implementation",
+    }
+    health_records = health_loop_issue_records(
+        synthetic_health,
+        write=False,
+        existing_records_by_fingerprint={},
+        created_at="2026-06-02T00:00:00+00:00",
+    )
+    transitions = [
+        {
+            "role": "pm-review",
+            "next_action": "pm-review-loop should triage blockers while unblocked work continues",
+            "blocked_count": blocker_reroute["blocked_count"],
+        },
+        {
+            "role": "orchestrator",
+            "next_action": blocker_reroute["next_action"],
+            "claim": claim,
+        },
+        {
+            "role": "worker",
+            "next_action": "worker-loop should implement the claimed ticket on its worker branch",
+            "worker_branch": claimed.get("worker_branch"),
+            "worktree_path": claimed.get("worktree_path"),
+        },
+        {
+            "role": "integrator",
+            "next_action": handoff["safe_next_action"],
+            "main_merge_allowed": handoff["main_merge_allowed"],
+            "ready_to_verify_count": handoff["ready_to_verify_count"],
+        },
+        {
+            "role": "health",
+            "next_action": "health-loop logged repo-local issue evidence and should stop implementation",
+            "logged": health_records,
+        },
+    ]
+    return {
+        "increment_id": increment_id,
+        "feature_branch": feature_branch,
+        "transitions": transitions,
+        "blocker_reroute": blocker_reroute,
+        "integrator_handoff": handoff,
+        "dry_run_mutation_safe": bool(claimed) and "path" not in claimed and not claim_path(ready_work["id"]).exists(),
+        "blocked_state_recovery": (
+            blocker_reroute["can_continue"]
+            and blocker_reroute["next_unblocked_issue_id"] == ready_work["id"]
+            and blocker_reroute["blocked"][0]["blocking_dependencies"][0]["id"] == "awf-blocking-gate"
+        ),
+    }
+
+
 def issue_log_data(title: str, severity: str, source: str, details: str, write: bool) -> dict[str, Any]:
     issue_id = now_id("health")
     item = {
@@ -3768,6 +3878,25 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and blocker_reroute["blocked"][0]["blocking_dependencies"][0]["id"] == "awf-gate"
             and "keep assigning unblocked work" in blocker_reroute["next_action"],
             "data": {"blocker_reroute": blocker_reroute},
+        }
+    )
+    role_transition_fixture = dry_run_role_transition_fixture()
+    role_order = [item.get("role") for item in role_transition_fixture.get("transitions", [])]
+    role_transition_claim = role_transition_fixture["transitions"][1].get("claim", {})
+    role_transition_health = role_transition_fixture["transitions"][4].get("logged", [])
+    results.append(
+        {
+            "name": "dry-run role transition fixture covers blocked-state recovery",
+            "ok": role_order == ["pm-review", "orchestrator", "worker", "integrator", "health"]
+            and role_transition_fixture["dry_run_mutation_safe"]
+            and role_transition_fixture["blocked_state_recovery"]
+            and role_transition_claim.get("claimed", {}).get("assigned_by") == "automation-loop:orchestrator:dry-run"
+            and role_transition_fixture["integrator_handoff"]["main_merge_allowed"] is False
+            and role_transition_fixture["integrator_handoff"]["ready_to_verify_count"] == 1
+            and len(role_transition_health) == 1
+            and "path" not in role_transition_health[0]
+            and "keep assigning unblocked work" in role_transition_fixture["blocker_reroute"]["next_action"],
+            "data": role_transition_fixture,
         }
     )
     synthetic_full_issues = [

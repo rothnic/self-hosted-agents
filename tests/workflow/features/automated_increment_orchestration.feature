@@ -21,6 +21,12 @@ Feature: Automated increment orchestration
     Then it records repo-local issue evidence with recurrence context
     And the operational record stops implementation until planner or health triage handles the issue
 
+  Scenario: Dry-run fixtures cover role transitions and blocked-state recovery
+    Given an increment has unblocked ready work and a separate blocked ticket
+    When the fixture driver simulates PM review, orchestrator, worker, integrator, and health transitions
+    Then the operational record proves the dry run does not mutate active claims
+    And the operational record keeps the blocked ticket visible while routing unblocked work forward
+
   Scenario: Integrator routes increment evidence to reviewer acceptance
     Given all child tickets for a spec phase are complete and verified
     When the integrator driver evaluates the feature branch

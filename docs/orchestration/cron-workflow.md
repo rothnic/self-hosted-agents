@@ -81,6 +81,13 @@ SCOPE='--spec-id 003-automated-increment-orchestration --phase "Goal 003"'
 Codex app automation prompts for these roles live in
 `docs/orchestration/codex-automation-prompts.md`.
 
+## Dry-Run Fixtures
+
+`uv run awf workflow-fixture-test` includes a synthetic dry-run role transition fixture. It proves PM/review,
+orchestrator, worker, integrator, and health transitions can be represented without mutating active claims, while a
+blocked ticket remains visible and unrelated ready work continues forward. This is fixture evidence for scheduled-loop
+routing; live scheduling still uses Beads ready work, claim files, increment ledgers, and review-agent acceptance.
+
 ## Separation
 
 Workers coordinate through Beads ready work and `.agent-runs/claims/`.

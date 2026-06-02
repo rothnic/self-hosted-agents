@@ -37,7 +37,7 @@
 - [X] T015 [US3] Add integrator verification of worker branches without merging to `main`
 - [X] T016 [US3] Add review-agent invocation guidance before PR and increment handoffs
 - [X] T017 [US3] Add health-loop issue logging for recurring workflow failures
-- [ ] T018 [US3] Add dry-run fixtures for role transitions and blocked-state recovery
+- [X] T018 [US3] Add dry-run fixtures for role transitions and blocked-state recovery
 
 ## Phase 7: Goal 003 Operator Visibility And Acceptance
 
