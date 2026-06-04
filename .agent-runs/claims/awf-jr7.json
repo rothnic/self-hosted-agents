@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T11:12:03.626363+00:00",
+  "id": "awf-jr7",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:04.336772Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:47.699260Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-1f9",
+        "issue_id": "awf-jr7",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:37.753842Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-jr7",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T015\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+    "id": "awf-jr7",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected",
+    "updated_at": "2026-06-04T06:39:47.699631Z"
+  },
+  "worker_branch": "codex/awf-jr7-add-accessibility-and-small-screen-revie",
+  "worker_id": "codex-goal006-t015",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-jr7-add-accessibility-and-small-screen-revie",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-jr7-add-accessibility-and-small-screen-revie ../self-hosted-agents-worktrees/awf-jr7-add-accessibility-and-small-screen-revie <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-jr7-add-accessibility-and-small-screen-revie && git status --short --branch"
+  }
+}

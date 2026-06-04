@@ -433,6 +433,30 @@ def workbench_interface(
     raise typer.Exit(0 if ok else 1)
 
 
+@app.command("accessibility-small-screen")
+def accessibility_small_screen(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local accessibility/small-screen rationale."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report why CLI/static does not require UI-specific accessibility checks for Goal 006."""
+    data = core.accessibility_small_screen_data(write=write)
+    ok = (
+        data["selected_interface"] == "cli-static"
+        and data["ui_built"] is False
+        and data["self_hosted"]["external_service_required"] is False
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=ok,
+            command="accessibility-small-screen",
+            summary=data["summary"],
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if ok else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

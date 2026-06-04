@@ -22,6 +22,8 @@ local UI.
 - `handoff-summary.md`: concise local-session and scheduled-agent handoff summaries with exact artifact handles.
 - `interface-decision.md`: decision record selecting CLI/static workbench artifacts instead of a local UI for Goal 006.
 - `interface.md`: selected CLI/static interface command, panels, primary actions, and self-hosted operating boundaries.
+- `accessibility-small-screen.md`: rationale for deferring UI-specific accessibility and small-screen checks while
+  CLI/static remains selected.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -48,4 +50,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T014 should implement the selected CLI/static interface with restrained operating-tool design.
+T015 should document why CLI/static remains selected instead of adding UI-only accessibility and small-screen checks.

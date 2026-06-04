@@ -1,0 +1,63 @@
+{
+  "accessibility_model": [
+    "Use plain text, Markdown, JSON, and standard terminal/editor/PR rendering.",
+    "Preserve exact commands and repo-relative artifact handles so screen readers and text tools have stable labels.",
+    "Keep primary actions line-oriented and limited to inspect, continue, review, and verify.",
+    "Avoid custom keyboard focus, pointer-only actions, color-only state, and decorative UI components."
+  ],
+  "future_ui_gate": {
+    "minimum_checks": [
+      "keyboard-only operation for primary actions",
+      "screen-reader labels or semantic terminal equivalents",
+      "focus order and visible focus indication",
+      "no color-only state",
+      "small-screen or narrow-terminal review",
+      "visual or snapshot evidence for any rendered UI"
+    ],
+    "must_preserve": [
+      "CLI/static commands for automation",
+      "repo-local source-of-truth artifacts",
+      "credential-free deterministic validation"
+    ],
+    "required_if_ui_reopened": true,
+    "trigger": "A later reviewed decision selects a local web or terminal UI for the workbench."
+  },
+  "generated_at": "2026-06-04T11:15:09.449858+00:00",
+  "generated_by": "uv run awf accessibility-small-screen --write --json",
+  "path": ".agent-runs/reports/workbench/accessibility/accessibility-small-screen-20260604T111509Z.json",
+  "rationale": [
+    "T013 selected CLI/static repo artifacts and T014 implemented that selected interface.",
+    "The interface is generated as text, JSON, Markdown, and repo-local artifacts rather than custom UI chrome.",
+    "There is no browser viewport, terminal UI runtime, focus model, ARIA layer, color contrast palette, or responsive layout to verify in this goal.",
+    "Adding UI checks without a UI would create false confidence and unnecessary maintenance surface."
+  ],
+  "schema": "awf.operator-workbench.accessibility-small-screen.v1",
+  "scope": {
+    "goal": "006-operator-workbench-review-ux",
+    "spec_id": "007-operator-workbench-review-ux",
+    "task_id": "T015",
+    "ticket_id": "awf-jr7"
+  },
+  "selected_interface": "cli-static",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false,
+    "fallback": "standard terminal, editor, PR, Markdown, and JSON artifact rendering"
+  },
+  "small_screen_model": [
+    "Keep status and evidence inspectable through copy-ready command output and PR-rendered Markdown.",
+    "Avoid fixed-width UI layouts, custom viewport assumptions, nested cards, and hidden hover-only controls.",
+    "Prefer concise sections and artifact links that can wrap naturally in terminals, editors, and mobile PR views.",
+    "Use repo-local JSON artifacts for dense data when terminal or mobile reading is too narrow."
+  ],
+  "source_artifacts": [
+    "docs/workbench/accessibility-small-screen.md",
+    "docs/workbench/interface-decision.md",
+    "docs/workbench/interface.md",
+    "docs/workbench/status-artifact-schema.md",
+    ".agent-runs/reports/workbench/interface/workbench-interface-20260604T105847Z.json"
+  ],
+  "summary": "No local UI is built for Goal 006, so UI-specific accessibility and small-screen verification are not applicable for T015.",
+  "ui_built": false,
+  "ui_checks_required_now": false
+}

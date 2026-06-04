@@ -1829,6 +1829,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "handoff_summary",
         "interface_decision",
         "workbench_interface",
+        "accessibility_small_screen",
         "health",
         "decision_summaries",
     ]
@@ -1851,6 +1852,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "awf.operator-workbench.review-action.v1",
         "awf.operator-workbench.branch-pr.v1",
         "awf.operator-workbench.interface.v1",
+        "awf.operator-workbench.accessibility-small-screen.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -3530,6 +3532,128 @@ def operator_workbench_interface_data() -> dict[str, Any]:
     }
 
 
+def accessibility_small_screen_data(write: bool = False) -> dict[str, Any]:
+    data = {
+        "schema": "awf.operator-workbench.accessibility-small-screen.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf accessibility-small-screen --json",
+        "scope": {
+            "goal": "006-operator-workbench-review-ux",
+            "spec_id": "007-operator-workbench-review-ux",
+            "task_id": "T015",
+            "ticket_id": "awf-jr7",
+        },
+        "selected_interface": "cli-static",
+        "ui_built": False,
+        "ui_checks_required_now": False,
+        "summary": (
+            "No local UI is built for Goal 006, so UI-specific accessibility and small-screen verification are "
+            "not applicable for T015."
+        ),
+        "rationale": [
+            "T013 selected CLI/static repo artifacts and T014 implemented that selected interface.",
+            "The interface is generated as text, JSON, Markdown, and repo-local artifacts rather than custom UI chrome.",
+            "There is no browser viewport, terminal UI runtime, focus model, ARIA layer, color contrast palette, or "
+            "responsive layout to verify in this goal.",
+            "Adding UI checks without a UI would create false confidence and unnecessary maintenance surface.",
+        ],
+        "accessibility_model": [
+            "Use plain text, Markdown, JSON, and standard terminal/editor/PR rendering.",
+            "Preserve exact commands and repo-relative artifact handles so screen readers and text tools have stable labels.",
+            "Keep primary actions line-oriented and limited to inspect, continue, review, and verify.",
+            "Avoid custom keyboard focus, pointer-only actions, color-only state, and decorative UI components.",
+        ],
+        "small_screen_model": [
+            "Keep status and evidence inspectable through copy-ready command output and PR-rendered Markdown.",
+            "Avoid fixed-width UI layouts, custom viewport assumptions, nested cards, and hidden hover-only controls.",
+            "Prefer concise sections and artifact links that can wrap naturally in terminals, editors, and mobile PR views.",
+            "Use repo-local JSON artifacts for dense data when terminal or mobile reading is too narrow.",
+        ],
+        "future_ui_gate": {
+            "required_if_ui_reopened": True,
+            "trigger": "A later reviewed decision selects a local web or terminal UI for the workbench.",
+            "minimum_checks": [
+                "keyboard-only operation for primary actions",
+                "screen-reader labels or semantic terminal equivalents",
+                "focus order and visible focus indication",
+                "no color-only state",
+                "small-screen or narrow-terminal review",
+                "visual or snapshot evidence for any rendered UI",
+            ],
+            "must_preserve": [
+                "CLI/static commands for automation",
+                "repo-local source-of-truth artifacts",
+                "credential-free deterministic validation",
+            ],
+        },
+        "source_artifacts": [
+            "docs/workbench/accessibility-small-screen.md",
+            "docs/workbench/interface-decision.md",
+            "docs/workbench/interface.md",
+            "docs/workbench/status-artifact-schema.md",
+            ".agent-runs/reports/workbench/interface/workbench-interface-20260604T105847Z.json",
+        ],
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "standard terminal, editor, PR, Markdown, and JSON artifact rendering",
+        },
+    }
+    if write:
+        data["generated_by"] = "uv run awf accessibility-small-screen --write --json"
+        data["path"] = write_json_artifact("reports/workbench/accessibility", "accessibility-small-screen", data)
+    return data
+
+
+def operator_workbench_accessibility_small_screen_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "accessibility-small-screen.md"
+    index_path = ROOT / "docs" / "workbench" / "README.md"
+    docs_text = read_text(docs_path)
+    index_text = read_text(index_path)
+    preview = accessibility_small_screen_data(write=False)
+    required_terms = [
+        "awf.operator-workbench.accessibility-small-screen.v1",
+        "uv run awf accessibility-small-screen",
+        "No local UI is built",
+        "accessibility",
+        "small-screen",
+        "CLI/static",
+        "future UI",
+        "credential-free",
+        "repo-local",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "docs indexed", "ok": "accessibility-small-screen.md" in index_text, "detail": rel(index_path)},
+        {
+            "name": "preview schema",
+            "ok": preview["schema"] == "awf.operator-workbench.accessibility-small-screen.v1",
+            "detail": "",
+        },
+        {"name": "selected cli static", "ok": preview["selected_interface"] == "cli-static", "detail": ""},
+        {"name": "no ui built", "ok": preview["ui_built"] is False, "detail": ""},
+        {"name": "ui checks deferred", "ok": preview["ui_checks_required_now"] is False, "detail": ""},
+        {"name": "future ui gate", "ok": preview["future_ui_gate"]["required_if_ui_reopened"] is True, "detail": ""},
+        {"name": "accessibility model", "ok": bool(preview["accessibility_model"]), "detail": ""},
+        {"name": "small screen model", "ok": bool(preview["small_screen_model"]), "detail": ""},
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "index_path": rel(index_path),
+        "schema": "awf.operator-workbench.accessibility-small-screen.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -3618,10 +3742,12 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "uv run awf workflow-state-lint --json",
                 "uv run awf interface-decision --json",
                 "uv run awf workbench-interface --json",
+                "uv run awf accessibility-small-screen --json",
             ],
             "artifacts": [
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
                 "docs/workbench/interface.md",
+                "docs/workbench/accessibility-small-screen.md",
                 "docs/workbench/goal-dashboard.md",
                 "docs/workbench/increment-dashboard.md",
                 "docs/workbench/evidence-view.md",
@@ -3751,6 +3877,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     }
     data["handoff_summary"] = handoff_summary_from_status(data, audience="session")
     data["interface_decision"] = interface_decision_data(write=False)
+    data["accessibility_small_screen"] = accessibility_small_screen_data(write=False)
     data["workbench_interface"] = workbench_interface_from_status(data)
     if write:
         data["generated_by"] = "uv run awf operator-status --write --json"
@@ -7361,6 +7488,23 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_accessibility_small_screen_data()
+    results.append(
+        {
+            "name": "operator workbench accessibility and small-screen rationale is documented",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/accessibility-small-screen.md"
+            and data["schema"] == "awf.operator-workbench.accessibility-small-screen.v1"
+            and data["preview"]["selected_interface"] == "cli-static"
+            and data["preview"]["ui_built"] is False
+            and data["preview"]["ui_checks_required_now"] is False
+            and bool(data["preview"]["accessibility_model"])
+            and bool(data["preview"]["small_screen_model"])
+            and data["preview"]["future_ui_gate"]["required_if_ui_reopened"] is True
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -7403,6 +7547,9 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["workbench_interface"]["schema"] == "awf.operator-workbench.interface.v1"
             and data["workbench_interface"]["selected_interface"] == "cli-static"
             and data["workbench_interface"]["layout"]["local_ui_runtime"] is False
+            and data["accessibility_small_screen"]["schema"]
+            == "awf.operator-workbench.accessibility-small-screen.v1"
+            and data["accessibility_small_screen"]["ui_built"] is False
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
@@ -7417,7 +7564,20 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
             and dashboard["current_phase"]["next_task"]["id"]
-            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014", "T015"}
+            in {
+                "T005",
+                "T006",
+                "T007",
+                "T008",
+                "T009",
+                "T010",
+                "T011",
+                "T012",
+                "T013",
+                "T014",
+                "T015",
+                "T016",
+            }
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -7484,6 +7644,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "awf-s6n",
                 "awf-1f9",
                 "awf-jr7",
+                "awf-svr",
             }
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8

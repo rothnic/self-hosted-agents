@@ -43,6 +43,7 @@ The report is generated from:
 - `interface_decision`: selected CLI/static interface decision plus local UI deferral rationale.
 - `workbench_interface`: selected CLI/static interface with decision strip, restrained primary actions, panels, and source
   handles.
+- `accessibility_small_screen`: CLI/static accessibility and small-screen rationale plus future UI gate.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.
 
 ## Self-Hosted Behavior
