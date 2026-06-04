@@ -3,6 +3,7 @@
 Status: defined for Goal 004 T011
 Selected product baseline: Pydantic AI plus Langfuse and DBOS
 Decision record: `docs/adr/0005-select-pydantic-ai-langfuse-dbos-for-product-baseline.md`
+Migration notes: `docs/candidate-references/non-selected-candidate-migration-notes.md`
 Acceptance command: `uv run awf workflow-fixture-test`
 
 ## Purpose
@@ -81,6 +82,7 @@ benchmark.
 - Requirements matrix: `docs/requirements-matrix.md`
 - Comparison evidence checklist: `docs/comparison-evidence.md`
 - Product baseline workflow: `docs/product-baseline/pydantic-ai-review-gated-work-order.md`
+- Migration notes: `docs/candidate-references/non-selected-candidate-migration-notes.md`
 
 ## Tradeoffs
 
@@ -91,6 +93,7 @@ Freezing in place is preferred over physical archive movement for this checkpoin
 - the repo avoids a compatibility or path-migration task before product-baseline work is deeper;
 - T012 can separately decide which fixtures, docs, or implementation ideas should migrate into shared or selected-stack
   locations.
+  T012 records that posture in `docs/candidate-references/non-selected-candidate-migration-notes.md`.
 
 The cost is that `apps/langgraph-python/` and `apps/mastra-ts/` remain visible beside the selected product lane. Agents
 must use this reference policy, ADR 0005, and Beads ready-work state to avoid treating those directories as active

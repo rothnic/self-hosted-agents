@@ -100,7 +100,8 @@ workflow boundary, contract, operating notes, and follow-up backlog.
   `docs/product-baseline/pydantic-ai-setup-operating-notes.md`.
 - **Frozen Candidate Reference**: A non-selected candidate retained for comparison history and reusable lessons. T011
   records the freeze policy, dispositions, and tradeoffs in
-  `docs/candidate-references/frozen-non-selected-candidates.md`.
+  `docs/candidate-references/frozen-non-selected-candidates.md`. T012 records migration notes for reusable code,
+  fixtures, and evidence in `docs/candidate-references/non-selected-candidate-migration-notes.md`.
 
 ## Success Criteria *(mandatory)*
 

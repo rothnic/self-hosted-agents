@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T02:06:20.507999+00:00",
+  "id": "awf-3u9",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:36.984948Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:46:57.774851Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-9a9",
+        "issue_id": "awf-3u9",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:48:40.007767Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-3u9",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T012\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T012",
+    "id": "awf-3u9",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes",
+    "updated_at": "2026-06-02T10:48:40.914069Z"
+  },
+  "worker_branch": "codex/awf-3u9-add-migration-notes-for-reusable-code-fi",
+  "worker_id": "codex-goal004-t012",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-3u9-add-migration-notes-for-reusable-code-fi",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-3u9-add-migration-notes-for-reusable-code-fi ../self-hosted-agents-worktrees/awf-3u9-add-migration-notes-for-reusable-code-fi <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-3u9-add-migration-notes-for-reusable-code-fi && git status --short --branch"
+  }
+}

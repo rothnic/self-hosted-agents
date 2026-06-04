@@ -6,33 +6,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-3mc",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-3u9",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-e04",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
-        "id": "awf-fpn",
-        "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-fpn",
             "status": null,
             "type": "blocks"
@@ -45,18 +18,18 @@
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 2,
+      "blocked": 1,
       "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-3u9",
+    "next_unblocked_issue_id": "awf-fpn",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T012",
-        "id": "awf-3u9",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
+        "id": "awf-fpn",
         "status": "open",
-        "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes"
+        "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
       }
     ],
     "stale_claims": [],
@@ -67,72 +40,6 @@
   "base_branch": "main",
   "beads_epic_id": "awf-dk3",
   "blocked": [
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:37.256982Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:46:59.094858Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-3mc",
-          "issue_id": "awf-fpn",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:46:59.527986Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-3u9",
-          "issue_id": "awf-fpn",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:48:41.381076Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-fpn",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:58.649301Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-e04",
-          "issue_id": "awf-fpn",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:46:58.221113Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-zi9",
-          "issue_id": "awf-fpn",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T013\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
-      "id": "awf-fpn",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 1,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection",
-      "updated_at": "2026-06-02T10:48:42.294805Z"
-    },
     {
       "compaction_level": 0,
       "created_at": "2026-06-02T10:46:37.581889Z",
@@ -178,33 +85,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-3mc",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-3u9",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-e04",
-            "status": null,
-            "type": "blocks"
-          },
-          {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
-        "id": "awf-fpn",
-        "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-fpn",
             "status": null,
             "type": "blocks"
@@ -215,10 +95,10 @@
         "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
       }
     ],
-    "blocked_count": 2,
+    "blocked_count": 1,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-3u9",
+    "next_unblocked_issue_id": "awf-fpn",
     "ready_count": 1
   },
   "child_tickets": [
@@ -311,11 +191,11 @@
       "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T012",
       "task_id": "T012",
       "ticket_id": "awf-3u9",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes"
     },
     {
@@ -349,6 +229,6 @@
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T01:49:14.679868+00:00",
+  "updated_at": "2026-06-04T02:15:10.702352+00:00",
   "validation_evidence": []
 }

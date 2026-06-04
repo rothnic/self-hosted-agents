@@ -10,6 +10,9 @@ Product baseline workflow: `docs/product-baseline/pydantic-ai-review-gated-work-
 Product baseline setup and operating notes:
 `docs/product-baseline/pydantic-ai-setup-operating-notes.md`.
 
+Non-selected candidate migration notes:
+`docs/candidate-references/non-selected-candidate-migration-notes.md`.
+
 ## First Slice
 
 Candidate id: `pydantic-ai`.

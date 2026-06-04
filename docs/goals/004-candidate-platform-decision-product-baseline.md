@@ -27,8 +27,9 @@ This is not final-solution promotion. T008 defines the first product-baseline wo
 `docs/product-baseline/pydantic-ai-review-gated-work-order.md`, and T009 adds its product-level BDD contract in
 `tests/workflow/features/product_baseline_work_order.feature`. T010 adds setup and operating notes in
 `docs/product-baseline/pydantic-ai-setup-operating-notes.md`. T011 freezes non-selected candidate references in
-`docs/candidate-references/frozen-non-selected-candidates.md`; Goal 004 still needs candidate-lane migration notes,
-production-hardening follow-up tickets, and increment acceptance evidence.
+`docs/candidate-references/frozen-non-selected-candidates.md`. T012 adds candidate-lane migration notes in
+`docs/candidate-references/non-selected-candidate-migration-notes.md`; Goal 004 still needs production-hardening
+follow-up tickets and increment acceptance evidence.
 
 ## Scope
 

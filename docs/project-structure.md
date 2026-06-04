@@ -21,6 +21,8 @@ The repository is organized by purpose so it can grow beyond a single Python app
 - `apps/mastra-ts/` is a frozen deferred TypeScript contrast reference.
 
 The non-selected candidate policy lives in `docs/candidate-references/frozen-non-selected-candidates.md`.
+Reusable-code, fixture, and evidence migration decisions live in
+`docs/candidate-references/non-selected-candidate-migration-notes.md`.
 
 Candidate apps should prove behavior through shared BDD contracts and future shared packages, not by sharing app
 internals.
