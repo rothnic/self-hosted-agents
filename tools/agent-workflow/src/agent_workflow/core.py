@@ -910,6 +910,152 @@ def deployment_startup_data(
     }
 
 
+def deployment_smoke_data(
+    profile: str,
+    env_file: str | None = None,
+    write: bool = False,
+    env: dict[str, str] | None = None,
+    candidate_data: dict[str, Any] | None = None,
+    durable_data: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    readiness = deployment_readiness_data(profile=profile, env_file=env_file, env=env)
+    startup = deployment_startup_data(profile=profile, env_file=env_file, write=False, env=env)
+    can_run_local_smoke = readiness["ok"] and startup["ok"] and profile == "local"
+    if can_run_local_smoke:
+        candidate = candidate_data if candidate_data is not None else pydantic_ai_candidate_smoke_result()
+        durable = durable_data if durable_data is not None else pydantic_ai_durable_smoke_result()
+    else:
+        reason = "local smoke requires readiness, startup, and the local profile"
+        candidate = candidate_data or {"ok": False, "skipped": True, "reason": reason}
+        durable = durable_data or {"ok": False, "skipped": True, "reason": reason}
+    candidate_artifact = candidate.get("artifact", {}) if isinstance(candidate.get("artifact"), dict) else {}
+    candidate_trace = candidate.get("trace", {}) if isinstance(candidate.get("trace"), dict) else {}
+    candidate_eval = candidate.get("evaluation", {}) if isinstance(candidate.get("evaluation"), dict) else {}
+    durable_artifact = durable.get("artifact", {}) if isinstance(durable.get("artifact"), dict) else {}
+    durable_dbos = durable_artifact.get("dbos", {}) if isinstance(durable_artifact.get("dbos"), dict) else {}
+    durable_ai = durable_artifact.get("pydantic_ai", {}) if isinstance(durable_artifact.get("pydantic_ai"), dict) else {}
+    smoke_id = now_id(f"deployment-smoke-{profile}")
+    health_checks = [
+        {"name": "deployment-readiness", "ok": readiness["ok"], "required": True, "source": "awf deployment-readiness"},
+        {"name": "deployment-startup", "ok": startup["ok"], "required": True, "source": "awf deployment-startup"},
+        {
+            "name": "pydantic-ai-candidate-app",
+            "ok": bool(candidate.get("ok")),
+            "required": True,
+            "source": "apps/pydantic-ai/run.py",
+        },
+        {
+            "name": "dbos-durable-runtime",
+            "ok": bool(durable.get("ok")),
+            "required": True,
+            "source": "apps/pydantic-ai/durable_smoke.py",
+        },
+        {
+            "name": "self-hosted-langfuse",
+            "ok": profile != "local" and bool(readiness["env"]["present_names"]),
+            "required": False,
+            "source": "docs/orchestration/self-hosted-langfuse.md",
+            "status": "not-required-for-local-fixture" if profile == "local" else "requires self-hosted env",
+        },
+    ]
+    trace_id = candidate_artifact.get("trace_id") or candidate_trace.get("trace_id")
+    run_id = candidate_artifact.get("run_id")
+    evaluation_id = candidate_eval.get("evaluation_id") or candidate_artifact.get("evaluation_output", {}).get(
+        "evaluation_id"
+    )
+    evidence = {
+        "schema": "awf.deployment-smoke.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "smoke_id": smoke_id,
+        "profile": profile,
+        "target_machine": readiness.get("target_machine"),
+        "command_used": f"uv run awf deployment-smoke --profile {profile} --write --json",
+        "acceptance_command": "uv run awf workflow-fixture-test",
+        "startup": {
+            "startup_mode": startup["manifest"].get("startup_mode"),
+            "one_command": startup["manifest"].get("one_command"),
+            "components": [item.get("name") for item in startup["manifest"].get("components", [])],
+        },
+        "health": {
+            "checks": health_checks,
+            "ok": all(item["ok"] for item in health_checks if item.get("required", True)),
+        },
+        "run": {
+            "candidate_app_id": candidate_artifact.get("candidate_app_id"),
+            "run_id": run_id,
+            "trace_id": trace_id,
+            "evaluation_id": evaluation_id,
+            "artifact_path": candidate.get("output"),
+            "trace_path": candidate.get("trace_output"),
+            "evaluation_path": candidate.get("evaluation_output"),
+        },
+        "observability": {
+            "repo_local_trace_available": bool(candidate.get("ok")) and candidate_trace.get("provider")
+            == "local-otel-json",
+            "native_pydantic_ai_otel": candidate_trace.get("pydantic_ai_otel", {}).get("status") == "captured",
+            "self_hosted_langfuse": {
+                "available_in_profile": profile != "local",
+                "required_for_local_fixture": False,
+                "status": "service-backed proof deferred to T007/T008" if profile == "local" else "requires env",
+            },
+        },
+        "durable_execution": {
+            "available": bool(durable.get("ok")),
+            "runtime": durable_artifact.get("runtime", {}).get("selected"),
+            "durable_run_id": durable_dbos.get("workflow_id"),
+            "agent_class": durable_ai.get("agent_class"),
+            "sqlite_development_mode": durable_artifact.get("runtime", {}).get("sqlite_development_mode"),
+        },
+        "correlation": {
+            "run_id": run_id,
+            "trace_id": trace_id,
+            "evaluation_id": evaluation_id,
+            "durable_run_id": durable_dbos.get("workflow_id"),
+            "health_check_names": [item["name"] for item in health_checks],
+        },
+        "deterministic_validation": {
+            "hosted_credentials_required": False,
+            "external_model_required": False,
+            "network_required": False,
+        },
+        "gaps": [
+            "Self-hosted Langfuse service-backed trace ingestion is deferred to T007/T008.",
+            "Production DBOS storage is deferred to later operations proof.",
+        ],
+    }
+    required = {
+        "readiness_ok": readiness["ok"],
+        "startup_ok": startup["ok"],
+        "candidate_ok": bool(candidate.get("ok")),
+        "durable_ok": bool(durable.get("ok")),
+        "run_trace_eval": bool(run_id and trace_id and evaluation_id),
+        "observability_available": evidence["observability"]["repo_local_trace_available"],
+        "durable_available": evidence["durable_execution"]["available"],
+        "health_correlated": evidence["health"]["ok"] and bool(evidence["correlation"]["health_check_names"]),
+        "credential_free": evidence["deterministic_validation"]["hosted_credentials_required"] is False,
+    }
+    evidence["required"] = required
+    evidence["passed"] = all(required.values())
+    evidence_path = None
+    if write and evidence["passed"]:
+        path = ROOT / ".agent-runs" / "verifications" / f"{smoke_id}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        evidence_path = rel(path)
+    return {
+        "ok": evidence["passed"],
+        "profile": profile,
+        "write": write,
+        "evidence_path": evidence_path,
+        "evidence": evidence,
+        "readiness": readiness,
+        "startup": startup,
+        "candidate": candidate,
+        "durable": durable,
+        "next_action": "commit smoke command evidence or continue to correlated evidence capture",
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4143,20 +4289,20 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
-    data = pydantic_ai_candidate_smoke_result()
+    pydantic_ai_data = pydantic_ai_candidate_smoke_result()
     results.append(
         {
             "name": "pydantic ai deterministic fixture app runs",
-            "ok": data["ok"],
-            "data": data,
+            "ok": pydantic_ai_data["ok"],
+            "data": pydantic_ai_data,
         }
     )
-    data = pydantic_ai_durable_smoke_result()
+    durable_data = pydantic_ai_durable_smoke_result()
     results.append(
         {
             "name": "pydantic ai dbos durable smoke proves retry and resume",
-            "ok": data["ok"],
-            "data": data,
+            "ok": durable_data["ok"],
+            "data": durable_data,
         }
     )
     data = deployment_env_templates_data()
@@ -4207,6 +4353,26 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["manifest_path"] is None
             and {"pydantic-ai-candidate-app", "dbos-durable-runtime", "self-hosted-langfuse"}.issubset(component_names)
             and not any(item["present"] for item in data["readiness"]["env"]["statuses"]),
+            "data": data,
+        }
+    )
+    data = deployment_smoke_data(
+        profile="local",
+        env={},
+        write=False,
+        candidate_data=pydantic_ai_data,
+        durable_data=durable_data,
+    )
+    results.append(
+        {
+            "name": "local deployment smoke correlates run trace eval durable and health evidence",
+            "ok": data["ok"]
+            and data["evidence_path"] is None
+            and data["evidence"]["schema"] == "awf.deployment-smoke.v1"
+            and data["evidence"]["required"]["run_trace_eval"]
+            and data["evidence"]["required"]["durable_available"]
+            and data["evidence"]["required"]["observability_available"]
+            and data["evidence"]["required"]["credential_free"],
             "data": data,
         }
     )

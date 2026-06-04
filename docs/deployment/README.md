@@ -11,6 +11,7 @@ Start here when an agent needs the deployment profile, target machine, or operat
 - `service-boundaries.md`: service boundaries, ports, volumes, secret names, storage paths, and target machines.
 - `environment-readiness.md`: environment templates and the `awf deployment-readiness` credential-free readiness check.
 - `startup.md`: one-command local startup and documented service-backed startup equivalents.
+- `smoke.md`: representative selected-stack smoke command and repo-local correlation evidence shape.
 
 ## Current Profile Recommendation
 
@@ -29,5 +30,6 @@ production promotion until backup, restore, reset, health, trace, recovery, and 
 - Service boundaries define the current port, volume, secret-name, storage-path, and target-machine map.
 - Environment readiness defines credential-free templates and prerequisite checks.
 - Startup defines the local one-command manifest and service-backed equivalent commands.
-- Later Goal 005 tickets add smoke commands, runbooks, and rehearsal evidence.
+- Smoke defines the representative selected-stack workflow command.
+- Later Goal 005 tickets add committed smoke evidence, runbooks, and rehearsal evidence.
 - Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.

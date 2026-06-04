@@ -255,6 +255,22 @@ def deployment_startup(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("deployment-smoke")
+def deployment_smoke(
+    profile: str = typer.Option("local", "--profile", help="local, development-server, or production-like."),
+    env_file: str | None = typer.Option(None, "--env-file", help="Optional env file to inspect without printing values."),
+    write: bool = typer.Option(False, "--write", help="Write repo-local smoke evidence under .agent-runs/verifications."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Run the representative selected-stack deployment smoke workflow."""
+    data = core.deployment_smoke_data(profile=profile, env_file=env_file, write=write)
+    print_envelope(
+        CommandEnvelope(ok=data["ok"], command="deployment-smoke", summary="Deployment smoke.", data=data),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("verify")
 def verify(
     profile: str = typer.Option(..., "--profile", help="ticket, increment, health, or pre-merge."),

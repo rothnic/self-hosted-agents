@@ -1,14 +1,14 @@
 # Deployment Startup
 
-Status: initialized for Goal 005 T005
+Status: updated through Goal 005 T006
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
 ## Purpose
 
 This page defines the startup surface for the selected self-hosted profiles without turning startup into the deployment
-smoke workflow. T005 proves another agent can start or inspect the profile boundary; T006 runs the representative smoke
-workflow and captures run evidence.
+smoke workflow. T005 proves another agent can start or inspect the profile boundary. The T006 smoke command is
+documented in `docs/deployment/smoke.md`.
 
 ## Local One-Command Startup
 
@@ -27,7 +27,7 @@ The local profile does not start a daemon. Pydantic AI and DBOS are repo CLI ent
 - Pydantic AI candidate app: `uv run python apps/pydantic-ai/run.py ...`
 - DBOS durable runtime proof: `uv run python apps/pydantic-ai/durable_smoke.py ...`
 
-Those commands are listed in the startup manifest for T006 and later smoke evidence. They are not executed by
+Those commands are listed in the startup manifest for deployment smoke evidence. They are not executed by
 `deployment-startup`, so startup validation remains fast and credential-free.
 
 ## Langfuse Service Equivalent
