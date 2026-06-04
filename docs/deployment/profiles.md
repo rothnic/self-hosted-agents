@@ -1,6 +1,6 @@
 # Self-Hosted Deployment Profiles
 
-Status: initialized for Goal 005 T002
+Status: updated through Goal 005 T003
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/self_hosted_deployment_operations.feature`
@@ -16,6 +16,9 @@ Define the three deployment profiles another agent can choose from without readi
 These profiles do not promote the stack as final production infrastructure. They define the operating surface that later
 Goal 005 tickets harden with detailed ports, volumes, environment templates, startup, smoke, backup, recovery, and
 fresh-setup evidence.
+
+Detailed service boundaries, ports, volumes, storage paths, secret names, and machine ownership are in
+`docs/deployment/service-boundaries.md`.
 
 ## Shared Principles
 
@@ -160,7 +163,7 @@ The production-like profile must use externally managed secrets, never committed
 
 ## Current Gaps Routed To Later Goal 005 Tickets
 
-- T003 documents detailed service boundaries, ports, volumes, storage paths, and target machine ownership.
+- T003 documented detailed service boundaries, ports, volumes, storage paths, and target machine ownership.
 - T004 adds environment templates and readiness checks that report missing prerequisites without exposing secrets.
 - T005 adds or documents startup for the selected Pydantic AI, Langfuse, and DBOS profile.
 - T006-T008 add deployment smoke and credential-free fallback evidence.

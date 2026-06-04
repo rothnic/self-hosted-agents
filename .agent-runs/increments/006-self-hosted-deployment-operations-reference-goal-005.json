@@ -54,30 +54,40 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-noh",
+            "id": "awf-2jm",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-71o",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-hic",
             "status": null,
             "type": "blocks"
           }
         ],
-        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
-        "id": "awf-is8",
-        "title": "Add environment templates and readiness checks that do not commit credentials"
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T012",
+        "id": "awf-pt7",
+        "title": "Run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets"
       }
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 10,
+      "blocked": 9,
       "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-noh",
+    "next_unblocked_issue_id": "awf-is8",
     "ready": [
       {
-        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T003",
-        "id": "awf-noh",
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
+        "id": "awf-is8",
         "status": "open",
-        "title": "Document service boundaries, ports, volumes, secrets, storage paths, and target machines"
+        "title": "Add environment templates and readiness checks that do not commit credentials"
       }
     ],
     "stale_claims": [],
@@ -239,44 +249,6 @@
       "status": "open",
       "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage",
       "updated_at": "2026-06-04T03:09:08.912423Z"
-    },
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-04T03:05:09.956638Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-04T03:09:01.147341Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-h2u",
-          "issue_id": "awf-is8",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-04T03:05:28.875865Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-noh",
-          "issue_id": "awf-is8",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T004\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
-      "id": "awf-is8",
-      "issue_type": "task",
-      "labels": [
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 2,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Add environment templates and readiness checks that do not commit credentials",
-      "updated_at": "2026-06-04T03:09:01.147682Z"
     },
     {
       "compaction_level": 0,
@@ -540,18 +512,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-noh",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
-        "id": "awf-is8",
-        "title": "Add environment templates and readiness checks that do not commit credentials"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-2jm",
             "status": null,
             "type": "blocks"
@@ -620,10 +580,10 @@
         "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
       }
     ],
-    "blocked_count": 10,
+    "blocked_count": 9,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-noh",
+    "next_unblocked_issue_id": "awf-is8",
     "ready_count": 1
   },
   "child_tickets": [
@@ -644,11 +604,11 @@
       "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T003",
       "task_id": "T003",
       "ticket_id": "awf-noh",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Document service boundaries, ports, volumes, secrets, storage paths, and target machines"
     },
     {
@@ -746,6 +706,6 @@
   "review_status": "executing",
   "spec_id": "006-self-hosted-deployment-operations-reference",
   "stale_claims": [],
-  "updated_at": "2026-06-04T03:33:25.377299+00:00",
+  "updated_at": "2026-06-04T03:42:29.530419+00:00",
   "validation_evidence": []
 }

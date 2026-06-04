@@ -8,6 +8,7 @@ Start here when an agent needs the deployment profile, target machine, or operat
 ## Profile Index
 
 - `profiles.md`: local, development-server, and production-like deployment profiles.
+- `service-boundaries.md`: service boundaries, ports, volumes, secret names, storage paths, and target machines.
 
 ## Current Profile Recommendation
 
@@ -23,6 +24,6 @@ production promotion until backup, restore, reset, health, trace, recovery, and 
 ## Boundaries
 
 - Deployment profiles define topology and assumptions.
-- Later Goal 005 tickets add detailed service boundaries, ports, volumes, environment templates, startup commands,
-  smoke commands, runbooks, and rehearsal evidence.
+- Service boundaries define the current port, volume, secret-name, storage-path, and target-machine map.
+- Later Goal 005 tickets add environment templates, startup commands, smoke commands, runbooks, and rehearsal evidence.
 - Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.
