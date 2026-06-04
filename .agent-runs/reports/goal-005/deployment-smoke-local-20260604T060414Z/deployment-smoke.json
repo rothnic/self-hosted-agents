@@ -1,0 +1,115 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "command_used": "uv run awf deployment-smoke --profile local --write --json",
+  "correlation": {
+    "durable_run_id": "dbos-workflow-dbb52094190e3493ff4ac538",
+    "evaluation_id": "eval-65ca933b165e3794",
+    "health_check_names": [
+      "deployment-readiness",
+      "deployment-startup",
+      "pydantic-ai-candidate-app",
+      "dbos-durable-runtime",
+      "self-hosted-langfuse"
+    ],
+    "run_id": "run-e93c5940e04ff8cf99fe2e21",
+    "trace_id": "trace-f9cac59a8a238a726e8289e1"
+  },
+  "deterministic_validation": {
+    "external_model_required": false,
+    "hosted_credentials_required": false,
+    "network_required": false
+  },
+  "durable_execution": {
+    "agent_class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+    "artifact_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-durable-smoke.json",
+    "available": true,
+    "durable_run_id": "dbos-workflow-dbb52094190e3493ff4ac538",
+    "runtime": "pydantic_ai_dbos",
+    "sqlite_development_mode": true
+  },
+  "gaps": [
+    "Self-hosted Langfuse service-backed trace ingestion requires operator-provided host-local env.",
+    "Production DBOS storage is deferred to later operations proof."
+  ],
+  "generated_at": "2026-06-04T06:04:34.015344+00:00",
+  "health": {
+    "checks": [
+      {
+        "name": "deployment-readiness",
+        "ok": true,
+        "required": true,
+        "source": "awf deployment-readiness"
+      },
+      {
+        "name": "deployment-startup",
+        "ok": true,
+        "required": true,
+        "source": "awf deployment-startup"
+      },
+      {
+        "name": "pydantic-ai-candidate-app",
+        "ok": true,
+        "required": true,
+        "source": "apps/pydantic-ai/run.py"
+      },
+      {
+        "name": "dbos-durable-runtime",
+        "ok": true,
+        "required": true,
+        "source": "apps/pydantic-ai/durable_smoke.py"
+      },
+      {
+        "name": "self-hosted-langfuse",
+        "ok": false,
+        "required": false,
+        "source": "docs/orchestration/self-hosted-langfuse.md",
+        "status": "not-required-for-local-fixture"
+      }
+    ],
+    "ok": true
+  },
+  "observability": {
+    "native_pydantic_ai_otel": true,
+    "repo_local_trace_available": true,
+    "self_hosted_langfuse": {
+      "available_in_profile": false,
+      "required_for_local_fixture": false,
+      "status": "not-required-for-local-fixture"
+    }
+  },
+  "passed": true,
+  "profile": "local",
+  "required": {
+    "candidate_ok": true,
+    "credential_free": true,
+    "durable_available": true,
+    "durable_ok": true,
+    "health_correlated": true,
+    "observability_available": true,
+    "readiness_ok": true,
+    "run_trace_eval": true,
+    "startup_ok": true
+  },
+  "run": {
+    "artifact_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.json",
+    "candidate_app_id": "pydantic-ai",
+    "evaluation_id": "eval-65ca933b165e3794",
+    "evaluation_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+    "run_id": "run-e93c5940e04ff8cf99fe2e21",
+    "trace_id": "trace-f9cac59a8a238a726e8289e1",
+    "trace_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json"
+  },
+  "schema": "awf.deployment-smoke.v1",
+  "smoke_id": "deployment-smoke-local-20260604T060414Z",
+  "startup": {
+    "components": [
+      "workflow-control-plane",
+      "pydantic-ai-candidate-app",
+      "dbos-durable-runtime",
+      "self-hosted-langfuse"
+    ],
+    "one_command": "uv run awf deployment-startup --profile local --write --json",
+    "startup_mode": "one-command-local-manifest"
+  },
+  "target_machine": "MacBook"
+}

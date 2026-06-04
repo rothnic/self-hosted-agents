@@ -57,17 +57,21 @@ tar -czf /tmp/self-hosted-agents-backups/repo-evidence-$(date -u +%Y%m%dT%H%M%SZ
   .agent-runs/claims \
   .agent-runs/increments \
   .agent-runs/reports \
-  .agent-runs/reviews \
   .agent-runs/verifications \
   specs \
   docs
 ```
+
+If `.agent-runs/reviews` exists, include it in the archive as an additional repo-local evidence surface. If it does not
+exist, record that reviewer acceptance is currently stored in Beads comments and committed reports, then continue with
+the existing paths instead of failing the backup.
 
 Expected evidence:
 
 - archive path and byte size are recorded in the rehearsal report
 - archive stays outside git
 - selected proof artifacts remain committed separately when they are review evidence
+- absent optional evidence directories are recorded as gaps or fixed runbook drift, not ignored
 
 ### 3. Backup DBOS State
 
@@ -241,6 +245,6 @@ An acceptable T009 report names:
 
 ## Current Gaps
 
-- T009 documents the procedures but does not rehearse a full clean-path restore.
+- T012 rehearsed the repo-local backup and restore path, and fixed the optional `.agent-runs/reviews` archive drift
+  found during rehearsal.
 - Production DBOS storage and Langfuse persistent volume backups still require controlled service-backed evidence.
-- T012 must record a clean-path or fresh setup rehearsal with commands, evidence, and remaining gaps.

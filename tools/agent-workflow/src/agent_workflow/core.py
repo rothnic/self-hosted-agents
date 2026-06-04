@@ -1428,6 +1428,119 @@ def deployment_recovery_retention_cost_runbook_data() -> dict[str, Any]:
     }
 
 
+def deployment_clean_path_rehearsal_data() -> dict[str, Any]:
+    report_path = ROOT / ".agent-runs" / "reports" / "goal-005" / "t012-clean-path-rehearsal-20260604.md"
+    artifact_path = (
+        ROOT
+        / ".agent-runs"
+        / "reports"
+        / "goal-005"
+        / "clean-path-rehearsal-20260604T060332Z"
+        / "rehearsal.json"
+    )
+    report_text = read_text(report_path)
+    artifact = json.loads(read_text(artifact_path)) if artifact_path.exists() else {}
+    required_sections = [
+        "## Rehearsal Scope",
+        "## Commands Run",
+        "## Evidence",
+        "## Gaps",
+        "## Follow-Up Routing",
+        "## Boundary",
+    ]
+    required_terms = [
+        "clean-path rehearsal",
+        "/tmp/self-hosted-agents-backups/repo-evidence-20260604T060332Z.tgz",
+        "/tmp/self-hosted-agents-restore-check-20260604T060332Z",
+        "uv run awf deployment-readiness --profile local --json",
+        "uv run awf deployment-smoke --profile local --write --json",
+        ".beads/issues.jsonl",
+        ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/deployment-smoke.json",
+        "Self-hosted Langfuse",
+        "Production DBOS storage",
+        "awf-eas",
+        "awf-lkr",
+        "awf-5ae",
+        "awf-4t2",
+    ]
+    artifact_checks = [
+        {
+            "name": "artifact schema",
+            "ok": artifact.get("schema") == "awf.deployment-clean-path-rehearsal.v1",
+            "detail": artifact.get("schema"),
+        },
+        {
+            "name": "artifact ticket",
+            "ok": artifact.get("ticket") == "awf-pt7",
+            "detail": artifact.get("ticket"),
+        },
+        {
+            "name": "backup rerun passed",
+            "ok": artifact.get("backup", {}).get("rerun", {}).get("exit_code") == 0,
+            "detail": artifact.get("backup", {}).get("rerun", {}).get("command"),
+        },
+        {
+            "name": "initial missing reviews finding recorded",
+            "ok": artifact.get("backup", {}).get("initial_attempt", {}).get("exit_code") == 1
+            and ".agent-runs/reviews" in artifact.get("backup", {}).get("initial_attempt", {}).get("finding", ""),
+            "detail": artifact.get("backup", {}).get("initial_attempt", {}).get("finding"),
+        },
+        {
+            "name": "smoke passed",
+            "ok": artifact.get("smoke", {}).get("ok") is True,
+            "detail": artifact.get("smoke", {}).get("evidence_path"),
+        },
+        {
+            "name": "follow-up issues recorded",
+            "ok": {"awf-eas", "awf-lkr", "awf-5ae", "awf-4t2"}.issubset(
+                {item.get("id") for item in artifact.get("follow_up_tickets", [])}
+            ),
+            "detail": [item.get("id") for item in artifact.get("follow_up_tickets", [])],
+        },
+    ]
+    checks = [
+        {
+            "name": "report exists",
+            "ok": report_path.exists(),
+            "detail": rel(report_path),
+        },
+        {
+            "name": "artifact exists",
+            "ok": artifact_path.exists(),
+            "detail": rel(artifact_path),
+        },
+        *[
+            {
+                "name": f"section:{section}",
+                "ok": section in report_text,
+                "detail": section,
+            }
+            for section in required_sections
+        ],
+        *[
+            {
+                "name": f"term:{term}",
+                "ok": term in report_text,
+                "detail": term,
+            }
+            for term in required_terms
+        ],
+        *artifact_checks,
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "report_path": rel(report_path),
+        "artifact_path": rel(artifact_path),
+        "checks": checks,
+        "missing": missing,
+        "profiles": ["local"],
+        "rehearsed_surfaces": ["backup", "restore", "readiness", "deployment smoke"],
+        "follow_up_issues": [item.get("id") for item in artifact.get("follow_up_tickets", [])],
+        "service_backed_gaps": ["Self-hosted Langfuse", "Production DBOS storage"],
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4811,6 +4924,18 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"local", "development-server", "production-like"}.issubset(set(data["profiles"]))
             and {"rollback", "recovery", "retention", "resource", "cost"}.issubset(set(data["operation_surfaces"]))
             and {"workflow/app", "DBOS", "Langfuse/storage"}.issubset(set(data["recovery_surfaces"])),
+            "data": data,
+        }
+    )
+    data = deployment_clean_path_rehearsal_data()
+    results.append(
+        {
+            "name": "deployment clean path rehearsal records evidence gaps and follow-up routing",
+            "ok": data["ok"]
+            and data["report_path"] == ".agent-runs/reports/goal-005/t012-clean-path-rehearsal-20260604.md"
+            and {"backup", "restore", "readiness", "deployment smoke"}.issubset(set(data["rehearsed_surfaces"]))
+            and {"awf-eas", "awf-lkr", "awf-5ae", "awf-4t2"}.issubset(set(data["follow_up_issues"]))
+            and {"Self-hosted Langfuse", "Production DBOS storage"}.issubset(set(data["service_backed_gaps"])),
             "data": data,
         }
     )

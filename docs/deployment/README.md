@@ -18,6 +18,7 @@ Start here when an agent needs the deployment profile, target machine, or operat
   and storage.
 - `../operations/recovery-retention-cost.md`: rollback, recovery, retention, resource, and cost runbook for one-engineer
   operation.
+- `../operations/README.md`: operations index, including the T012 clean-path rehearsal report.
 
 ## Current Profile Recommendation
 
@@ -37,6 +38,6 @@ production promotion until backup, restore, reset, health, trace, recovery, and 
 - Environment readiness defines credential-free templates and prerequisite checks.
 - Startup defines the local one-command manifest and service-backed equivalent commands.
 - Smoke defines the representative selected-stack workflow command.
-- Operations runbooks define backup, restore, reset, diagnostics, recovery, retention, and rehearsal surfaces as they
-  are completed.
+- Operations runbooks define backup, restore, reset, diagnostics, recovery, retention, and rehearsal surfaces. The T012
+  report records the current local clean-path proof and the remaining service-backed gaps.
 - Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.

@@ -1,0 +1,61 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "backup": {
+    "archive_bytes": 10365259,
+    "archive_path": "/tmp/self-hosted-agents-backups/repo-evidence-20260604T060332Z.tgz",
+    "initial_attempt": {
+      "command": "tar -czf /tmp/self-hosted-agents-backups/repo-evidence-20260604T060332Z.tgz .beads .agent-runs/claims .agent-runs/increments .agent-runs/reports .agent-runs/reviews .agent-runs/verifications specs docs",
+      "exit_code": 1,
+      "finding": ".agent-runs/reviews does not exist in this checkout; reviewer acceptance is currently recorded in Beads comments and committed reports."
+    },
+    "rerun": {
+      "command": "tar -czf /tmp/self-hosted-agents-backups/repo-evidence-20260604T060332Z.tgz .beads .agent-runs/claims .agent-runs/increments .agent-runs/reports .agent-runs/verifications specs docs",
+      "exit_code": 0
+    }
+  },
+  "evidence_paths": [
+    ".agent-runs/reports/goal-005/clean-path-rehearsal-20260604T060332Z/rehearsal.json",
+    ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/deployment-smoke.json",
+    ".agent-runs/reports/goal-005/t012-clean-path-rehearsal-20260604.md"
+  ],
+  "follow_up_tickets": [
+    {
+      "id": "awf-eas",
+      "reason": "Langfuse production operations proof covers self-hosted retention, backup, reset, and recovery."
+    },
+    {
+      "id": "awf-lkr",
+      "reason": "DBOS production storage proof covers self-hosted Postgres or equivalent storage topology."
+    },
+    {
+      "id": "awf-5ae",
+      "reason": "DBOS recovery rehearsal and retention proof covers service-backed restore and cleanup."
+    },
+    {
+      "id": "awf-4t2",
+      "reason": "Phoenix or Opik fallback comparison remains the route if Langfuse burden is too high."
+    }
+  ],
+  "gaps": [
+    "Self-hosted Langfuse service-backed backup, restore, and trace visibility still require host-local service evidence.",
+    "Production DBOS storage backup and restore still require a controlled self-hosted database proof.",
+    ".agent-runs/reviews was absent in this checkout; the runbook now treats it as an optional archive surface."
+  ],
+  "generated_at": "2026-06-04T06:03:32Z",
+  "profile": "local",
+  "restore": {
+    "command": "tar -xzf /tmp/self-hosted-agents-backups/repo-evidence-20260604T060332Z.tgz -C /tmp/self-hosted-agents-restore-check-20260604T060332Z",
+    "restore_target": "/tmp/self-hosted-agents-restore-check-20260604T060332Z",
+    "verified_paths": [
+      "/tmp/self-hosted-agents-restore-check-20260604T060332Z/.beads/issues.jsonl",
+      "/tmp/self-hosted-agents-restore-check-20260604T060332Z/.agent-runs/reports/goal-005"
+    ]
+  },
+  "schema": "awf.deployment-clean-path-rehearsal.v1",
+  "smoke": {
+    "command": "uv run awf deployment-smoke --profile local --write --json",
+    "evidence_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/deployment-smoke.json",
+    "ok": true
+  },
+  "ticket": "awf-pt7"
+}
