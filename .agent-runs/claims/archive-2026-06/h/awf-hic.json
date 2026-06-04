@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T05:39:28.978681+00:00",
+  "id": "awf-hic",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:11.831482Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:08.912147Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-hic",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:32.062837Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-rgf",
+        "issue_id": "awf-hic",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T010\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T010",
+    "id": "awf-hic",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage",
+    "updated_at": "2026-06-04T03:09:08.912423Z"
+  },
+  "worker_branch": "codex/awf-hic-add-health-log-trace-and-diagnostics-run",
+  "worker_id": "codex-goal005-t010",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-hic-add-health-log-trace-and-diagnostics-run",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-hic-add-health-log-trace-and-diagnostics-run ../self-hosted-agents-worktrees/awf-hic-add-health-log-trace-and-diagnostics-run <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-hic-add-health-log-trace-and-diagnostics-run && git status --short --branch"
+  }
+}

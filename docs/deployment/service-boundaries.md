@@ -1,6 +1,6 @@
 # Deployment Service Boundaries
 
-Status: updated through Goal 005 T009
+Status: updated through Goal 005 T010
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -11,7 +11,8 @@ selected self-hosted stack. It extends `docs/deployment/profiles.md` and is pair
 `docs/deployment/environment-readiness.md` for environment templates and readiness checks,
 `docs/deployment/startup.md` for startup commands and documented service equivalents, and
 `docs/deployment/smoke.md` for the representative selected-stack smoke command, and
-`docs/operations/backup-restore-reset.md` for backup, restore, and reset procedures.
+`docs/operations/backup-restore-reset.md` for backup, restore, and reset procedures, and
+`docs/operations/diagnostics.md` for health, log, trace, and diagnostics procedures.
 
 ## Boundary Rules
 
@@ -147,5 +148,6 @@ Fixture validation must pass when all observability, durable storage, and model-
 - T007 captured committed local smoke evidence across the app, observability, durable runtime, and health boundaries.
 - T008 captured credential-free fallback proof for absent deployment services or secrets.
 - T009 added backup, restore, and reset runbooks for database, service state, and run evidence.
-- T010-T012 add diagnostics, recovery, operating burden, and rehearsal evidence.
+- T010 added health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage.
+- T011-T012 add recovery, operating burden, and rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

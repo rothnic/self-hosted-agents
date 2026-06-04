@@ -1255,6 +1255,95 @@ def deployment_backup_restore_reset_runbook_data() -> dict[str, Any]:
     }
 
 
+def deployment_diagnostics_runbook_data() -> dict[str, Any]:
+    path = ROOT / "docs" / "operations" / "diagnostics.md"
+    text = read_text(path)
+    required_sections = [
+        "## Diagnostic Surfaces",
+        "## Health Checks",
+        "## Log Collection",
+        "## Trace Inspection",
+        "## Durable Runtime Diagnostics",
+        "## Storage Diagnostics",
+        "## Incident Triage Procedure",
+        "## T010 Evidence Expectations",
+        "## Current Gaps",
+    ]
+    required_terms = [
+        "Pydantic AI app",
+        "Langfuse observability",
+        "DBOS durable runtime",
+        "Langfuse storage",
+        "uv run awf deployment-readiness --profile local --json",
+        "uv run awf deployment-smoke --profile local --write --json",
+        "uv run awf verify --profile health --json",
+        "docker compose ps",
+        "docker compose logs --tail=200",
+        "curl -fsS \"$LANGFUSE_BASE_URL/api/public/health\"",
+        "psql \"$DBOS_DATABASE_URL\"",
+        "clickhouse-client",
+        "trace_id",
+        "evaluation_id",
+        "run_id",
+    ]
+    evidence_expectations = [
+        "app health command and result",
+        "Langfuse health or explicit service-backed gap",
+        "DBOS diagnostics command and local proof artifact or storage gap",
+        "storage diagnostics command and result or explicit gap",
+        "log bundle path or bounded log commands inspected",
+        "trace correlation path with `run_id`, `trace_id`, and `evaluation_id`",
+        "incident triage command sequence another agent can repeat",
+    ]
+    checks = [
+        {
+            "name": "runbook exists",
+            "ok": path.exists(),
+            "detail": rel(path),
+        },
+        *[
+            {
+                "name": f"section:{section}",
+                "ok": section in text,
+                "detail": section,
+            }
+            for section in required_sections
+        ],
+        *[
+            {
+                "name": f"term:{term}",
+                "ok": term in text,
+                "detail": term,
+            }
+            for term in required_terms
+        ],
+        *[
+            {
+                "name": f"evidence:{expectation}",
+                "ok": expectation in text,
+                "detail": expectation,
+            }
+            for expectation in evidence_expectations
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "path": rel(path),
+        "checks": checks,
+        "missing": missing,
+        "profiles": ["local", "development-server", "production-like"],
+        "diagnostic_surfaces": [
+            "Pydantic AI app",
+            "Langfuse observability",
+            "DBOS durable runtime",
+            "Langfuse storage",
+        ],
+        "evidence_surfaces": ["health", "logs", "traces", "storage diagnostics"],
+        "rehearsal_boundary": "T012 records the clean-path incident response rehearsal after operations runbooks are complete.",
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4609,6 +4698,23 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"repo-local evidence", "DBOS state", "Langfuse service state"}.issubset(
                 set(data["state_surfaces"])
             ),
+            "data": data,
+        }
+    )
+    data = deployment_diagnostics_runbook_data()
+    results.append(
+        {
+            "name": "deployment diagnostics runbook covers health logs traces and storage surfaces",
+            "ok": data["ok"]
+            and data["path"] == "docs/operations/diagnostics.md"
+            and {"local", "development-server", "production-like"}.issubset(set(data["profiles"]))
+            and {
+                "Pydantic AI app",
+                "Langfuse observability",
+                "DBOS durable runtime",
+                "Langfuse storage",
+            }.issubset(set(data["diagnostic_surfaces"]))
+            and {"health", "logs", "traces", "storage diagnostics"}.issubset(set(data["evidence_surfaces"])),
             "data": data,
         }
     )

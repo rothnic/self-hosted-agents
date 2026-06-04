@@ -14,6 +14,8 @@ Start here when an agent needs the deployment profile, target machine, or operat
 - `smoke.md`: representative selected-stack smoke command and repo-local correlation evidence shape.
 - `../operations/backup-restore-reset.md`: backup, restore, and reset runbook for database, service state, and run
   evidence.
+- `../operations/diagnostics.md`: health, log, trace, and diagnostics runbook for app, observability, durable runtime,
+  and storage.
 
 ## Current Profile Recommendation
 
