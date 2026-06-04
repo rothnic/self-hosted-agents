@@ -6,18 +6,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-6kf",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T010",
-        "id": "awf-3mc",
-        "title": "Add setup and operating notes for the selected stack product baseline"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-9a9",
             "status": null,
             "type": "blocks"
@@ -26,18 +14,6 @@
         "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T012",
         "id": "awf-3u9",
         "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes"
-      },
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-6kf",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
-        "id": "awf-e04",
-        "title": "Add product-level BDD contracts for the baseline workflow"
       },
       {
         "blocking_dependencies": [
@@ -81,18 +57,24 @@
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 5,
-      "ready": 2,
+      "blocked": 3,
+      "ready": 3,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-6kf",
+    "next_unblocked_issue_id": "awf-e04",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
-        "id": "awf-6kf",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
+        "id": "awf-e04",
         "status": "open",
-        "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo"
+        "title": "Add product-level BDD contracts for the baseline workflow"
+      },
+      {
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T010",
+        "id": "awf-3mc",
+        "status": "open",
+        "title": "Add setup and operating notes for the selected stack product baseline"
       },
       {
         "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
@@ -109,45 +91,6 @@
   "base_branch": "main",
   "beads_epic_id": "awf-dk3",
   "blocked": [
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:36.312279Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:46:56.746809Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-6kf",
-          "issue_id": "awf-3mc",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:48:37.167204Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-3mc",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T010\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T010",
-      "id": "awf-3mc",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 2,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Add setup and operating notes for the selected stack product baseline",
-      "updated_at": "2026-06-02T10:48:38.111057Z"
-    },
     {
       "compaction_level": 0,
       "created_at": "2026-06-02T10:46:36.984948Z",
@@ -186,45 +129,6 @@
       "status": "open",
       "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes",
       "updated_at": "2026-06-02T10:48:40.914069Z"
-    },
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:35.990869Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:46:56.271826Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-6kf",
-          "issue_id": "awf-e04",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:48:35.736821Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-e04",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T009\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
-      "id": "awf-e04",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 2,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Add product-level BDD contracts for the baseline workflow",
-      "updated_at": "2026-06-02T10:48:36.670356Z"
     },
     {
       "compaction_level": 0,
@@ -337,18 +241,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-6kf",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T010",
-        "id": "awf-3mc",
-        "title": "Add setup and operating notes for the selected stack product baseline"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-9a9",
             "status": null,
             "type": "blocks"
@@ -357,18 +249,6 @@
         "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T012",
         "id": "awf-3u9",
         "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes"
-      },
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-6kf",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
-        "id": "awf-e04",
-        "title": "Add product-level BDD contracts for the baseline workflow"
       },
       {
         "blocking_dependencies": [
@@ -410,11 +290,11 @@
         "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
       }
     ],
-    "blocked_count": 5,
+    "blocked_count": 3,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-6kf",
-    "ready_count": 2
+    "next_unblocked_issue_id": "awf-e04",
+    "ready_count": 3
   },
   "child_tickets": [
     {
@@ -474,11 +354,11 @@
       "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
       "task_id": "T008",
       "ticket_id": "awf-6kf",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo"
     },
     {
@@ -540,10 +420,10 @@
   "ok": true,
   "path": ".agent-runs/increments/005-candidate-platform-decision-product-baseline-goal-004.json",
   "phase": "Goal 004",
-  "ready_count": 2,
+  "ready_count": 3,
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T00:58:32.400177+00:00",
+  "updated_at": "2026-06-04T01:10:15.036817+00:00",
   "validation_evidence": []
 }

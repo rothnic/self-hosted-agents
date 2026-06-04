@@ -5,6 +5,8 @@ Python app except for shared contracts and comparison assets.
 
 Detailed slice plan: `apps/pydantic-ai/implementation-plan.md`.
 
+Product baseline workflow: `docs/product-baseline/pydantic-ai-review-gated-work-order.md`.
+
 ## First Slice
 
 Candidate id: `pydantic-ai`.

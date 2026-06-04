@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T01:04:33.014500+00:00",
+  "id": "awf-6kf",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:35.719676Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:34.395439Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-6kf",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:55.827355Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-zi9",
+        "issue_id": "awf-6kf",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T008\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
+    "id": "awf-6kf",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo",
+    "updated_at": "2026-06-02T10:48:35.285327Z"
+  },
+  "worker_branch": "codex/awf-6kf-define-the-first-product-baseline-workfl",
+  "worker_id": "codex-goal004-t008",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-6kf-define-the-first-product-baseline-workfl",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-6kf-define-the-first-product-baseline-workfl ../self-hosted-agents-worktrees/awf-6kf-define-the-first-product-baseline-workfl <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-6kf-define-the-first-product-baseline-workfl && git status --short --branch"
+  }
+}

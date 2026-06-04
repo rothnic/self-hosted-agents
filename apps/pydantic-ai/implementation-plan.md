@@ -2,10 +2,10 @@
 
 ## Purpose
 
-Define the approved implementation slice for `apps/pydantic-ai/` before writing candidate app code. This plan maps the
-required functional needs to the Pydantic AI, Langfuse/OpenTelemetry, Pydantic Evals, and durable execution components
-expected to provide them, then scopes the next implementation tickets so later evidence can be compared against
-`apps/langgraph-python/` and future candidate lanes.
+Define the approved implementation slice for `apps/pydantic-ai/` and preserve how it became the selected product
+baseline lane. This plan maps the required functional needs to the Pydantic AI, Langfuse/OpenTelemetry, Pydantic Evals,
+and durable execution components expected to provide them, then scopes implementation tickets so later evidence can be
+compared against `apps/langgraph-python/` and future candidate lanes.
 
 ## Approved Slice
 
@@ -14,12 +14,14 @@ Candidate id: `pydantic-ai`
 Stack under evaluation: Pydantic AI plus Langfuse/OpenTelemetry, with Pydantic Evals planned as the evaluation path and
 durable execution options evaluated after the deterministic comparable workflow exists.
 
-Approved decision: implement this as the next Python-first evidence-producing candidate lane. This is not a final
-platform choice.
+Approved decision: ADR 0005 selects this as the Python-first product-baseline lane. This is a product-baseline choice,
+not final-solution promotion.
 
 Primary goal: prove that a typed Pydantic AI workflow can run the shared comparable-agent scenario and produce
 reviewable run, trace, evaluation, setup, and gap evidence without requiring hosted credentials for deterministic
 validation.
+
+Product baseline workflow: `docs/product-baseline/pydantic-ai-review-gated-work-order.md`.
 
 ## Functional Needs Mapping
 

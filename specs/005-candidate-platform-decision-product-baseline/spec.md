@@ -94,7 +94,8 @@ workflow boundary, contract, operating notes, and follow-up backlog.
 - **Platform Decision Record**: The chosen primary stack, alternatives, rationale, promotion blockers, and reviewer
   acceptance evidence.
 - **Product Baseline Workflow**: The first product-oriented workflow for the selected stack, separate from the shared
-  comparison demo.
+  comparison demo. T008 defines this as the review-gated implementation work-order workflow in
+  `docs/product-baseline/pydantic-ai-review-gated-work-order.md`.
 - **Frozen Candidate Reference**: A non-selected candidate retained for comparison history and reusable lessons.
 
 ## Success Criteria *(mandatory)*

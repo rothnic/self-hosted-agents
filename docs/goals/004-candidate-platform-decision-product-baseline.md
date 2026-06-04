@@ -23,9 +23,9 @@ current candidate with implementation evidence across run, trace, evaluation, se
 categories. LangGraph Python plus Langfuse remains a comparison reference, Mastra TypeScript remains a deferred
 cross-language reference, and LangSmith remains an external benchmark that does not satisfy the self-hosted constraint.
 
-This is not final-solution promotion. Goal 004 still needs independent reviewer acceptance for the decision evidence,
-product-baseline workflow definition, product-level BDD contracts, setup notes, candidate-lane transition notes,
-production-hardening follow-up tickets, and increment acceptance evidence.
+This is not final-solution promotion. T008 defines the first product-baseline workflow in
+`docs/product-baseline/pydantic-ai-review-gated-work-order.md`; Goal 004 still needs product-level BDD contracts, setup
+notes, candidate-lane transition notes, production-hardening follow-up tickets, and increment acceptance evidence.
 
 ## Scope
 
