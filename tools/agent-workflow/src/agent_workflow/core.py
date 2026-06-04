@@ -921,9 +921,19 @@ def deployment_smoke_data(
     readiness = deployment_readiness_data(profile=profile, env_file=env_file, env=env)
     startup = deployment_startup_data(profile=profile, env_file=env_file, write=False, env=env)
     can_run_local_smoke = readiness["ok"] and startup["ok"] and profile == "local"
+    smoke_id = now_id(f"deployment-smoke-{profile}")
+    smoke_dir = ROOT / ".agent-runs" / "reports" / "goal-005" / smoke_id if write else None
     if can_run_local_smoke:
-        candidate = candidate_data if candidate_data is not None else pydantic_ai_candidate_smoke_result()
-        durable = durable_data if durable_data is not None else pydantic_ai_durable_smoke_result()
+        candidate = (
+            candidate_data
+            if candidate_data is not None
+            else pydantic_ai_candidate_smoke_result(artifact_dir=smoke_dir)
+        )
+        durable = (
+            durable_data
+            if durable_data is not None
+            else pydantic_ai_durable_smoke_result(artifact_dir=smoke_dir)
+        )
     else:
         reason = "local smoke requires readiness, startup, and the local profile"
         candidate = candidate_data or {"ok": False, "skipped": True, "reason": reason}
@@ -934,7 +944,6 @@ def deployment_smoke_data(
     durable_artifact = durable.get("artifact", {}) if isinstance(durable.get("artifact"), dict) else {}
     durable_dbos = durable_artifact.get("dbos", {}) if isinstance(durable_artifact.get("dbos"), dict) else {}
     durable_ai = durable_artifact.get("pydantic_ai", {}) if isinstance(durable_artifact.get("pydantic_ai"), dict) else {}
-    smoke_id = now_id(f"deployment-smoke-{profile}")
     health_checks = [
         {"name": "deployment-readiness", "ok": readiness["ok"], "required": True, "source": "awf deployment-readiness"},
         {"name": "deployment-startup", "ok": startup["ok"], "required": True, "source": "awf deployment-startup"},
@@ -1005,6 +1014,7 @@ def deployment_smoke_data(
             "durable_run_id": durable_dbos.get("workflow_id"),
             "agent_class": durable_ai.get("agent_class"),
             "sqlite_development_mode": durable_artifact.get("runtime", {}).get("sqlite_development_mode"),
+            "artifact_path": durable.get("output"),
         },
         "correlation": {
             "run_id": run_id,
@@ -1038,7 +1048,7 @@ def deployment_smoke_data(
     evidence["passed"] = all(required.values())
     evidence_path = None
     if write and evidence["passed"]:
-        path = ROOT / ".agent-runs" / "verifications" / f"{smoke_id}.json"
+        path = (smoke_dir or (ROOT / ".agent-runs" / "reports" / "goal-005" / smoke_id)) / "deployment-smoke.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         evidence_path = rel(path)
@@ -1805,9 +1815,9 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
             "stdout": proc.stdout.strip(),
             "stderr": proc.stderr.strip(),
             "fixture": rel(fixture),
-            "output": str(output_path),
-            "trace_output": str(trace_path),
-            "evaluation_output": str(evaluation_path),
+            "output": rel(output_path),
+            "trace_output": rel(trace_path),
+            "evaluation_output": rel(evaluation_path),
             "required": required,
             "artifact": artifact,
             "trace": trace,
@@ -1815,7 +1825,7 @@ def langgraph_python_candidate_smoke_result() -> dict[str, Any]:
         }
 
 
-def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
+def pydantic_ai_candidate_smoke_result(artifact_dir: Path | None = None) -> dict[str, Any]:
     fixture = ROOT / "packages" / "comparison" / "fixtures" / "pydantic-ai-decision-slice.json"
     runner = ROOT / "apps" / "pydantic-ai" / "run.py"
     if not fixture.exists() or not runner.exists():
@@ -1832,7 +1842,9 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
         fixture_data = {}
     expected_next_task = fixture_data.get("project_context", {}).get("next_expected_slice", "T024")
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = Path(tmpdir) / "pydantic-ai-run.json"
+        output_dir = artifact_dir or Path(tmpdir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / "pydantic-ai-run.json"
         command = [
             sys.executable,
             str(runner),
@@ -1972,9 +1984,9 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
             "stdout": proc.stdout.strip(),
             "stderr": proc.stderr.strip(),
             "fixture": rel(fixture),
-            "output": str(output_path),
-            "trace_output": str(trace_path),
-            "evaluation_output": str(evaluation_path),
+            "output": rel(output_path),
+            "trace_output": rel(trace_path),
+            "evaluation_output": rel(evaluation_path),
             "ambient_credential_check": {
                 "returncode": ambient_proc.returncode,
                 "stderr": ambient_proc.stderr.strip(),
@@ -1992,7 +2004,7 @@ def pydantic_ai_candidate_smoke_result() -> dict[str, Any]:
         }
 
 
-def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
+def pydantic_ai_durable_smoke_result(artifact_dir: Path | None = None) -> dict[str, Any]:
     fixture = ROOT / "packages" / "comparison" / "fixtures" / "pydantic-ai-decision-slice.json"
     runner = ROOT / "apps" / "pydantic-ai" / "durable_smoke.py"
     if not fixture.exists() or not runner.exists():
@@ -2004,7 +2016,9 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "runner": rel(runner),
         }
     with tempfile.TemporaryDirectory() as tmpdir:
-        output_path = Path(tmpdir) / "pydantic-ai-durable-smoke.json"
+        output_dir = artifact_dir or Path(tmpdir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_path = output_dir / "pydantic-ai-durable-smoke.json"
         db_path = Path(tmpdir) / "pydantic-ai-dbos.sqlite"
         side_effect_log = Path(tmpdir) / "pydantic-ai-dbos-side-effect.jsonl"
         command = [
@@ -2291,7 +2305,7 @@ def pydantic_ai_durable_smoke_result() -> dict[str, Any]:
             "stdout": proc.stdout.strip(),
             "stderr": proc.stderr.strip(),
             "fixture": rel(fixture),
-            "output": str(output_path),
+            "output": rel(output_path),
             "required": required,
             "artifact": artifact,
         }

@@ -1,6 +1,6 @@
 # Deployment Smoke
 
-Status: initialized for Goal 005 T006
+Status: captured through Goal 005 T007
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -18,8 +18,8 @@ Use the local profile for deterministic ticket validation:
 uv run awf deployment-smoke --profile local --write --json
 ```
 
-When the local profile is ready, the command writes a smoke artifact under `.agent-runs/verifications/`. The artifact
-uses schema `awf.deployment-smoke.v1` and includes:
+When the local profile is ready, the command writes a per-smoke evidence bundle under
+`.agent-runs/reports/goal-005/<smoke-id>/`. The top-level artifact uses schema `awf.deployment-smoke.v1` and includes:
 
 - deployment readiness and startup health checks
 - Pydantic AI run id, trace id, evaluation id, and artifact paths
@@ -27,6 +27,24 @@ uses schema `awf.deployment-smoke.v1` and includes:
 - repo-local observability availability
 - deterministic validation flags showing no hosted credentials, external model provider, or network is required
 - explicit gaps for self-hosted Langfuse service-backed ingestion and production DBOS storage proof
+
+## Captured Local Evidence
+
+T007 captured the first committed local smoke artifact:
+
+- `.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/deployment-smoke.json`
+- `.agent-runs/reports/goal-005/t007-deployment-smoke-evidence-20260604.md`
+
+The artifact correlates the local profile health checks with the Pydantic AI run id, trace id, evaluation id, DBOS
+durable run id, and credential-free deterministic validation flags. Self-hosted Langfuse remains the selected
+observability service boundary, but it is not required for the local fixture profile.
+
+The same evidence bundle includes the durable child artifacts referenced by the smoke result:
+
+- `pydantic-ai-run.json`
+- `pydantic-ai-run.trace.json`
+- `pydantic-ai-run.evaluation.json`
+- `pydantic-ai-durable-smoke.json`
 
 ## Service-Backed Boundary
 

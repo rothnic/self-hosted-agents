@@ -1,0 +1,2 @@
+{"attempt": 1, "event": "controlled-retry", "will_fail": true, "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"}
+{"attempt": 2, "event": "controlled-retry", "will_fail": false, "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"}

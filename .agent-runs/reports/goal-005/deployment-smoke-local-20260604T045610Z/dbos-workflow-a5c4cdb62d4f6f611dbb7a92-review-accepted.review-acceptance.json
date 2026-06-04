@@ -1,0 +1,11 @@
+{
+  "accepted": true,
+  "accepted_at": "fixture-deterministic-review-acceptance",
+  "beads_issue_id": "awf-75o",
+  "decision": "accepted",
+  "event": "independent-reviewer-acceptance",
+  "presented_by_agent_id": "fixture-worker-presenter",
+  "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+  "reviewer_agent_id": "fixture-independent-reviewer",
+  "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+}

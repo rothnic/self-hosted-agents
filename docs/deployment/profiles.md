@@ -1,6 +1,6 @@
 # Self-Hosted Deployment Profiles
 
-Status: updated through Goal 005 T006
+Status: updated through Goal 005 T007
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/self_hosted_deployment_operations.feature`
@@ -172,6 +172,7 @@ The production-like profile must use externally managed secrets, never committed
 - T004 added environment templates and readiness checks that report missing prerequisites without exposing secrets.
 - T005 added or documented startup for the selected Pydantic AI, Langfuse, and DBOS profile.
 - T006 added the deployment smoke command for the representative selected-stack workflow.
-- T007-T008 add committed smoke evidence and credential-free fallback evidence.
+- T007 captured committed local smoke evidence with run, trace, eval, durable, and health correlation.
+- T008 adds credential-free fallback evidence for absent deployment services or secrets.
 - T009-T012 add runbooks and fresh-setup rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

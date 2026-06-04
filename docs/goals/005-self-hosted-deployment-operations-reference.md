@@ -32,7 +32,7 @@ The increment ledger is
 `.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and the Beads parent epic is
 `awf-h2u`.
 
-Completed through T006:
+Completed through T007:
 
 - T001 / `awf-n19`: self-hosted deployment operations BDD contract.
 - T002 / `awf-gdu`: local, development-server, and production-like deployment profiles.
@@ -40,10 +40,12 @@ Completed through T006:
 - T004 / `awf-is8`: environment templates and credential-free readiness checks.
 - T005 / `awf-091`: one-command local startup manifest and documented service-backed startup equivalents.
 - T006 / `awf-t1m`: representative selected-stack deployment smoke command.
+- T007 / `awf-xei`: repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation.
 
 Next ready implementer ticket:
 
-- `awf-xei` / T007: capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation.
+- `awf-rgf` / T008: prove deterministic validation remains credential-free when deployment services or secrets are
+  absent.
 
 The remaining Goal 005 tickets are dependency-ordered through T013. T013 presents final Goal 005 evidence, and a
 separate reviewer agent must record acceptance or rejection. Human review is not a progress blocker unless a decision is

@@ -1,0 +1,106 @@
+{
+  "case_id": "pydantic-ai-comparable-agent-workflow",
+  "criteria": [
+    {
+      "name": "recommendation_output",
+      "passed": true,
+      "reason": "Recommendation includes the expected next slice and rationale.",
+      "source": "ComparableWorkflowEvaluator"
+    },
+    {
+      "name": "acceptance_check",
+      "passed": true,
+      "reason": "Output names the shared workflow fixture acceptance check.",
+      "source": "ComparableWorkflowEvaluator"
+    },
+    {
+      "name": "run_trace_correlation",
+      "passed": true,
+      "reason": "Evaluation case, run artifact, and trace evidence share run and trace ids.",
+      "source": "ComparableWorkflowEvaluator"
+    },
+    {
+      "name": "pydantic_ai_runtime",
+      "passed": true,
+      "reason": "Run used Pydantic AI Agent with native OTel spans and no network model requirement.",
+      "source": "ComparableWorkflowEvaluator"
+    },
+    {
+      "name": "evidence_completeness",
+      "passed": true,
+      "reason": "Run links fixture, run, trace, evaluation, setup, and gap evidence.",
+      "source": "ComparableWorkflowEvaluator"
+    }
+  ],
+  "dataset": {
+    "case_count": 1,
+    "evaluator_count": 1,
+    "name": "pydantic-ai-fixture-evaluation"
+  },
+  "evaluation_id": "eval-65ca933b165e3794",
+  "evidence_links": {
+    "evaluation_evidence": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+    "fixture_input": "/Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json",
+    "gap_notes": "apps/pydantic-ai/implementation-plan.md",
+    "run_artifact": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.json",
+    "setup_notes": "apps/pydantic-ai/README.md",
+    "trace_evidence": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json"
+  },
+  "gaps": [],
+  "max_score": 5,
+  "passed": true,
+  "provider": "Pydantic Evals",
+  "pydantic_evals": {
+    "cases": [
+      {
+        "assertions": {
+          "acceptance_check": {
+            "passed": true,
+            "reason": "Output names the shared workflow fixture acceptance check.",
+            "source": "ComparableWorkflowEvaluator"
+          },
+          "evidence_completeness": {
+            "passed": true,
+            "reason": "Run links fixture, run, trace, evaluation, setup, and gap evidence.",
+            "source": "ComparableWorkflowEvaluator"
+          },
+          "pydantic_ai_runtime": {
+            "passed": true,
+            "reason": "Run used Pydantic AI Agent with native OTel spans and no network model requirement.",
+            "source": "ComparableWorkflowEvaluator"
+          },
+          "recommendation_output": {
+            "passed": true,
+            "reason": "Recommendation includes the expected next slice and rationale.",
+            "source": "ComparableWorkflowEvaluator"
+          },
+          "run_trace_correlation": {
+            "passed": true,
+            "reason": "Evaluation case, run artifact, and trace evidence share run and trace ids.",
+            "source": "ComparableWorkflowEvaluator"
+          }
+        },
+        "case_id": "pydantic-ai-comparable-agent-workflow",
+        "output": {
+          "candidate_app_id": "pydantic-ai",
+          "run_id": "run-e93c5940e04ff8cf99fe2e21",
+          "trace_id": "trace-f9cac59a8a238a726e8289e1"
+        },
+        "task_duration": 0.0004372691037133336,
+        "total_duration": 0.001667022705078125
+      }
+    ],
+    "report_name": "pydantic-ai-fixture-evaluation",
+    "span_id": "0000000000000000",
+    "trace_id": "00000000000000000000000000000000"
+  },
+  "rerun_command": "uv run python apps/pydantic-ai/run.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --output /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.json --pretty",
+  "run_id": "run-e93c5940e04ff8cf99fe2e21",
+  "score": 5,
+  "scorer": {
+    "rubric": "docs/evaluation-criteria.md",
+    "type": "pydantic-evals-deterministic-assertion"
+  },
+  "summary": "Pydantic Evals deterministic assertions passed for the comparable workflow artifact.",
+  "trace_id": "trace-f9cac59a8a238a726e8289e1"
+}

@@ -1,0 +1,600 @@
+{
+  "acceptance_command": "uv run awf workflow-fixture-test",
+  "accepted_review_resume": {
+    "acceptance": {
+      "accepted": true,
+      "accepted_at": "fixture-deterministic-review-acceptance",
+      "beads_issue_id": "awf-75o",
+      "decision": "accepted",
+      "event": "independent-reviewer-acceptance",
+      "presented_by_agent_id": "fixture-worker-presenter",
+      "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+      "reviewer_agent_id": "fixture-independent-reviewer",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+    },
+    "acceptance_artifact_exists": true,
+    "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+    "beads_issue_id": "awf-75o",
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite --side-effect-log /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl --retry-state-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl --workflow-id dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted --wait-seconds 300.0 --retry-failures 1 --issue-id awf-75o --review-wait-state /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-wait.json --review-acceptance /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json --post-wait-side-effect-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl --required-review-evidence-path .agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json --child-phase review-wait --child-result-output /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.child-result.json",
+    "exit_code": 0,
+    "post_wait_side_effect": {
+      "events": [
+        {
+          "event": "post-wait-side-effect",
+          "sequence": 1,
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+        }
+      ],
+      "line_count": 1,
+      "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl"
+    },
+    "proven": true,
+    "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+    "state": {
+      "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+      "beads_issue_id": "awf-75o",
+      "event": "review-wait",
+      "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+      "post_wait_side_effects_allowed": true,
+      "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+      "status": "accepted",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+    },
+    "state_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-wait.json",
+    "stderr_excerpt": "23:56:27 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n23:56:27 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n23:56:27 [    INFO] (dbos:_dbos.py:534) Application version: goal-002-durable-smoke\n23:56:27 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite (schema: dbos)\n23:56:27 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n23:56:27 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version goal-002-durable-smoke\n23:56:27 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:56:27 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:56:27 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"review-wait\", \"status\": \"accepted\", \"workflow_id\": \"dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted\"}\n",
+    "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted",
+    "workflow_result": {
+      "post_wait_side_effect": {
+        "event": {
+          "event": "post-wait-side-effect",
+          "sequence": 1,
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+        },
+        "line_count_after": 1,
+        "line_count_before": 0,
+        "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl"
+      },
+      "review_wait": {
+        "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+        "beads_issue_id": "awf-75o",
+        "event": "review-wait",
+        "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+        "post_wait_side_effects_allowed": true,
+        "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+        "status": "accepted",
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+      },
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+    },
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "goal-002-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780548987288,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-wait.json",
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+          "awf-75o",
+          ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json"
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_review_wait_smoke",
+      "output": {
+        "post_wait_side_effect": {
+          "event": {
+            "event": "post-wait-side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl"
+        },
+        "review_wait": {
+          "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+          "beads_issue_id": "awf-75o",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+          "post_wait_side_effects_allowed": true,
+          "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+          "status": "accepted",
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+        },
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 1,
+      "status": "SUCCESS",
+      "updated_at": 1780548987000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548987292,
+        "error": null,
+        "function_id": 1,
+        "function_name": "record_review_wait_state",
+        "output": {
+          "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+          "beads_issue_id": "awf-75o",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+          "post_wait_side_effects_allowed": true,
+          "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+          "status": "accepted",
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+        },
+        "started_at_epoch_ms": 1780548987290
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548987296,
+        "error": null,
+        "function_id": 2,
+        "function_name": "record_post_wait_side_effect",
+        "output": {
+          "event": {
+            "event": "post-wait-side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl"
+        },
+        "started_at_epoch_ms": 1780548987295
+      }
+    ]
+  },
+  "candidate_app": "apps/pydantic-ai",
+  "command_used": "uv run python apps/pydantic-ai/durable_smoke.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --output /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-durable-smoke.json --db-path /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite --side-effect-log /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl --pretty",
+  "correlation": {
+    "accepted_review_resume": {
+      "post_wait_event_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted",
+      "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.post-wait-side-effect.jsonl",
+      "state_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-wait.json",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+    },
+    "beads": {
+      "acceptance_command": "uv run awf workflow-fixture-test",
+      "beads_issue_id": "awf-75o",
+      "evidence_artifact": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-durable-smoke.json",
+      "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T010",
+      "objective_id": "agentic-development-foundation",
+      "spec_id": "004-durable-agent-execution-runtime",
+      "task_id": "T010"
+    },
+    "durable_run": {
+      "durable_run_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+      "resume_attempt_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+      "workflow_result_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+      "workflow_status_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+    },
+    "evaluation": {
+      "evaluation_id": "eval-2993ec7eb1f088d5",
+      "provider": "deterministic-fixture-correlation",
+      "run_id": "run-a082311f08912a9d8993178a",
+      "trace_id": "trace-f0b125169b95faf60824bb12"
+    },
+    "observability": {
+      "pydantic_ai_run_id": "run-a082311f08912a9d8993178a",
+      "trace_id": "trace-f0b125169b95faf60824bb12"
+    },
+    "proven": true,
+    "review_wait": {
+      "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+      "state_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-wait.json",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+    },
+    "reviewer_acceptance": {
+      "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted.review-acceptance.json",
+      "accepted": true,
+      "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted-acceptance.json",
+      "reviewer_agent_id": "fixture-independent-reviewer",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-accepted"
+    }
+  },
+  "dbos": {
+    "db_path": "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite",
+    "side_effect_step_marker": "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.side-effect-step-complete.json",
+    "system_database_url": "sqlite:////var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite",
+    "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "goal-002-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780548979665,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl",
+          300.0,
+          "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.side-effect-step-complete.json",
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl",
+          1
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_durable_smoke",
+      "output": {
+        "agent": {
+          "class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+          "model": "pydantic_ai.models.test.TestModel",
+          "network_required": false,
+          "recommendation": {
+            "linked_task": "T011",
+            "next_slice": "Update roadmap, requirements, and promotion gates with the durable proof result.",
+            "reason": "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus fixture-safe review wait, accepted-review continuation, and durable artifact correlation with fixture shape assertions, so the next useful slice is updating promotion gates."
+          },
+          "usage": {
+            "input_tokens": 77,
+            "output_tokens": 57,
+            "requests": 1
+          }
+        },
+        "pydantic_ai_run_id": "run-a082311f08912a9d8993178a",
+        "retry": {
+          "attempt": 2,
+          "failures_before_success": 1,
+          "line_count_after": 2,
+          "line_count_before": 1,
+          "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl"
+        },
+        "side_effect": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl"
+        },
+        "trace_id": "trace-f0b125169b95faf60824bb12",
+        "wait": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 2,
+      "status": "SUCCESS",
+      "updated_at": 1780548981000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548979773,
+        "error": null,
+        "function_id": 1,
+        "function_name": "controlled_retry_once",
+        "output": {
+          "attempt": 2,
+          "failures_before_success": 1,
+          "line_count_after": 2,
+          "line_count_before": 1,
+          "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl"
+        },
+        "started_at_epoch_ms": 1780548979666
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548979779,
+        "error": null,
+        "function_id": 2,
+        "function_name": "record_side_effect_once",
+        "output": {
+          "event": {
+            "event": "side-effect",
+            "sequence": 1,
+            "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+          },
+          "line_count_after": 1,
+          "line_count_before": 0,
+          "log_path": "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl"
+        },
+        "started_at_epoch_ms": 1780548979777
+      },
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548981739,
+        "error": null,
+        "function_id": 3,
+        "function_name": "controlled_resume_wait",
+        "output": {
+          "resumed": true,
+          "slept_seconds": 0
+        },
+        "started_at_epoch_ms": 1780548981738
+      },
+      {
+        "child_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-4",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 4,
+        "function_name": "DecisionSliceDBOSAgent.run_sync",
+        "output": null,
+        "started_at_epoch_ms": null
+      },
+      {
+        "child_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-4",
+        "completed_at_epoch_ms": null,
+        "error": null,
+        "function_id": 5,
+        "function_name": "DBOS.getResult",
+        "output": "AgentRunResult(output=DecisionRecommendation(next_slice='Update roadmap, requirements, and promotion gates with the durable proof result.', reason='The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus fixture-safe review wait, accepted-review continuation, and durable artifact correlation with fixture shape assertions, so the next useful slice is updating promotion gates.', linked_task='T011'))",
+        "started_at_epoch_ms": null
+      }
+    ]
+  },
+  "deterministic_validation": {
+    "external_model_required": false,
+    "hosted_credentials_required": false,
+    "service_count": 0
+  },
+  "durable_property": {
+    "artifact_correlation_proven": true,
+    "completed_step_not_duplicated": true,
+    "controlled_failure": "first child process killed after DBOS side-effect step returned",
+    "controlled_retry": "DBOS step controlled_retry_once failed 1 time(s), then retried and completed",
+    "resume_proven": true,
+    "retry_proven": true,
+    "review_resume_proven": true,
+    "review_wait_proven": true,
+    "run_identity_preserved": true,
+    "side_effect_idempotency_proven": true
+  },
+  "first_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite --side-effect-log /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl --retry-state-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl --side-effect-step-marker /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.side-effect-step-complete.json --workflow-id dbos-workflow-a5c4cdb62d4f6f611dbb7a92 --wait-seconds 300.0 --retry-failures 1 --issue-id awf-75o --child-phase start",
+    "exit_code": -9,
+    "side_effect_step_returned_before_kill": true,
+    "stderr_excerpt": "19 [    INFO] (dbos:_sys_db_sqlite.py:82) Applying DBOS SQLite system database schema migration 32\n23:56:19 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version goal-002-durable-smoke\n23:56:19 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:56:19 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:56:19 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n23:56:19 [ WARNING] (dbos:_core.py:1641) Step being automatically retried (attempt 1 of 3)\nTraceback (most recent call last):\n  File \"/Users/nroth/workspace/self-hosted-agents/.venv/lib/python3.14/site-packages/dbos/_outcome.py\", line 143, in _retry\n    return func()\n  File \"/Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py\", line 95, in controlled_retry_once\n    raise RuntimeError(f\"controlled DBOS retry attempt {attempt}\")\nRuntimeError: controlled DBOS retry attempt 1\n",
+    "stdout_excerpt": "{\"phase\": \"start\", \"workflow_id\": \"dbos-workflow-a5c4cdb62d4f6f611dbb7a92\"}\n"
+  },
+  "identity": {
+    "first_attempt_phase": "start",
+    "first_attempt_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "requested_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "resume_attempt_phase": "resume",
+    "resume_attempt_status": "complete",
+    "resume_attempt_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "retry_event_workflow_ids": [
+      "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+    ],
+    "side_effect_event_workflow_ids": [
+      "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+    ],
+    "workflow_result_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "workflow_status_output_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92",
+    "workflow_status_workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+  },
+  "issue_id": "awf-75o",
+  "passed": true,
+  "pydantic_ai": {
+    "agent_class": "pydantic_ai.durable_exec.dbos.DBOSAgent",
+    "model_class": "pydantic_ai.models.test.TestModel",
+    "network_required": false,
+    "recommendation": {
+      "linked_task": "T011",
+      "next_slice": "Update roadmap, requirements, and promotion gates with the durable proof result.",
+      "reason": "The Pydantic AI DBOS lane now has deterministic retry, resume, run identity, and side-effect idempotency evidence plus fixture-safe review wait, accepted-review continuation, and durable artifact correlation with fixture shape assertions, so the next useful slice is updating promotion gates."
+    },
+    "run_id": "run-a082311f08912a9d8993178a",
+    "trace_id": "trace-f0b125169b95faf60824bb12"
+  },
+  "resume_attempt": {
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite --side-effect-log /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl --retry-state-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl --side-effect-step-marker /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.side-effect-step-complete.json --workflow-id dbos-workflow-a5c4cdb62d4f6f611dbb7a92 --wait-seconds 300.0 --retry-failures 1 --issue-id awf-75o --child-phase resume --child-result-output /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.child-result.json",
+    "exit_code": 0,
+    "stderr_excerpt": "23:56:21 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n23:56:21 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n23:56:21 [    INFO] (dbos:_dbos.py:534) Application version: goal-002-durable-smoke\n23:56:21 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite (schema: dbos)\n23:56:21 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n23:56:21 [    INFO] (dbos:_dbos.py:611) Recovering 1 workflows from application version goal-002-durable-smoke\n23:56:21 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:56:21 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:56:21 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"resume\", \"workflow_id\": \"dbos-workflow-a5c4cdb62d4f6f611dbb7a92\", \"status\": \"complete\"}\n"
+  },
+  "retry": {
+    "events": [
+      {
+        "attempt": 1,
+        "event": "controlled-retry",
+        "will_fail": true,
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+      },
+      {
+        "attempt": 2,
+        "event": "controlled-retry",
+        "will_fail": false,
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+      }
+    ],
+    "failure_count": 1,
+    "line_count": 2,
+    "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl",
+    "success_count": 1
+  },
+  "review_wait": {
+    "acceptance_artifact_exists": false,
+    "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+    "beads_issue_id": "awf-75o",
+    "command": "/Users/nroth/workspace/self-hosted-agents/.venv/bin/python3 /Users/nroth/workspace/self-hosted-agents/apps/pydantic-ai/durable_smoke.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --db-path /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite --side-effect-log /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl --retry-state-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92.retry.jsonl --workflow-id dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait --wait-seconds 300.0 --retry-failures 1 --issue-id awf-75o --review-wait-state /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-wait.json --review-acceptance /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json --post-wait-side-effect-log /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl --required-review-evidence-path .agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json --child-phase review-wait --child-result-output /var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.child-result.json",
+    "exit_code": 0,
+    "post_wait_side_effect": {
+      "events": [],
+      "line_count": 0,
+      "log_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl"
+    },
+    "proven": true,
+    "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+    "state": {
+      "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+      "beads_issue_id": "awf-75o",
+      "event": "review-wait",
+      "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl",
+      "post_wait_side_effects_allowed": false,
+      "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+      "status": "waiting-for-reviewer-acceptance",
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+    },
+    "state_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-wait.json",
+    "stderr_excerpt": "23:56:24 [    INFO] (dbos:_dbos.py:462) Initializing DBOS (v2.22.0)\n23:56:24 [    INFO] (dbos:_dbos.py:533) Executor ID: local\n23:56:24 [    INFO] (dbos:_dbos.py:534) Application version: goal-002-durable-smoke\n23:56:24 [    INFO] (dbos:_sys_db.py:511) Initializing DBOS system database with URL: sqlite:////var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos.sqlite (schema: dbos)\n23:56:24 [    INFO] (dbos:_sys_db.py:515) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.\n23:56:24 [    INFO] (dbos:_dbos.py:615) No workflows to recover from application version goal-002-durable-smoke\n23:56:24 [    INFO] (dbos:_dbos.py:709) DBOS launched!\n23:56:24 [    INFO] (dbos:_dbos.py:717) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=pydantic-ai-durable-smoke\n23:56:24 [    INFO] (dbos:_queue.py:666) Listening to 0 queues:\n",
+    "stdout_excerpt": "{\"phase\": \"review-wait\", \"status\": \"waiting-for-reviewer-acceptance\", \"workflow_id\": \"dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait\"}\n",
+    "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait",
+    "workflow_result": {
+      "post_wait_side_effect": {
+        "reason": "reviewer acceptance missing",
+        "skipped": true
+      },
+      "review_wait": {
+        "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+        "beads_issue_id": "awf-75o",
+        "event": "review-wait",
+        "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl",
+        "post_wait_side_effects_allowed": false,
+        "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+        "status": "waiting-for-reviewer-acceptance",
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+      },
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+    },
+    "workflow_status": {
+      "app_id": "",
+      "app_version": "goal-002-durable-smoke",
+      "assumed_role": null,
+      "authenticated_roles": null,
+      "authenticated_user": null,
+      "class_name": null,
+      "config_name": null,
+      "created_at": 1780548984921,
+      "deduplication_id": null,
+      "delay_until_epoch_ms": null,
+      "dequeued_at": null,
+      "error": null,
+      "executor_id": "local",
+      "forked_from": null,
+      "input": {
+        "args": [
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-wait.json",
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+          "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl",
+          "awf-75o",
+          ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json"
+        ],
+        "kwargs": {}
+      },
+      "name": "pydantic_ai_review_wait_smoke",
+      "output": {
+        "post_wait_side_effect": {
+          "reason": "reviewer acceptance missing",
+          "skipped": true
+        },
+        "review_wait": {
+          "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+          "beads_issue_id": "awf-75o",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl",
+          "post_wait_side_effects_allowed": false,
+          "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+          "status": "waiting-for-reviewer-acceptance",
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+        },
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+      },
+      "parent_workflow_id": null,
+      "priority": 0,
+      "queue_name": null,
+      "queue_partition_key": null,
+      "recovery_attempts": 1,
+      "status": "SUCCESS",
+      "updated_at": 1780548984000,
+      "was_forked_from": false,
+      "workflow_deadline_epoch_ms": null,
+      "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait",
+      "workflow_timeout_ms": null
+    },
+    "workflow_steps": [
+      {
+        "child_workflow_id": null,
+        "completed_at_epoch_ms": 1780548984925,
+        "error": null,
+        "function_id": 1,
+        "function_name": "record_review_wait_state",
+        "output": {
+          "acceptance_path": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.review-acceptance.json",
+          "beads_issue_id": "awf-75o",
+          "event": "review-wait",
+          "post_wait_side_effect_log": "/Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait.post-wait-side-effect.jsonl",
+          "post_wait_side_effects_allowed": false,
+          "required_evidence_path": ".agent-runs/reviews/awf-75o-dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait-acceptance.json",
+          "status": "waiting-for-reviewer-acceptance",
+          "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92-review-wait"
+        },
+        "started_at_epoch_ms": 1780548984923
+      }
+    ]
+  },
+  "runtime": {
+    "selected": "pydantic_ai_dbos",
+    "sqlite_development_mode": true
+  },
+  "side_effect": {
+    "events": [
+      {
+        "event": "side-effect",
+        "sequence": 1,
+        "workflow_id": "dbos-workflow-a5c4cdb62d4f6f611dbb7a92"
+      }
+    ],
+    "idempotency": {
+      "after_resume_line_count": 1,
+      "before_resume_line_count": 1,
+      "event_keys": [
+        "dbos-workflow-a5c4cdb62d4f6f611dbb7a92:side-effect:1"
+      ],
+      "events_unchanged_after_resume": true,
+      "proven": true,
+      "resume_duplicate_count": 0,
+      "retry_failure_count_before_side_effect": 1,
+      "retry_line_count_before_side_effect": 2,
+      "retry_success_count_before_side_effect": 1,
+      "workflow_result_event_matches_log": true,
+      "workflow_result_line_count_after": 1,
+      "workflow_result_line_count_before": 0
+    },
+    "line_count": 1,
+    "log_path": "/var/folders/0v/0z62tzvn037cpx7drn6wp97m0000gp/T/tmp3f4d1m9j/pydantic-ai-dbos-side-effect.jsonl"
+  }
+}

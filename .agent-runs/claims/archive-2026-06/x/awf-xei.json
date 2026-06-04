@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T04:42:42.246743+00:00",
+  "id": "awf-xei",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:10.898757Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:04.964125Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-xei",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:30.435522Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-t1m",
+        "issue_id": "awf-xei",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T007\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+    "id": "awf-xei",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation",
+    "updated_at": "2026-06-04T03:09:04.964447Z"
+  },
+  "worker_branch": "codex/awf-xei-capture-repo-local-deployment-smoke-evid",
+  "worker_id": "codex-goal005-t007",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-xei-capture-repo-local-deployment-smoke-evid",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-xei-capture-repo-local-deployment-smoke-evid ../self-hosted-agents-worktrees/awf-xei-capture-repo-local-deployment-smoke-evid <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-xei-capture-repo-local-deployment-smoke-evid && git status --short --branch"
+  }
+}
