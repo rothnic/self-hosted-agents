@@ -95,7 +95,8 @@ workflow boundary, contract, operating notes, and follow-up backlog.
   acceptance evidence.
 - **Product Baseline Workflow**: The first product-oriented workflow for the selected stack, separate from the shared
   comparison demo. T008 defines this as the review-gated implementation work-order workflow in
-  `docs/product-baseline/pydantic-ai-review-gated-work-order.md`.
+  `docs/product-baseline/pydantic-ai-review-gated-work-order.md`. T009 adds the implementation-agnostic BDD contract
+  in `tests/workflow/features/product_baseline_work_order.feature`.
 - **Frozen Candidate Reference**: A non-selected candidate retained for comparison history and reusable lessons.
 
 ## Success Criteria *(mandatory)*

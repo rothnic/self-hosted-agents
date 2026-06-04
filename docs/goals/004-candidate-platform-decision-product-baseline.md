@@ -24,8 +24,9 @@ categories. LangGraph Python plus Langfuse remains a comparison reference, Mastr
 cross-language reference, and LangSmith remains an external benchmark that does not satisfy the self-hosted constraint.
 
 This is not final-solution promotion. T008 defines the first product-baseline workflow in
-`docs/product-baseline/pydantic-ai-review-gated-work-order.md`; Goal 004 still needs product-level BDD contracts, setup
-notes, candidate-lane transition notes, production-hardening follow-up tickets, and increment acceptance evidence.
+`docs/product-baseline/pydantic-ai-review-gated-work-order.md`, and T009 adds its product-level BDD contract in
+`tests/workflow/features/product_baseline_work_order.feature`; Goal 004 still needs setup notes, candidate-lane
+transition notes, production-hardening follow-up tickets, and increment acceptance evidence.
 
 ## Scope
 

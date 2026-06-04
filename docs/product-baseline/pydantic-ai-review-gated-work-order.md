@@ -3,6 +3,7 @@
 Status: defined for Goal 004 T008
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
+BDD contract: `tests/workflow/features/product_baseline_work_order.feature`
 
 ## Purpose
 
@@ -168,5 +169,7 @@ another comparison workflow. Shared BDD contracts, fixtures, and evaluation asse
 `packages/`; Pydantic AI, Langfuse, and DBOS glue stays inside `apps/pydantic-ai/` until another selected product lane
 needs it.
 
-T009 should convert this definition into implementation-agnostic BDD contracts. T010 should add setup and operating
-notes. Later implementation tickets should add the runnable product boundary and its evidence artifacts.
+T009 converted this definition into implementation-agnostic BDD contracts in
+`tests/workflow/features/product_baseline_work_order.feature` with driver-boundary notes in
+`tests/workflow/drivers/README.md`. T010 should add setup and operating notes. Later implementation tickets should add
+the runnable product boundary and its evidence artifacts.

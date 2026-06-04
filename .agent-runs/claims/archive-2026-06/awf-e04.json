@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T01:15:22.101701+00:00",
+  "id": "awf-e04",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:35.990869Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:46:56.271826Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-6kf",
+        "issue_id": "awf-e04",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:48:35.736821Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-e04",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T009\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
+    "id": "awf-e04",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add product-level BDD contracts for the baseline workflow",
+    "updated_at": "2026-06-02T10:48:36.670356Z"
+  },
+  "worker_branch": "codex/awf-e04-add-product-level-bdd-contracts-for-the",
+  "worker_id": "codex-goal004-t009",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-e04-add-product-level-bdd-contracts-for-the",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-e04-add-product-level-bdd-contracts-for-the ../self-hosted-agents-worktrees/awf-e04-add-product-level-bdd-contracts-for-the <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-e04-add-product-level-bdd-contracts-for-the && git status --short --branch"
+  }
+}

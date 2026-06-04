@@ -149,7 +149,7 @@ review-agent guidance, health issue logging, dry-run fixtures, active-work summa
 rehearsal with reviewer-accepted evidence.
 
 Goal 004 has completed the candidate evidence audit, Mastra contrast decision, evidence normalization, candidate
-scoring, platform decision ADR, decision propagation, and independent decision-evidence acceptance. T008 defines the
-first product baseline workflow in `docs/product-baseline/pydantic-ai-review-gated-work-order.md`. The current ordered
-work is to add product-level BDD contracts and setup notes, freeze non-selected candidate lanes, record production
-hardening follow-up tickets, and capture final Goal 004 increment acceptance evidence.
+scoring, platform decision ADR, decision propagation, independent decision-evidence acceptance, product baseline
+workflow definition, and product-level BDD contract. The current ordered work is to add setup notes, freeze
+non-selected candidate lanes, record production hardening follow-up tickets, and capture final Goal 004 increment
+acceptance evidence.
