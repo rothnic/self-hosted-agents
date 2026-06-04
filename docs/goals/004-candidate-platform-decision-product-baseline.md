@@ -25,8 +25,9 @@ cross-language reference, and LangSmith remains an external benchmark that does 
 
 This is not final-solution promotion. T008 defines the first product-baseline workflow in
 `docs/product-baseline/pydantic-ai-review-gated-work-order.md`, and T009 adds its product-level BDD contract in
-`tests/workflow/features/product_baseline_work_order.feature`; Goal 004 still needs setup notes, candidate-lane
-transition notes, production-hardening follow-up tickets, and increment acceptance evidence.
+`tests/workflow/features/product_baseline_work_order.feature`. T010 adds setup and operating notes in
+`docs/product-baseline/pydantic-ai-setup-operating-notes.md`; Goal 004 still needs candidate-lane transition notes,
+production-hardening follow-up tickets, and increment acceptance evidence.
 
 ## Scope
 

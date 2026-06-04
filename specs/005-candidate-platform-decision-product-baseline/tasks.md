@@ -20,7 +20,7 @@
 
 - [X] T008 [US3] Define the first product baseline workflow for the selected stack beyond the comparison demo
 - [X] T009 [US3] Add product-level BDD contracts for the baseline workflow
-- [ ] T010 [US3] Add setup and operating notes for the selected stack product baseline
+- [X] T010 [US3] Add setup and operating notes for the selected stack product baseline
 
 ## Phase 4: Goal 004 Candidate Lane Transition
 

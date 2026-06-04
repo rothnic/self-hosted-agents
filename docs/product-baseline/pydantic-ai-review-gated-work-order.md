@@ -4,6 +4,7 @@ Status: defined for Goal 004 T008
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/product_baseline_work_order.feature`
+Setup and operating notes: `docs/product-baseline/pydantic-ai-setup-operating-notes.md`
 
 ## Purpose
 
@@ -152,8 +153,8 @@ close them.
 
 ## Setup Expectations
 
-T008 only defines the workflow. T010 must add operating notes that show how another agent starts, resets, and inspects
-the baseline without hidden service state.
+T010 adds operating notes in `docs/product-baseline/pydantic-ai-setup-operating-notes.md` that show how another agent
+starts, resets, and inspects the baseline without hidden service state.
 
 The future setup path should preserve these boundaries:
 
@@ -171,5 +172,6 @@ needs it.
 
 T009 converted this definition into implementation-agnostic BDD contracts in
 `tests/workflow/features/product_baseline_work_order.feature` with driver-boundary notes in
-`tests/workflow/drivers/README.md`. T010 should add setup and operating notes. Later implementation tickets should add
-the runnable product boundary and its evidence artifacts.
+`tests/workflow/drivers/README.md`. T010 adds setup and operating notes in
+`docs/product-baseline/pydantic-ai-setup-operating-notes.md`. Later implementation tickets should add the runnable
+product boundary and its evidence artifacts.

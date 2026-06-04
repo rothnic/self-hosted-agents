@@ -7,6 +7,9 @@ Detailed slice plan: `apps/pydantic-ai/implementation-plan.md`.
 
 Product baseline workflow: `docs/product-baseline/pydantic-ai-review-gated-work-order.md`.
 
+Product baseline setup and operating notes:
+`docs/product-baseline/pydantic-ai-setup-operating-notes.md`.
+
 ## First Slice
 
 Candidate id: `pydantic-ai`.

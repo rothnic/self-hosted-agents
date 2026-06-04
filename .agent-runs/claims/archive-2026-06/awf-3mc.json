@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T01:27:43.231783+00:00",
+  "id": "awf-3mc",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:36.312279Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:46:56.746809Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-6kf",
+        "issue_id": "awf-3mc",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:48:37.167204Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-3mc",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T010\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T010",
+    "id": "awf-3mc",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add setup and operating notes for the selected stack product baseline",
+    "updated_at": "2026-06-02T10:48:38.111057Z"
+  },
+  "worker_branch": "codex/awf-3mc-add-setup-and-operating-notes-for-the-se",
+  "worker_id": "codex-goal004-t010",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-3mc-add-setup-and-operating-notes-for-the-se",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-3mc-add-setup-and-operating-notes-for-the-se ../self-hosted-agents-worktrees/awf-3mc-add-setup-and-operating-notes-for-the-se <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-3mc-add-setup-and-operating-notes-for-the-se && git status --short --branch"
+  }
+}
