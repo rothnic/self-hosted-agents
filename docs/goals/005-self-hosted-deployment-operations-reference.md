@@ -32,7 +32,7 @@ The increment ledger is
 `.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and the Beads parent epic is
 `awf-h2u`.
 
-Completed through T010:
+Completed through T011:
 
 - T001 / `awf-n19`: self-hosted deployment operations BDD contract.
 - T002 / `awf-gdu`: local, development-server, and production-like deployment profiles.
@@ -44,10 +44,11 @@ Completed through T010:
 - T008 / `awf-rgf`: credential-free fallback proof for absent deployment services or secrets.
 - T009 / `awf-71o`: backup, restore, and reset runbooks for database, service state, and run evidence.
 - T010 / `awf-hic`: health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage.
+- T011 / `awf-2jm`: rollback, recovery, retention, resource, and cost notes for one-engineer operation.
 
 Next ready implementer ticket:
 
-- `awf-2jm` / T011: add rollback, recovery, retention, resource, and cost notes for one-engineer operation.
+- `awf-pt7` / T012: run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets.
 
 The remaining Goal 005 tickets are dependency-ordered through T013. T013 presents final Goal 005 evidence, and a
 separate reviewer agent must record acceptance or rejection. Human review is not a progress blocker unless a decision is

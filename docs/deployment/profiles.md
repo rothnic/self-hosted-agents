@@ -1,6 +1,6 @@
 # Self-Hosted Deployment Profiles
 
-Status: updated through Goal 005 T010
+Status: updated through Goal 005 T011
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/self_hosted_deployment_operations.feature`
@@ -21,7 +21,8 @@ Detailed service boundaries, ports, volumes, storage paths, secret names, and ma
 `docs/deployment/service-boundaries.md`. Environment templates and readiness checks are in
 `docs/deployment/environment-readiness.md`. Startup commands and service-backed equivalents are in
 `docs/deployment/startup.md`. The representative smoke command is in `docs/deployment/smoke.md`. Operations
-diagnostics are in `docs/operations/diagnostics.md`.
+diagnostics are in `docs/operations/diagnostics.md`. Rollback, recovery, retention, resource, and cost guidance is in
+`docs/operations/recovery-retention-cost.md`.
 
 ## Shared Principles
 
@@ -179,5 +180,6 @@ The production-like profile must use externally managed secrets, never committed
 - T008 captured credential-free fallback evidence for absent deployment services or secrets.
 - T009 added backup, restore, and reset runbooks.
 - T010 added diagnostics runbooks.
-- T011-T012 add recovery, operating-burden, and fresh-setup rehearsal evidence.
+- T011 added recovery, operating-burden, resource, and cost notes.
+- T012 adds fresh-setup rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

@@ -1344,6 +1344,90 @@ def deployment_diagnostics_runbook_data() -> dict[str, Any]:
     }
 
 
+def deployment_recovery_retention_cost_runbook_data() -> dict[str, Any]:
+    path = ROOT / "docs" / "operations" / "recovery-retention-cost.md"
+    text = read_text(path)
+    required_sections = [
+        "## Operating Principles",
+        "## Rollback Procedure",
+        "## Recovery Procedure",
+        "## Retention Policy",
+        "## Resource Expectations",
+        "## Cost And Operating Burden",
+        "## Escalation Criteria",
+        "## T011 Evidence Expectations",
+        "## Current Gaps",
+    ]
+    required_terms = [
+        "one-engineer",
+        "uv run awf workflow-fixture-test",
+        "uv run awf deployment-smoke --profile local --write --json",
+        "uv run awf issue-log --write",
+        "DBOS Durable Runtime Failure",
+        "Langfuse Or Storage Failure",
+        "pg_restore",
+        "docker compose restart",
+        ".beads/issues.jsonl",
+        ".agent-runs/reports/",
+        "/tmp/pydantic-ai-dbos-*",
+        "/tmp/self-hosted-agents-backups",
+        "development-server",
+        "production-like",
+        "Phoenix or Opik",
+    ]
+    evidence_expectations = [
+        "rollback target selection command and validation command",
+        "recovery command sequence for workflow/app, DBOS, and Langfuse or explicit profile gap",
+        "retention policy surfaces and cleanup boundaries",
+        "resource expectation by local, development-server, and production-like profile",
+        "cost and operating-burden tradeoffs",
+        "escalation criteria and follow-up issue policy",
+        "T012 rehearsal boundary",
+    ]
+    checks = [
+        {
+            "name": "runbook exists",
+            "ok": path.exists(),
+            "detail": rel(path),
+        },
+        *[
+            {
+                "name": f"section:{section}",
+                "ok": section in text,
+                "detail": section,
+            }
+            for section in required_sections
+        ],
+        *[
+            {
+                "name": f"term:{term}",
+                "ok": term in text,
+                "detail": term,
+            }
+            for term in required_terms
+        ],
+        *[
+            {
+                "name": f"evidence:{expectation}",
+                "ok": expectation in text,
+                "detail": expectation,
+            }
+            for expectation in evidence_expectations
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "path": rel(path),
+        "checks": checks,
+        "missing": missing,
+        "profiles": ["local", "development-server", "production-like"],
+        "operation_surfaces": ["rollback", "recovery", "retention", "resource", "cost"],
+        "recovery_surfaces": ["workflow/app", "DBOS", "Langfuse/storage"],
+        "rehearsal_boundary": "T012 records the clean-path or fresh setup rehearsal after operations runbooks are complete.",
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4715,6 +4799,18 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "Langfuse storage",
             }.issubset(set(data["diagnostic_surfaces"]))
             and {"health", "logs", "traces", "storage diagnostics"}.issubset(set(data["evidence_surfaces"])),
+            "data": data,
+        }
+    )
+    data = deployment_recovery_retention_cost_runbook_data()
+    results.append(
+        {
+            "name": "deployment recovery retention cost runbook covers one engineer operation",
+            "ok": data["ok"]
+            and data["path"] == "docs/operations/recovery-retention-cost.md"
+            and {"local", "development-server", "production-like"}.issubset(set(data["profiles"]))
+            and {"rollback", "recovery", "retention", "resource", "cost"}.issubset(set(data["operation_surfaces"]))
+            and {"workflow/app", "DBOS", "Langfuse/storage"}.issubset(set(data["recovery_surfaces"])),
             "data": data,
         }
     )

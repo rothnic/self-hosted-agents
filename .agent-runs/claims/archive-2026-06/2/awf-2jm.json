@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T05:51:26.015716+00:00",
+  "id": "awf-2jm",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:12.163526Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:10.143523Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-2jm",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:32.557305Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-rgf",
+        "issue_id": "awf-2jm",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T011\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T011",
+    "id": "awf-2jm",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add rollback, recovery, retention, resource, and cost notes for one-engineer operation",
+    "updated_at": "2026-06-04T03:09:10.143808Z"
+  },
+  "worker_branch": "codex/awf-2jm-add-rollback-recovery-retention-resource",
+  "worker_id": "codex-goal005-t011",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-2jm-add-rollback-recovery-retention-resource",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-2jm-add-rollback-recovery-retention-resource ../self-hosted-agents-worktrees/awf-2jm-add-rollback-recovery-retention-resource <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-2jm-add-rollback-recovery-retention-resource && git status --short --branch"
+  }
+}

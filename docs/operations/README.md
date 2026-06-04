@@ -7,6 +7,7 @@ plus Langfuse/DBOS stack without prior chat context.
 
 - `backup-restore-reset.md`: backup, restore, and reset procedures for databases, service state, and run evidence.
 - `diagnostics.md`: health, log, trace, and diagnostics procedures for app, observability, durable runtime, and storage.
+- `recovery-retention-cost.md`: rollback, recovery, retention, resource, and cost notes for one-engineer operation.
 
 ## Boundaries
 

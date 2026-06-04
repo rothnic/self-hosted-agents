@@ -21,7 +21,7 @@
 
 - [X] T009 [US3] Add backup, restore, and reset runbooks for databases, service state, and run evidence
 - [X] T010 [US3] Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage
-- [ ] T011 [US3] Add rollback, recovery, retention, resource, and cost notes for one-engineer operation
+- [X] T011 [US3] Add rollback, recovery, retention, resource, and cost notes for one-engineer operation
 - [ ] T012 [US3] Run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets
 
 ## Goal 005 Phase 4: Acceptance

@@ -16,6 +16,8 @@ Start here when an agent needs the deployment profile, target machine, or operat
   evidence.
 - `../operations/diagnostics.md`: health, log, trace, and diagnostics runbook for app, observability, durable runtime,
   and storage.
+- `../operations/recovery-retention-cost.md`: rollback, recovery, retention, resource, and cost runbook for one-engineer
+  operation.
 
 ## Current Profile Recommendation
 
