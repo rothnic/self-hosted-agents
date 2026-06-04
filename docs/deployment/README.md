@@ -1,0 +1,28 @@
+# Deployment Reference
+
+Goal 005 turns the selected Pydantic AI plus Langfuse/DBOS product baseline into a reproducible self-hosted deployment
+reference.
+
+Start here when an agent needs the deployment profile, target machine, or operating boundary for the selected stack.
+
+## Profile Index
+
+- `profiles.md`: local, development-server, and production-like deployment profiles.
+
+## Current Profile Recommendation
+
+Use the **local profile** for deterministic development and ticket validation. It must remain credential-free and must
+not require model providers, hosted observability, or running self-hosted services.
+
+Use the **development-server profile** on `vps-dev` for heavier service-backed proof work when Docker-backed Langfuse,
+DBOS production-storage experiments, or longer smoke runs would be too expensive on the MacBook.
+
+Use the **production-like profile** on `vps-gw` only for controlled always-on management proof. It is not final
+production promotion until backup, restore, reset, health, trace, recovery, and fresh-setup evidence are accepted.
+
+## Boundaries
+
+- Deployment profiles define topology and assumptions.
+- Later Goal 005 tickets add detailed service boundaries, ports, volumes, environment templates, startup commands,
+  smoke commands, runbooks, and rehearsal evidence.
+- Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.

@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T03:28:31.180372+00:00",
+  "id": "awf-gdu",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:09.289658Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:08:58.287140Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-gdu",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:27.801914Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-n19",
+        "issue_id": "awf-gdu",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T002\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T002",
+    "id": "awf-gdu",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`",
+    "updated_at": "2026-06-04T03:08:58.287483Z"
+  },
+  "worker_branch": "codex/awf-gdu-define-local-development-server-and-prod",
+  "worker_id": "codex-goal005-t002",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-gdu-define-local-development-server-and-prod",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-gdu-define-local-development-server-and-prod ../self-hosted-agents-worktrees/awf-gdu-define-local-development-server-and-prod <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-gdu-define-local-development-server-and-prod && git status --short --branch"
+  }
+}
