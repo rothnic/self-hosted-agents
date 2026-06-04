@@ -1730,6 +1730,74 @@ def operator_workbench_views_data() -> dict[str, Any]:
     }
 
 
+def operator_workbench_bdd_contract_data() -> dict[str, Any]:
+    feature_path = ROOT / "tests" / "workflow" / "features" / "operator_workbench_review_ux.feature"
+    driver_path = ROOT / "tests" / "workflow" / "drivers" / "README.md"
+    feature_text = read_text(feature_path)
+    driver_text = read_text(driver_path)
+    bdd_features = collect_bdd_features()
+    required_feature_terms = [
+        "Feature: Operator workbench review UX",
+        "decision status",
+        "active objective",
+        "Beads work state",
+        "trace, eval, branch, PR, report, and review evidence",
+        "independent reviewer accepts, rejects, defers, or asks a question",
+        "reviewer id, verdict, evidence checked, findings, follow-up routing, and human-required status",
+        "handoff summary",
+        "no hosted/cloud credentials or prior chat context",
+    ]
+    required_driver_terms = [
+        "Operator Workbench Review UX",
+        "generate one decision status surface",
+        "record reviewer id, verdict, evidence checked, findings, follow-up routing",
+        "accepted, rejected, deferred, and question decisions",
+        "concise handoff summaries",
+        "GitHub and self-hosted Langfuse as optional enrichment",
+        "without hosted credentials, cloud services, or external project tokens",
+    ]
+    checks = [
+        {"name": "feature exists", "ok": feature_path.exists(), "detail": rel(feature_path)},
+        {"name": "driver notes exist", "ok": driver_path.exists(), "detail": rel(driver_path)},
+        *[
+            {"name": f"feature term:{term}", "ok": term in feature_text, "detail": term}
+            for term in required_feature_terms
+        ],
+        *[
+            {"name": f"driver term:{term}", "ok": term in driver_text, "detail": term}
+            for term in required_driver_terms
+        ],
+    ]
+    matching_features = [item for item in bdd_features if item["path"] == rel(feature_path)]
+    if matching_features:
+        feature = matching_features[0]
+        checks.extend(
+            [
+                {"name": "feature has actor marker", "ok": feature["has_actor"], "detail": feature["path"]},
+                {
+                    "name": "feature has operational assertion",
+                    "ok": feature["has_operational_assertion"],
+                    "detail": feature["path"],
+                },
+                {"name": "feature has driver boundary", "ok": feature["has_driver_boundary"], "detail": feature["path"]},
+            ]
+        )
+    else:
+        checks.append({"name": "feature collected by BDD parser", "ok": False, "detail": rel(feature_path)})
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "feature_path": rel(feature_path),
+        "driver_path": rel(driver_path),
+        "feature": matching_features[0] if matching_features else None,
+        "required_surfaces": ["status", "evidence", "review decisions", "handoffs"],
+        "decision_verbs": ["accept", "reject", "defer", "ask question"],
+        "fallbacks": ["GitHub unavailable", "self-hosted Langfuse unavailable", "credential-free fixture"],
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -5163,6 +5231,19 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             }.issubset(set(data["views"]))
             and "Beads" in data["source_of_truth"]
             and "GitHub unavailable" in data["fallbacks"],
+            "data": data,
+        }
+    )
+    data = operator_workbench_bdd_contract_data()
+    results.append(
+        {
+            "name": "operator workbench BDD contract covers status evidence review and handoffs",
+            "ok": data["ok"]
+            and data["feature_path"] == "tests/workflow/features/operator_workbench_review_ux.feature"
+            and data["driver_path"] == "tests/workflow/drivers/README.md"
+            and {"status", "evidence", "review decisions", "handoffs"}.issubset(set(data["required_surfaces"]))
+            and {"accept", "reject", "defer", "ask question"}.issubset(set(data["decision_verbs"]))
+            and "credential-free fixture" in data["fallbacks"],
             "data": data,
         }
     )

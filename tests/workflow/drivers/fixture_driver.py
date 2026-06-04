@@ -35,6 +35,7 @@ def run(features: list[dict]) -> dict:
     observations = [
         driver.observe("human reviewer sees the next safe action"),
         driver.observe("operational record contains trigger mode context blockers and checks"),
+        driver.observe("operator workbench status links decisions evidence and handoffs"),
     ]
     driver.stop()
     return {

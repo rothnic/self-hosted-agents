@@ -50,3 +50,18 @@ contract into these observable actions:
 Service-backed observability, durable execution, and deployment smoke evidence should be captured when controlled
 self-hosted services are available. The contract remains testable in fixture mode by recording the unavailable
 service-backed evidence as explicit gaps instead of silently requiring hosted services.
+
+## Operator Workbench Review UX
+
+The operator workbench driver boundary starts from repo-local goals, specs, Beads state, claims, validation evidence,
+trace/eval artifacts, branch/PR state, and reviewer records. A concrete driver should translate the contract into these
+observable actions:
+
+- generate one decision status surface from repo state and workflow commands;
+- show the active objective, current goal/spec, Beads ready/blocked/claimed work, validation state, and next owner;
+- link source artifacts for reports, claims, traces, evals, branches, PRs, and reviewer decisions when available;
+- record reviewer id, verdict, evidence checked, findings, follow-up routing, and human-required state;
+- support accepted, rejected, deferred, and question decisions without relying on hidden chat context;
+- emit concise handoff summaries for scheduled agents and local sessions with exact artifact handles;
+- preserve GitHub and self-hosted Langfuse as optional enrichment with explicit unavailable fallback state;
+- prove deterministic fixture validation without hosted credentials, cloud services, or external project tokens.

@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T07:03:25.843220+00:00",
+  "id": "awf-288",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:37:59.757624Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:39.380476Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-x12",
+        "issue_id": "awf-288",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:23.612964Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-288",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T002\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+    "id": "awf-288",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs",
+    "updated_at": "2026-06-04T06:39:39.380813Z"
+  },
+  "worker_branch": "codex/awf-288-add-an-operator-workbench-bdd-contract-f",
+  "worker_id": "codex-goal006-t002",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-288-add-an-operator-workbench-bdd-contract-f",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-288-add-an-operator-workbench-bdd-contract-f ../self-hosted-agents-worktrees/awf-288-add-an-operator-workbench-bdd-contract-f <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-288-add-an-operator-workbench-bdd-contract-f && git status --short --branch"
+  }
+}
