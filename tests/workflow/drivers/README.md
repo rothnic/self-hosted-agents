@@ -30,3 +30,23 @@ observable actions:
 
 Self-hosted observability evidence can enrich the operational observations, but the contract remains satisfied by
 repo-local fixture evidence when hosted or service-backed credentials are unavailable.
+
+## Self-Hosted Deployment Operations
+
+The deployment operations driver boundary starts from the selected Pydantic AI plus Langfuse/DBOS stack and observes
+whether another agent can operate it through repo-local deployment artifacts. A concrete driver should translate the
+contract into these observable actions:
+
+- load local, development-server, and production-like deployment profiles;
+- verify that profiles name services, ports, storage paths, secret names, resource expectations, and target machines;
+- report missing tools, services, paths, or secret names without exposing or requiring secret values;
+- start or inspect the reference deployment profile through documented commands;
+- run the representative selected-stack smoke workflow when the profile is available;
+- expose repo-local run, trace, evaluation, durable, health, setup, and gap evidence;
+- prove deterministic fixture validation without hosted credentials, external model providers, or cloud services;
+- expose backup, restore, reset, health, log, trace, rollback, and recovery runbook evidence;
+- keep Goal 005 completion waiting until an independent reviewer acceptance or rejection artifact exists.
+
+Service-backed observability, durable execution, and deployment smoke evidence should be captured when controlled
+self-hosted services are available. The contract remains testable in fixture mode by recording the unavailable
+service-backed evidence as explicit gaps instead of silently requiring hosted services.

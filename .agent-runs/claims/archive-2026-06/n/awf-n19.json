@@ -1,0 +1,40 @@
+{
+  "claimed_at": "2026-06-04T03:18:50.767162+00:00",
+  "id": "awf-n19",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:08.915385Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:08:57.036435Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-n19",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T001\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T001",
+    "id": "awf-n19",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add a self-hosted deployment operations BDD contract for profiles, smoke evidence, and recovery",
+    "updated_at": "2026-06-04T03:08:57.036742Z"
+  },
+  "worker_branch": "codex/awf-n19-add-a-self-hosted-deployment-operations",
+  "worker_id": "codex-goal005-t001",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-n19-add-a-self-hosted-deployment-operations",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-n19-add-a-self-hosted-deployment-operations ../self-hosted-agents-worktrees/awf-n19-add-a-self-hosted-deployment-operations <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-n19-add-a-self-hosted-deployment-operations && git status --short --branch"
+  }
+}
