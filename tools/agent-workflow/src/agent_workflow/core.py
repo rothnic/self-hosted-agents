@@ -725,6 +725,10 @@ def enrich_ready_issues(raw_ready: list[dict[str, Any]], issues: list[dict[str, 
     return [issues_by_id.get(issue.get("id"), issue) for issue in raw_ready]
 
 
+def ready_issue_ids(raw_ready: list[dict[str, Any]]) -> set[str]:
+    return {str(issue.get("id")) for issue in raw_ready if issue.get("id")}
+
+
 def ready_work_data() -> dict[str, Any]:
     br = find_br()
     if br:
@@ -736,6 +740,7 @@ def ready_work_data() -> dict[str, Any]:
                 raw_ready = json.loads(proc.stdout)
             except json.JSONDecodeError:
                 raw_ready = []
+        raw_ready_ids = ready_issue_ids(raw_ready)
         human_required = [
             issue for issue in issues if issue.get("status") == "open" and is_human_review_issue(issue)
         ]
@@ -745,12 +750,13 @@ def ready_work_data() -> dict[str, Any]:
             if issue.get("status") == "open"
             and is_implementation_issue(issue)
             and issue_open_dependencies(issue)
+            and str(issue.get("id")) not in raw_ready_ids
         ]
         enriched_raw_ready = enrich_ready_issues(raw_ready, issues)
         ready = [
             issue
             for issue in enriched_raw_ready
-            if is_implementation_issue(issue) and not issue_open_dependencies(issue)
+            if is_implementation_issue(issue)
         ]
         return {
             "br": br,
@@ -4286,6 +4292,48 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "name": "ready work enrichment preserves Beads human review labels",
             "ok": [item["id"] for item in enriched_ready if is_implementation_issue(item)] == ["awf-ready"],
             "data": {"enriched_ready": enriched_ready},
+        }
+    )
+    synthetic_parent_ready_issues = [
+        {
+            "id": "awf-parent",
+            "title": "Open increment",
+            "status": "open",
+            "issue_type": "epic",
+        },
+        {
+            "id": "awf-parent-ready",
+            "title": "Ready child task",
+            "status": "open",
+            "issue_type": "task",
+            "dependencies": [
+                {
+                    "depends_on_id": "awf-parent",
+                    "type": "parent-child",
+                    "status": "open",
+                }
+            ],
+        },
+    ]
+    synthetic_parent_raw_ready = [
+        {"id": "awf-parent-ready", "title": "Ready child task", "issue_type": "task"}
+    ]
+    parent_ready_ids = ready_issue_ids(synthetic_parent_raw_ready)
+    parent_enriched_ready = enrich_ready_issues(synthetic_parent_raw_ready, synthetic_parent_ready_issues)
+    parent_ready = [issue for issue in parent_enriched_ready if is_implementation_issue(issue)]
+    parent_blocked = [
+        issue
+        for issue in synthetic_parent_ready_issues
+        if issue.get("status") == "open"
+        and is_implementation_issue(issue)
+        and issue_open_dependencies(issue)
+        and str(issue.get("id")) not in parent_ready_ids
+    ]
+    results.append(
+        {
+            "name": "ready work trusts Beads readiness despite open parent child links",
+            "ok": [item["id"] for item in parent_ready] == ["awf-parent-ready"] and parent_blocked == [],
+            "data": {"ready": parent_ready, "blocked": parent_blocked},
         }
     )
     synthetic_failed_health = {

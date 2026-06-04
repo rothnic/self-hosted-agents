@@ -3,6 +3,18 @@
 Second comparison candidate for the solution comparison roadmap. Keep this independent from the Python LangGraph app
 except for shared contracts and comparison assets.
 
+## Current Status
+
+Status: `deferred-before-platform-selection`.
+
+Goal 004 T002 decided that Mastra TypeScript does not need a runnable contrast slice before the platform selection.
+Decision evidence is recorded in
+`.agent-runs/reports/goal-004-t002-mastra-contrast-decision-20260602.md`.
+
+Mastra remains a useful TypeScript contrast candidate, but current repo state has no runnable app, package manifest,
+fixture, trace export, eval artifact, or durable runtime proof for this lane. Do not score Mastra as
+implementation-proven until a future ticket creates those artifacts.
+
 ## Intended Contrast
 
 Candidate id: `mastra-ts`.

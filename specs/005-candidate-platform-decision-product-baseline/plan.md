@@ -63,6 +63,20 @@ apps/
 7. Freeze or archive non-selected candidate lanes as comparison references, with migration notes where useful.
 8. Sync follow-up tasks into Beads and continue with one implementer ticket at a time.
 
+## T002 Mastra Contrast Decision
+
+Decision: Mastra TypeScript is deferred before the Goal 004 platform selection.
+
+Evidence: `.agent-runs/reports/goal-004-t002-mastra-contrast-decision-20260602.md`.
+
+Mastra remains a documented TypeScript contrast candidate, but it has no runnable implementation evidence in current
+repo state and should not be scored as implementation-proven in T003 or T004. The platform decision can proceed with
+Mastra marked as `deferred-before-platform-selection` and `not implementation-comparable`.
+
+Reopen the runnable Mastra slice only if T004 cannot distinguish the Python candidates without cross-language evidence,
+the product baseline requires TypeScript-native app integration, or a future goal explicitly asks for a TypeScript
+contrast implementation after the primary product lane is selected.
+
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |

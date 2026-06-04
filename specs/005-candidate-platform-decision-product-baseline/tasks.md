@@ -6,7 +6,7 @@
 ## Phase 1: Goal 004 Evidence Audit
 
 - [X] T001 [US1] Audit current LangGraph Python, Pydantic AI, and Mastra TypeScript evidence against `docs/comparison-evidence.md`
-- [ ] T002 [US1] Decide whether Mastra TypeScript needs a runnable contrast slice before platform selection
+- [X] T002 [US1] Decide whether Mastra TypeScript needs a runnable contrast slice before platform selection
 - [ ] T003 [US1] Normalize candidate run, trace, evaluation, setup, durable, and gap evidence in `docs/requirements-matrix.md`
 
 ## Phase 2: Goal 004 Platform Decision
