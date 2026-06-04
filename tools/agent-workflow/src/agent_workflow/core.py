@@ -2834,6 +2834,188 @@ def operator_workbench_branch_pr_status_data() -> dict[str, Any]:
     }
 
 
+def normalized_artifact_path(value: str | None) -> str | None:
+    if not value:
+        return None
+    path = Path(value)
+    if path.is_absolute():
+        try:
+            return rel(path)
+        except ValueError:
+            return str(path)
+    return str(path)
+
+
+def trace_link_item(path: str) -> dict[str, Any]:
+    data = read_json(ROOT / path) or {}
+    langfuse = data.get("langfuse", {}) if isinstance(data.get("langfuse"), dict) else {}
+    otel_trace_id = data.get("otel_trace_id") or langfuse.get("otel_trace_id")
+    project_id = langfuse.get("project_id_recorded")
+    trace_url = langfuse.get("trace_url") if isinstance(langfuse.get("trace_url"), str) else ""
+    return {
+        "path": path,
+        "kind": "trace",
+        "provider": data.get("provider"),
+        "format": data.get("format"),
+        "run_id": data.get("run_id"),
+        "trace_id": data.get("trace_id"),
+        "otel_trace_id": otel_trace_id,
+        "span_count": len(data.get("spans", [])),
+        "pydantic_ai_span_count": data.get("pydantic_ai_otel", {}).get("span_count"),
+        "repo_local_url": path,
+        "langfuse": {
+            "state": "available" if trace_url else "unavailable",
+            "configured": bool(langfuse.get("configured")),
+            "sent": bool(langfuse.get("sent")),
+            "verified": bool(langfuse.get("verified")),
+            "status": langfuse.get("status"),
+            "trace_url": trace_url or None,
+            "trace_api": langfuse.get("trace_api"),
+            "project_id": project_id or None,
+            "fallback": "repo-local trace artifact" if not trace_url else None,
+        },
+        "gaps": data.get("gaps", []),
+    }
+
+
+def evaluation_link_item(path: str) -> dict[str, Any]:
+    data = read_json(ROOT / path) or {}
+    evidence_links = data.get("evidence_links", {}) if isinstance(data.get("evidence_links"), dict) else {}
+    return {
+        "path": path,
+        "kind": "evaluation",
+        "provider": data.get("provider"),
+        "evaluation_id": data.get("evaluation_id"),
+        "run_id": data.get("run_id"),
+        "trace_id": data.get("trace_id"),
+        "passed": data.get("passed"),
+        "score": data.get("score"),
+        "max_score": data.get("max_score"),
+        "criteria_count": len(data.get("criteria", [])),
+        "repo_local_url": path,
+        "trace_evidence": normalized_artifact_path(evidence_links.get("trace_evidence")),
+        "run_artifact": normalized_artifact_path(evidence_links.get("run_artifact")),
+        "rerun_command": data.get("rerun_command"),
+    }
+
+
+def trace_eval_correlation(trace_links: list[dict[str, Any]], eval_links: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    pairs = []
+    for evaluation in eval_links:
+        trace_evidence = evaluation.get("trace_evidence")
+        trace = None
+        match_method = None
+        if trace_evidence:
+            trace = next((item for item in trace_links if item.get("path") == trace_evidence), None)
+            match_method = "trace_evidence" if trace else None
+        if trace is None and not trace_evidence:
+            candidates = [
+                item
+                for item in trace_links
+                if item.get("run_id") == evaluation.get("run_id")
+                or item.get("trace_id") == evaluation.get("trace_id")
+            ]
+            if len(candidates) == 1:
+                trace = candidates[0]
+                match_method = "unique_id"
+        pairs.append(
+            {
+                "evaluation_path": evaluation.get("path"),
+                "trace_path": trace.get("path") if trace else evaluation.get("trace_evidence"),
+                "run_id": evaluation.get("run_id"),
+                "trace_id": evaluation.get("trace_id"),
+                "evaluation_id": evaluation.get("evaluation_id"),
+                "correlated": bool(trace),
+                "match_method": match_method,
+                "langfuse_trace_url": trace.get("langfuse", {}).get("trace_url") if trace else None,
+            }
+        )
+    return pairs
+
+
+def trace_eval_links_data(write: bool = False) -> dict[str, Any]:
+    trace_paths = recent_artifact_paths_anywhere((".trace.json",), limit=20)
+    eval_paths = recent_artifact_paths_anywhere((".evaluation.json",), limit=20)
+    trace_links = [trace_link_item(path) for path in trace_paths]
+    eval_links = [evaluation_link_item(path) for path in eval_paths]
+    langfuse_links = [
+        {
+            "trace_path": item["path"],
+            "trace_id": item.get("trace_id"),
+            "otel_trace_id": item.get("otel_trace_id"),
+            "url": item["langfuse"]["trace_url"],
+            "verified": item["langfuse"]["verified"],
+            "status": item["langfuse"]["status"],
+        }
+        for item in trace_links
+        if item.get("langfuse", {}).get("trace_url")
+    ]
+    data = {
+        "schema": "awf.operator-workbench.trace-eval-links.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf trace-eval-links --json",
+        "repo_local_trace_links": trace_links,
+        "repo_local_eval_links": eval_links,
+        "self_hosted_langfuse_links": langfuse_links,
+        "correlations": trace_eval_correlation(trace_links, eval_links),
+        "availability": {
+            "self_hosted_langfuse": {
+                "state": "available" if langfuse_links else "unavailable",
+                "fallback": "repo-local trace artifacts",
+            },
+            "repo_local_evidence": {
+                "state": "available" if trace_links or eval_links else "unavailable",
+                "fallback": None,
+            },
+        },
+        "gaps": []
+        if langfuse_links
+        else ["No self-hosted Langfuse trace URLs were found in recent trace artifacts; repo-local trace links remain authoritative."],
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+        },
+    }
+    if write:
+        data["path"] = write_json_artifact("reports/workbench", "trace-eval-links", data)
+    return data
+
+
+def operator_workbench_trace_eval_links_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "trace-eval-links.md"
+    docs_text = read_text(docs_path)
+    preview = trace_eval_links_data(write=False)
+    required_terms = [
+        "awf.operator-workbench.trace-eval-links.v1",
+        "uv run awf trace-eval-links",
+        "repo-local trace",
+        "repo-local eval",
+        "self-hosted Langfuse",
+        "credential-free",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "preview schema", "ok": preview["schema"] == "awf.operator-workbench.trace-eval-links.v1", "detail": ""},
+        {"name": "trace links", "ok": bool(preview["repo_local_trace_links"]), "detail": len(preview["repo_local_trace_links"])},
+        {"name": "eval links", "ok": bool(preview["repo_local_eval_links"]), "detail": len(preview["repo_local_eval_links"])},
+        {"name": "correlations", "ok": any(item["correlated"] for item in preview["correlations"]), "detail": ""},
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.trace-eval-links.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -2885,6 +3067,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     verifications = recent_artifact_paths(".agent-runs/verifications", (".json",), limit=20)
     trace_artifacts = recent_artifact_paths_anywhere((".trace.json",), limit=20)
     eval_artifacts = recent_artifact_paths_anywhere((".evaluation.json",), limit=20)
+    trace_eval = trace_eval_links_data(write=False)
     review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
     review_actions = recent_review_actions()
     review_decisions = recent_review_decisions()
@@ -2932,6 +3115,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 ".agent-runs/verifications/",
                 ".agent-runs/review-actions/",
                 ".agent-runs/review-decisions/",
+                ".agent-runs/reports/workbench/",
             ],
         },
         "scope": {
@@ -2945,7 +3129,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         },
         "availability": {
             "github": {"state": branch_pr["github"]["state"], "fallback": branch_pr["fallback"]},
-            "self_hosted_langfuse": {"state": "not_checked", "fallback": "repo-local trace artifacts"},
+            "self_hosted_langfuse": trace_eval["availability"]["self_hosted_langfuse"],
             "dbos": {"state": "not_checked", "fallback": "repo-local durable smoke evidence"},
             "repo_local_evidence": {"state": "available", "fallback": None},
         },
@@ -3001,10 +3185,9 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "supported_verdicts": sorted(REVIEW_VERDICTS),
         },
         "trace_eval": {
-            "repo_local_trace_links": [item["path"] for item in evidence_view["trace_artifacts"]],
-            "repo_local_eval_links": [item["path"] for item in evidence_view["eval_artifacts"]],
-            "self_hosted_langfuse_links": [],
-            "gaps": ["self-hosted Langfuse availability is not checked by this credential-free status command"],
+            **trace_eval,
+            "repo_local_trace_paths": [item["path"] for item in evidence_view["trace_artifacts"]],
+            "repo_local_eval_paths": [item["path"] for item in evidence_view["eval_artifacts"]],
         },
         "branch_pr": {
             **branch_pr,
@@ -6582,6 +6765,21 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_trace_eval_links_data()
+    results.append(
+        {
+            "name": "operator workbench trace and eval links include repo-local and Langfuse fallbacks",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/trace-eval-links.md"
+            and data["schema"] == "awf.operator-workbench.trace-eval-links.v1"
+            and bool(data["preview"]["repo_local_trace_links"])
+            and bool(data["preview"]["repo_local_eval_links"])
+            and any(item["correlated"] for item in data["preview"]["correlations"])
+            and data["preview"]["availability"]["repo_local_evidence"]["state"] == "available"
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -6593,6 +6791,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["branch_pr"]["branch"] == "codex/pydantic-ai-fixture-scaffold"
             and data["branch_pr"]["github"]["state"] in {"available", "unavailable", "not_checked"}
             and data["availability"]["github"]["state"] == data["branch_pr"]["github"]["state"]
+            and data["trace_eval"]["schema"] == "awf.operator-workbench.trace-eval-links.v1"
+            and bool(data["trace_eval"]["repo_local_trace_links"])
+            and bool(data["trace_eval"]["repo_local_eval_links"])
+            and any(item["correlated"] for item in data["trace_eval"]["correlations"])
+            and data["availability"]["self_hosted_langfuse"]["state"]
+            == data["trace_eval"]["availability"]["self_hosted_langfuse"]["state"]
             and data["work_queue"]["source"] == "beads"
             and isinstance(data["work_queue"]["active_claims"], list)
             and isinstance(data["work_queue"]["blocked"], list)
@@ -6620,7 +6824,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
             and dashboard["current_phase"]["next_task"]["id"]
-            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011"}
+            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -6677,7 +6881,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx", "awf-diw"}
+            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx", "awf-diw", "awf-xwm"}
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1

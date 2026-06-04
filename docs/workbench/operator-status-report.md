@@ -35,7 +35,8 @@ The report is generated from:
 - `review_gate`: current gate state, findings, human-required count, supported actions, and recent review actions.
 - `review_actions`: recent durable review-action artifacts from `.agent-runs/review-actions/`.
 - `decision_summaries`: recent reviewer decision records from `.agent-runs/review-decisions/`.
-- `trace_eval`: repo-local trace/eval links plus self-hosted Langfuse fallback state.
+- `trace_eval`: repo-local trace/eval links, trace/eval correlations, optional self-hosted Langfuse deep links, and
+  fallback state.
 - `branch_pr`: branch, commit, upstream, GitHub PR metadata when available, and repo-local fallback when unavailable.
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.

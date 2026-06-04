@@ -1,0 +1,285 @@
+{
+  "availability": {
+    "repo_local_evidence": {
+      "fallback": null,
+      "state": "available"
+    },
+    "self_hosted_langfuse": {
+      "fallback": "repo-local trace artifacts",
+      "state": "available"
+    }
+  },
+  "correlations": [
+    {
+      "correlated": true,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "evaluation_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      "langfuse_trace_url": null,
+      "match_method": "trace_evidence",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1",
+      "trace_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json"
+    },
+    {
+      "correlated": true,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "evaluation_path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      "langfuse_trace_url": null,
+      "match_method": "trace_evidence",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1",
+      "trace_path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json"
+    },
+    {
+      "correlated": true,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "evaluation_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      "langfuse_trace_url": null,
+      "match_method": "trace_evidence",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1",
+      "trace_path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json"
+    },
+    {
+      "correlated": true,
+      "evaluation_id": "eval-a584886d68bad6f4",
+      "evaluation_path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json",
+      "langfuse_trace_url": null,
+      "match_method": "trace_evidence",
+      "run_id": "run-e545699517a2885613711cf9",
+      "trace_id": "trace-573f0157f5d65ccdc1c963d4",
+      "trace_path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json"
+    }
+  ],
+  "gaps": [],
+  "generated_at": "2026-06-04T09:52:46.956559+00:00",
+  "generated_by": "uv run awf trace-eval-links --json",
+  "repo_local_eval_links": [
+    {
+      "criteria_count": 5,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "kind": "evaluation",
+      "max_score": 5,
+      "passed": true,
+      "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      "provider": "Pydantic Evals",
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      "rerun_command": "uv run python apps/pydantic-ai/run.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --output /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.json --pretty",
+      "run_artifact": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "score": 5,
+      "trace_evidence": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "criteria_count": 5,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "kind": "evaluation",
+      "max_score": 5,
+      "passed": true,
+      "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      "provider": "Pydantic Evals",
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      "rerun_command": "uv run python apps/pydantic-ai/run.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --output /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.json --pretty",
+      "run_artifact": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "score": 5,
+      "trace_evidence": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "criteria_count": 5,
+      "evaluation_id": "eval-65ca933b165e3794",
+      "kind": "evaluation",
+      "max_score": 5,
+      "passed": true,
+      "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      "provider": "Pydantic Evals",
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      "rerun_command": "uv run python apps/pydantic-ai/run.py --fixture /Users/nroth/workspace/self-hosted-agents/packages/comparison/fixtures/pydantic-ai-decision-slice.json --output /Users/nroth/workspace/self-hosted-agents/.agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.json --pretty",
+      "run_artifact": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "score": 5,
+      "trace_evidence": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "criteria_count": 5,
+      "evaluation_id": "eval-a584886d68bad6f4",
+      "kind": "evaluation",
+      "max_score": 5,
+      "passed": true,
+      "path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json",
+      "provider": "Pydantic Evals",
+      "repo_local_url": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json",
+      "rerun_command": "uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-evals-run-20260531.json --pretty",
+      "run_artifact": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.json",
+      "run_id": "run-e545699517a2885613711cf9",
+      "score": 5,
+      "trace_evidence": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+    }
+  ],
+  "repo_local_trace_links": [
+    {
+      "format": "otel-style-json",
+      "gaps": [
+        "External Logfire telemetry is not sent during deterministic fixture validation.",
+        "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+        "Optional Logfire export requires an operator-provided token and backend.",
+        "Token, cost, and live model-call spans require a later non-fixture model run."
+      ],
+      "kind": "trace",
+      "langfuse": {
+        "configured": false,
+        "fallback": "repo-local trace artifact",
+        "project_id": null,
+        "sent": false,
+        "state": "unavailable",
+        "status": "missing-langfuse-otel-config",
+        "trace_api": null,
+        "trace_url": null,
+        "verified": false
+      },
+      "otel_trace_id": "2b99cc6c32d979d94be33e866c478f02",
+      "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      "provider": "local-otel-json",
+      "pydantic_ai_span_count": 2,
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "span_count": 5,
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "format": "otel-style-json",
+      "gaps": [
+        "External Logfire telemetry is not sent during deterministic fixture validation.",
+        "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+        "Optional Logfire export requires an operator-provided token and backend.",
+        "Token, cost, and live model-call spans require a later non-fixture model run."
+      ],
+      "kind": "trace",
+      "langfuse": {
+        "configured": false,
+        "fallback": "repo-local trace artifact",
+        "project_id": null,
+        "sent": false,
+        "state": "unavailable",
+        "status": "missing-langfuse-otel-config",
+        "trace_api": null,
+        "trace_url": null,
+        "verified": false
+      },
+      "otel_trace_id": "2b99cc6c32d979d94be33e866c478f02",
+      "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      "provider": "local-otel-json",
+      "pydantic_ai_span_count": 2,
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "span_count": 5,
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "format": "otel-style-json",
+      "gaps": [
+        "External Logfire telemetry is not sent during deterministic fixture validation.",
+        "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+        "Optional Logfire export requires an operator-provided token and backend.",
+        "Token, cost, and live model-call spans require a later non-fixture model run."
+      ],
+      "kind": "trace",
+      "langfuse": {
+        "configured": false,
+        "fallback": "repo-local trace artifact",
+        "project_id": null,
+        "sent": false,
+        "state": "unavailable",
+        "status": "missing-langfuse-otel-config",
+        "trace_api": null,
+        "trace_url": null,
+        "verified": false
+      },
+      "otel_trace_id": "2b99cc6c32d979d94be33e866c478f02",
+      "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      "provider": "local-otel-json",
+      "pydantic_ai_span_count": 2,
+      "repo_local_url": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      "run_id": "run-e93c5940e04ff8cf99fe2e21",
+      "span_count": 5,
+      "trace_id": "trace-f9cac59a8a238a726e8289e1"
+    },
+    {
+      "format": "otel-style-json",
+      "gaps": [
+        "External Logfire telemetry is not sent during deterministic fixture validation.",
+        "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+        "Optional Logfire export requires an operator-provided token and backend.",
+        "Token, cost, and live model-call spans require a later non-fixture model run."
+      ],
+      "kind": "trace",
+      "langfuse": {
+        "configured": false,
+        "fallback": "repo-local trace artifact",
+        "project_id": null,
+        "sent": false,
+        "state": "unavailable",
+        "status": "missing-langfuse-otel-config",
+        "trace_api": null,
+        "trace_url": null,
+        "verified": false
+      },
+      "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+      "path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      "provider": "local-otel-json",
+      "pydantic_ai_span_count": 2,
+      "repo_local_url": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      "run_id": "run-e545699517a2885613711cf9",
+      "span_count": 5,
+      "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+    },
+    {
+      "format": "otel-style-json",
+      "gaps": [
+        "External Logfire telemetry is not sent during deterministic fixture validation.",
+        "Self-hosted Langfuse ingestion is not attempted without an explicit proof flag.",
+        "Optional Logfire export requires an operator-provided token and backend.",
+        "Token, cost, and live model-call spans require a later non-fixture model run."
+      ],
+      "kind": "trace",
+      "langfuse": {
+        "configured": true,
+        "fallback": null,
+        "project_id": "self-hosted-agents-pydantic-ai",
+        "sent": true,
+        "state": "available",
+        "status": "verified-in-langfuse",
+        "trace_api": "http://127.0.0.1:13300/api/public/traces/735c1665d723b965ef77950eeeac36df",
+        "trace_url": "http://127.0.0.1:13300/project/self-hosted-agents-pydantic-ai/traces/735c1665d723b965ef77950eeeac36df",
+        "verified": true
+      },
+      "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+      "path": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json",
+      "provider": "local-otel-json",
+      "pydantic_ai_span_count": 2,
+      "repo_local_url": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json",
+      "run_id": "run-e545699517a2885613711cf9",
+      "span_count": 5,
+      "trace_id": "trace-573f0157f5d65ccdc1c963d4"
+    }
+  ],
+  "schema": "awf.operator-workbench.trace-eval-links.v1",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false
+  },
+  "self_hosted_langfuse_links": [
+    {
+      "otel_trace_id": "735c1665d723b965ef77950eeeac36df",
+      "status": "verified-in-langfuse",
+      "trace_id": "trace-573f0157f5d65ccdc1c963d4",
+      "trace_path": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json",
+      "url": "http://127.0.0.1:13300/project/self-hosted-agents-pydantic-ai/traces/735c1665d723b965ef77950eeeac36df",
+      "verified": true
+    }
+  ]
+}

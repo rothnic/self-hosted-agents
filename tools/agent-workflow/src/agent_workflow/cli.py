@@ -347,6 +347,25 @@ def branch_pr_status(
     raise typer.Exit(0)
 
 
+@app.command("trace-eval-links")
+def trace_eval_links(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local trace/eval links artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report repo-local trace/eval links and optional self-hosted Langfuse deep links."""
+    data = core.trace_eval_links_data(write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=bool(data["repo_local_trace_links"] or data["repo_local_eval_links"]),
+            command="trace-eval-links",
+            summary="Trace and eval links.",
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["repo_local_trace_links"] or data["repo_local_eval_links"] else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

@@ -18,6 +18,7 @@ local UI.
 - `review-decisions.md`: durable reviewer decision records with verdict, evidence checked, findings, and follow-up
   routing.
 - `branch-pr-status.md`: branch and PR status integration with repo-local fallback when GitHub access is unavailable.
+- `trace-eval-links.md`: trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -43,4 +44,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T011 should add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence.
+T012 should add concise daily or session handoff summaries for scheduled agents and local sessions.
