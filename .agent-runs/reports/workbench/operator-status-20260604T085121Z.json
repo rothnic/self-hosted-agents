@@ -1,0 +1,1564 @@
+{
+  "availability": {
+    "dbos": {
+      "fallback": "repo-local durable smoke evidence",
+      "state": "not_checked"
+    },
+    "github": {
+      "fallback": "git branch and commit status",
+      "state": "not_checked"
+    },
+    "repo_local_evidence": {
+      "fallback": null,
+      "state": "available"
+    },
+    "self_hosted_langfuse": {
+      "fallback": "repo-local trace artifacts",
+      "state": "not_checked"
+    }
+  },
+  "branch_pr": {
+    "branch": "codex/pydantic-ai-fixture-scaffold",
+    "commit": "781d461",
+    "github_fallback": "git status plus branch commit",
+    "pr_url": null,
+    "state": "not_checked"
+  },
+  "decision_summaries": [],
+  "evidence_map": {
+    "beads_comments": [
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T001",
+        "issue_id": "awf-x12",
+        "latest_comment_at": "2026-06-04T06:59:31Z",
+        "latest_comment_id": 132,
+        "status": "closed",
+        "title": "Research and define the minimum operator views in `docs/workbench/`"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T004",
+        "issue_id": "awf-x3q",
+        "latest_comment_at": "2026-06-02T03:07:08Z",
+        "latest_comment_id": 70,
+        "status": "closed",
+        "title": "Extend the Pydantic AI DBOS smoke with a controlled retry proof"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+        "issue_id": "awf-xei",
+        "latest_comment_at": "2026-06-04T05:04:47Z",
+        "latest_comment_id": 119,
+        "status": "closed",
+        "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+        "issue_id": "awf-xjv",
+        "latest_comment_at": "2026-06-04T06:28:49Z",
+        "latest_comment_id": 131,
+        "status": "closed",
+        "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
+        "issue_id": "awf-yka",
+        "latest_comment_at": "2026-06-04T00:24:30Z",
+        "latest_comment_id": 95,
+        "status": "closed",
+        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+        "issue_id": "awf-yu8",
+        "latest_comment_at": "2026-06-04T08:41:05Z",
+        "latest_comment_id": 138,
+        "status": "closed",
+        "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T005",
+        "issue_id": "awf-yuz",
+        "latest_comment_at": "2026-06-02T03:25:54Z",
+        "latest_comment_id": 71,
+        "status": "closed",
+        "title": "Harden the restart/resume smoke so run identity survives process interruption"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T007",
+        "issue_id": "awf-zi9",
+        "latest_comment_at": "2026-06-04T00:58:19Z",
+        "latest_comment_id": 98,
+        "status": "closed",
+        "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
+      }
+    ],
+    "eval_artifacts": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json"
+    ],
+    "pr_evidence": [
+      {
+        "branch": "codex/pydantic-ai-fixture-scaffold",
+        "commit": "781d461",
+        "fallback": "repo-local branch and commit; GitHub PR lookup is deferred to T010",
+        "pr_url": null,
+        "state": "not_checked"
+      }
+    ],
+    "presenter_reports": [
+      ".agent-runs/reports/workbench/operator-status-20260604T084119Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T083502Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T082602Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T082055Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T080857Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T080341Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T074012Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T073238Z.json",
+      ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md",
+      ".agent-runs/reports/goal-005/t012-clean-path-rehearsal-20260604.md",
+      ".agent-runs/reports/goal-005/clean-path-rehearsal-20260604T060332Z/rehearsal.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/deployment-smoke.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-durable-smoke.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/t011-recovery-retention-cost-runbook-20260604.md",
+      ".agent-runs/reports/goal-005/t010-diagnostics-runbook-20260604.md",
+      ".agent-runs/reports/goal-005/t009-backup-restore-reset-runbook-20260604.md",
+      ".agent-runs/reports/goal-005/t008-credential-free-fallback-20260604.md",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/credential-free-fallback.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-durable-smoke.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json"
+    ],
+    "reviewer_reports": [
+      ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md",
+      ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+      ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+      ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+      ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+      ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+      ".agent-runs/reports/goal-005/t013-independent-review-20260604.md",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-accepted.review-wait.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-accepted.review-acceptance.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-wait.review-wait.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-accepted.review-wait.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-accepted.review-acceptance.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-wait.review-wait.json"
+    ],
+    "trace_artifacts": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+    ],
+    "verification_artifacts": [
+      ".agent-runs/verifications/verify-increment-20260604T024229Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T103037Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102149Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102124Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-health-20260602T102020Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T074617Z.json",
+      ".agent-runs/verifications/verify-ticket-20260602T074546Z.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t009-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json",
+      ".agent-runs/verifications/verify-increment-20260601T002227Z.json",
+      ".agent-runs/verifications/verify-increment-20260531T235614Z.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json",
+      ".agent-runs/verifications/verify-durable-options-t024-20260531.json",
+      ".agent-runs/verifications/verify-pydantic-evals-t023-20260531.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.json"
+    ]
+  },
+  "evidence_view": {
+    "acceptance_state": {
+      "accepted_report_count": 9,
+      "beads_issue_with_comments_count": 8,
+      "eval_artifact_count": 4,
+      "presenter_report_count": 25,
+      "reviewer_report_count": 15,
+      "trace_artifact_count": 5,
+      "verification_artifact_count": 20
+    },
+    "beads_comments": [
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T001",
+        "issue_id": "awf-x12",
+        "latest_comment_at": "2026-06-04T06:59:31Z",
+        "latest_comment_id": 132,
+        "status": "closed",
+        "title": "Research and define the minimum operator views in `docs/workbench/`"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T004",
+        "issue_id": "awf-x3q",
+        "latest_comment_at": "2026-06-02T03:07:08Z",
+        "latest_comment_id": 70,
+        "status": "closed",
+        "title": "Extend the Pydantic AI DBOS smoke with a controlled retry proof"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+        "issue_id": "awf-xei",
+        "latest_comment_at": "2026-06-04T05:04:47Z",
+        "latest_comment_id": 119,
+        "status": "closed",
+        "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+        "issue_id": "awf-xjv",
+        "latest_comment_at": "2026-06-04T06:28:49Z",
+        "latest_comment_id": 131,
+        "status": "closed",
+        "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
+        "issue_id": "awf-yka",
+        "latest_comment_at": "2026-06-04T00:24:30Z",
+        "latest_comment_id": 95,
+        "status": "closed",
+        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+        "issue_id": "awf-yu8",
+        "latest_comment_at": "2026-06-04T08:41:05Z",
+        "latest_comment_id": 138,
+        "status": "closed",
+        "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T005",
+        "issue_id": "awf-yuz",
+        "latest_comment_at": "2026-06-02T03:25:54Z",
+        "latest_comment_id": 71,
+        "status": "closed",
+        "title": "Harden the restart/resume smoke so run identity survives process interruption"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T007",
+        "issue_id": "awf-zi9",
+        "latest_comment_at": "2026-06-04T00:58:19Z",
+        "latest_comment_id": 98,
+        "status": "closed",
+        "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
+      }
+    ],
+    "branch_pr": {
+      "branch": "codex/pydantic-ai-fixture-scaffold",
+      "commit": "781d461",
+      "fallback": "repo-local branch and commit; GitHub PR lookup is deferred to T010",
+      "pr_url": null,
+      "state": "not_checked"
+    },
+    "eval_artifacts": [
+      {
+        "kind": "evaluation",
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json"
+      },
+      {
+        "kind": "evaluation",
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json"
+      },
+      {
+        "kind": "evaluation",
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json"
+      },
+      {
+        "kind": "evaluation",
+        "path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json"
+      }
+    ],
+    "presenter_reports": [
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T084119Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T083502Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T082602Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T082055Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T080857Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T080341Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T074012Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/workbench/operator-status-20260604T073238Z.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t012-clean-path-rehearsal-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/clean-path-rehearsal-20260604T060332Z/rehearsal.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/deployment-smoke.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-durable-smoke.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t011-recovery-retention-cost-runbook-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t010-diagnostics-runbook-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t009-backup-restore-reset-runbook-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t008-credential-free-fallback-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/credential-free-fallback.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-durable-smoke.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json"
+      },
+      {
+        "accepted": false,
+        "kind": "presenter-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json"
+      }
+    ],
+    "reviewer_reports": [
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t004-operator-status-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t003-status-schema-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/t001-operator-views-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": true,
+        "path": ".agent-runs/reports/goal-006/planning-backlog-20260604.md"
+      },
+      {
+        "accepted": true,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/t013-independent-review-20260604.md"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-accepted.review-wait.json"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-accepted.review-acceptance.json"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/dbos-workflow-dbb52094190e3493ff4ac538-review-wait.review-wait.json"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-accepted.review-wait.json"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-accepted.review-acceptance.json"
+      },
+      {
+        "accepted": false,
+        "kind": "reviewer-report",
+        "mentions_independent_reviewer": false,
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/dbos-workflow-9e6c3e4cd2a6916fbca012bc-review-wait.review-wait.json"
+      }
+    ],
+    "run_artifacts": [
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-increment-20260604T024229Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-increment-20260602T103037Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102149Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102124Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/goal-003-t021/verify-health-20260602T102020Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-increment-20260602T074617Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-ticket-20260602T074546Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t009-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-increment-20260601T002227Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-increment-20260531T235614Z.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-durable-options-t024-20260531.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/verify-pydantic-evals-t023-20260531.json"
+      },
+      {
+        "kind": "run-or-verification",
+        "path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.json"
+      }
+    ],
+    "schema": "awf.operator-workbench.evidence-view.v1",
+    "self_hosted": {
+      "credential_free": true,
+      "external_service_required": false,
+      "fallback": "repo-local run, trace, eval, Beads, branch, and PR-placeholder evidence"
+    },
+    "source": "repo-local artifacts and Beads comments",
+    "target": {
+      "goal": "006-operator-workbench-review-ux",
+      "spec_id": "007-operator-workbench-review-ux",
+      "ticket_id": "awf-3c5"
+    },
+    "trace_artifacts": [
+      {
+        "kind": "trace",
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json"
+      },
+      {
+        "kind": "trace",
+        "path": ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json"
+      },
+      {
+        "kind": "trace",
+        "path": ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json"
+      },
+      {
+        "kind": "trace",
+        "path": ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json"
+      },
+      {
+        "kind": "trace",
+        "path": ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+      }
+    ]
+  },
+  "executive_snapshot": {
+    "active_role": "implementer",
+    "current_phase": "implementation",
+    "next_owner": "implementer",
+    "reason": "repo-local Beads, claims, and validation state were summarized",
+    "recommendation": "continue claimed ticket awf-3c5",
+    "risks": []
+  },
+  "generated_at": "2026-06-04T08:51:20.884311+00:00",
+  "generated_by": "uv run awf operator-status --json",
+  "generated_from": {
+    "artifacts": [
+      "docs/goals/000-self-hosted-agent-system-roadmap.md",
+      "docs/workbench/goal-dashboard.md",
+      "docs/workbench/increment-dashboard.md",
+      "docs/workbench/evidence-view.md",
+      "docs/workbench/status-artifact-schema.md",
+      ".beads/issues.jsonl",
+      ".agent-runs/claims/",
+      ".agent-runs/reports/",
+      ".agent-runs/verifications/"
+    ],
+    "commands": [
+      "uv run awf context-index --json",
+      "uv run awf ready-work --json",
+      "uv run awf increment-status --spec-id 007-operator-workbench-review-ux --phase 'Goal 006' --json",
+      "uv run awf review-gate --json",
+      "uv run awf repo-hygiene --json",
+      "uv run awf workflow-state-lint --json"
+    ]
+  },
+  "goal_dashboard": {
+    "accepted_evidence_links": [
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-001-evidence-review-20260601.md",
+        "reviewer_id": "019e8342-568a-7fc2-807e-230b5910c2cd"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-002-evidence-review-20260602.md",
+        "reviewer_id": "019e86d4-2711-70e0-9206-b21cb59df87c"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-003-increment-evidence-20260602.md",
+        "reviewer_id": "019e87dc-b122-72d1-b3db-af302833dbe1"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-004/t014-increment-acceptance-20260604.md",
+        "reviewer_id": "019e9084-eeef-7cc2-bcb7-cc21785c372c"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-005/t013-independent-review-20260604.md",
+        "reviewer_id": "019e9149-edca-7530-b652-c707f6bf3238"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+        "reviewer_id": "019e915f-292a-7322-8ab4-6f5cdfd8bb7e"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+        "reviewer_id": "019e916b-4d7d-7903-a27c-cf4dd7e1fa3d"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+        "reviewer_id": "019e9175-86d4-72b3-98f1-af27e927b050"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+        "reviewer_id": "019e9182-075e-7191-af5d-fbfecf1a999c"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+        "reviewer_id": "019e918f-4b01-74e3-855f-7e291039a13b"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md",
+        "reviewer_id": null
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md",
+        "reviewer_id": "019e91ba-a055-7cf2-bea6-446c04d12927"
+      },
+      {
+        "accepted": true,
+        "path": ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md",
+        "reviewer_id": "019e91c7-852a-7933-b7ae-b2c850417707"
+      }
+    ],
+    "counts": {
+      "accepted_evidence_count": 13,
+      "accepted_goal_count": 5,
+      "active_goal_count": 1,
+      "follow_up_epic_count": 9,
+      "ordered_goal_count": 6
+    },
+    "current_goal_id": "006",
+    "current_phase": {
+      "completed_task_count": 7,
+      "next_task": {
+        "acceptance": "uv run awf workflow-fixture-test",
+        "id": "T008",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      },
+      "open_task_count": 10,
+      "phase": "Goal 006 later phase",
+      "phase_task_ids": [
+        "T004",
+        "T005",
+        "T006",
+        "T007"
+      ]
+    },
+    "follow_up_epics": [
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#evaluation-workflow-follow-up",
+        "id": "awf-2du",
+        "title": "Follow up Langfuse evaluation workflow proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#phoenix-opik-fallback-follow-up",
+        "id": "awf-4t2",
+        "title": "Follow up Phoenix or Opik fallback comparison"
+      },
+      {
+        "external_ref": "docs/product-baseline/pydantic-ai-review-gated-work-order.md#runnable-work-order-follow-up",
+        "id": "awf-4x7",
+        "title": "Follow up product baseline runnable work-order app proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#recovery-retention-follow-up",
+        "id": "awf-5ae",
+        "title": "Follow up DBOS recovery rehearsal and retention proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#live-model-tool-trace-follow-up",
+        "id": "awf-6zf",
+        "title": "Follow up live model and tool trace coverage proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#tool-context-approval-follow-up",
+        "id": "awf-7ck",
+        "title": "Follow up product tool and context approval boundary proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#langfuse-operations-follow-up",
+        "id": "awf-eas",
+        "title": "Follow up Langfuse production operations proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#production-storage-follow-up",
+        "id": "awf-lkr",
+        "title": "Follow up DBOS production storage proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#worker-topology-follow-up",
+        "id": "awf-ygu",
+        "title": "Follow up DBOS worker and queue topology proof"
+      }
+    ],
+    "goals": [
+      {
+        "accepted_evidence": [
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-001-evidence-review-20260601.md",
+            "reviewer_id": "019e8342-568a-7fc2-807e-230b5910c2cd"
+          }
+        ],
+        "id": "001",
+        "next_ticket": null,
+        "path": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md",
+        "phase": "complete",
+        "state": "accepted",
+        "title": "Goal 001: Self-Hosted Observability And Evaluation Control Plane"
+      },
+      {
+        "accepted_evidence": [
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-002-evidence-review-20260602.md",
+            "reviewer_id": "019e86d4-2711-70e0-9206-b21cb59df87c"
+          }
+        ],
+        "id": "002",
+        "next_ticket": null,
+        "path": "docs/goals/002-durable-agent-execution-runtime.md",
+        "phase": "complete",
+        "state": "accepted",
+        "title": "Goal 002: Durable Agent Execution Runtime"
+      },
+      {
+        "accepted_evidence": [
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-003-increment-evidence-20260602.md",
+            "reviewer_id": "019e87dc-b122-72d1-b3db-af302833dbe1"
+          }
+        ],
+        "id": "003",
+        "next_ticket": null,
+        "path": "docs/goals/003-autonomous-multi-agent-delivery-loop.md",
+        "phase": "complete",
+        "state": "accepted",
+        "title": "Goal 003: Autonomous Multi-Agent Delivery Loop"
+      },
+      {
+        "accepted_evidence": [
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-004/t014-increment-acceptance-20260604.md",
+            "reviewer_id": "019e9084-eeef-7cc2-bcb7-cc21785c372c"
+          }
+        ],
+        "id": "004",
+        "next_ticket": null,
+        "path": "docs/goals/004-candidate-platform-decision-product-baseline.md",
+        "phase": "complete",
+        "state": "accepted",
+        "title": "Goal 004: Candidate Platform Decision And Product Baseline"
+      },
+      {
+        "accepted_evidence": [
+          {
+            "accepted": false,
+            "path": ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md",
+            "reviewer_id": null
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-005/t013-independent-review-20260604.md",
+            "reviewer_id": "019e9149-edca-7530-b652-c707f6bf3238"
+          }
+        ],
+        "id": "005",
+        "next_ticket": null,
+        "path": "docs/goals/005-self-hosted-deployment-operations-reference.md",
+        "phase": "complete",
+        "state": "accepted",
+        "title": "Goal 005: Self-Hosted Deployment And Operations Reference"
+      },
+      {
+        "accepted_evidence": [
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+            "reviewer_id": "019e915f-292a-7322-8ab4-6f5cdfd8bb7e"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+            "reviewer_id": "019e916b-4d7d-7903-a27c-cf4dd7e1fa3d"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+            "reviewer_id": "019e9175-86d4-72b3-98f1-af27e927b050"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+            "reviewer_id": "019e9182-075e-7191-af5d-fbfecf1a999c"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+            "reviewer_id": "019e918f-4b01-74e3-855f-7e291039a13b"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md",
+            "reviewer_id": null
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md",
+            "reviewer_id": "019e91ba-a055-7cf2-bea6-446c04d12927"
+          },
+          {
+            "accepted": true,
+            "path": ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md",
+            "reviewer_id": "019e91c7-852a-7933-b7ae-b2c850417707"
+          }
+        ],
+        "id": "006",
+        "next_ticket": "awf-3c5",
+        "path": "docs/goals/006-operator-workbench-review-ux.md",
+        "phase": "Goal 006 later phase",
+        "state": "active",
+        "title": "Goal 006: Operator Workbench And Review UX"
+      }
+    ],
+    "next_ticket": "awf-3c5",
+    "review_model": "presenter evidence plus independent reviewer acceptance or rejection",
+    "schema": "awf.operator-workbench.goal-dashboard.v1",
+    "source": "docs/goals/000-self-hosted-agent-system-roadmap.md"
+  },
+  "handoff": {
+    "artifact_handles": [
+      ".agent-runs/claims/awf-3c5.json"
+    ],
+    "next_role": "implementer",
+    "next_ticket": "awf-3c5",
+    "required_files": [
+      ".agent-runs/claims/",
+      "docs/workbench/status-artifact-schema.md",
+      "specs/007-operator-workbench-review-ux/tasks.md"
+    ],
+    "risks": [],
+    "validation_commands": [
+      "uv run awf workflow-fixture-test",
+      "uv run awf verify --profile ticket --json"
+    ]
+  },
+  "health": {
+    "acceptance": "not_run_by_operator_status",
+    "git": {
+      "branch": "codex/pydantic-ai-fixture-scaffold...origin/codex/pydantic-ai-fixture-scaffold",
+      "changed_files": 8,
+      "clean": false,
+      "summary": "8 changed file(s)"
+    },
+    "ok": true,
+    "repo_hygiene": true,
+    "review_gate": true,
+    "validation": {
+      "checks": [
+        {
+          "command": "uv run awf review-gate",
+          "error_count": 0,
+          "name": "review-gate",
+          "ok": true
+        },
+        {
+          "command": "uv run awf repo-hygiene",
+          "error_count": 0,
+          "name": "repo-hygiene",
+          "ok": true
+        },
+        {
+          "command": "uv run awf workflow-state-lint",
+          "error_count": 0,
+          "name": "workflow-state-lint",
+          "ok": true
+        }
+      ],
+      "ok": true
+    },
+    "workflow_state_lint": true
+  },
+  "increment_dashboard": {
+    "active_claims": [
+      {
+        "claimed_at": "2026-06-04T08:46:21.723188+00:00",
+        "id": "awf-3c5",
+        "issue": {
+          "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+          "id": "awf-3c5",
+          "status": "open",
+          "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+        },
+        "worker_branch": "codex/awf-3c5-add-durable-review-gate-actions-for-appr",
+        "worker_id": "codex-goal006-t008",
+        "worktree_path": "../self-hosted-agents-worktrees/awf-3c5-add-durable-review-gate-actions-for-appr"
+      }
+    ],
+    "active_workers": [
+      {
+        "claim_path": ".agent-runs/claims/awf-3c5.json",
+        "ticket_id": "awf-3c5",
+        "worker_branch": "codex/awf-3c5-add-durable-review-gate-actions-for-appr",
+        "worker_id": "codex-goal006-t008",
+        "worktree_path": "../self-hosted-agents-worktrees/awf-3c5-add-durable-review-gate-actions-for-appr"
+      }
+    ],
+    "blocked_tickets": [
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-3c5",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "id": "awf-09s",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-09s",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "id": "awf-1cx",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-s6n",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "id": "awf-1f9",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-1cx",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+        "id": "awf-diw",
+        "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-1f9",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+        "id": "awf-jr7",
+        "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+      }
+    ],
+    "counts": {
+      "active_claims": 1,
+      "active_workers": 1,
+      "blocked_tickets": 5,
+      "completed_tickets": 7,
+      "open_tickets": 10,
+      "ready_tickets": 1,
+      "stale_claims": 0,
+      "total_tickets": 17,
+      "validation_checks": 3
+    },
+    "handoff": {
+      "active_ticket": "awf-3c5",
+      "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+      "next_unblocked_issue_id": "awf-3c5",
+      "resume_claim": ".agent-runs/claims/awf-3c5.json"
+    },
+    "increment_id": "007-operator-workbench-review-ux-goal-006",
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "phase": "Goal 006",
+    "ready_tickets": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "id": "awf-3c5",
+        "status": "open",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      }
+    ],
+    "review_status": "executing",
+    "schema": "awf.operator-workbench.increment-dashboard.v1",
+    "self_hosted": {
+      "credential_free": true,
+      "external_service_required": false,
+      "fallback": "repo-local Beads, claims, increment ledger, and workflow checks"
+    },
+    "source": ".agent-runs/increments/007-operator-workbench-review-ux-goal-006.json",
+    "spec_id": "007-operator-workbench-review-ux",
+    "stale_claims": [],
+    "tickets": [
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T001",
+        "state": "completed",
+        "task_id": "T001",
+        "ticket_id": "awf-x12",
+        "ticket_status": "closed",
+        "title": "Research and define the minimum operator views in `docs/workbench/`"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+        "state": "completed",
+        "task_id": "T002",
+        "ticket_id": "awf-288",
+        "ticket_status": "closed",
+        "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T003",
+        "state": "completed",
+        "task_id": "T003",
+        "ticket_id": "awf-vht",
+        "ticket_status": "closed",
+        "title": "Define the generated artifact schema for workbench status and decision summaries"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T004",
+        "state": "completed",
+        "task_id": "T004",
+        "ticket_id": "awf-isu",
+        "ticket_status": "closed",
+        "title": "Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+        "state": "completed",
+        "task_id": "T005",
+        "ticket_id": "awf-sdh",
+        "ticket_status": "closed",
+        "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T006",
+        "state": "completed",
+        "task_id": "T006",
+        "ticket_id": "awf-vty",
+        "ticket_status": "closed",
+        "title": "Add an increment dashboard for tickets, claims, blockers, active workers, and validation state"
+      },
+      {
+        "done": true,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+        "state": "completed",
+        "task_id": "T007",
+        "ticket_id": "awf-yu8",
+        "ticket_status": "closed",
+        "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "state": "claimed",
+        "task_id": "T008",
+        "ticket_id": "awf-3c5",
+        "ticket_status": "open",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "state": "blocked",
+        "task_id": "T009",
+        "ticket_id": "awf-09s",
+        "ticket_status": "open",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "state": "blocked",
+        "task_id": "T010",
+        "ticket_id": "awf-1cx",
+        "ticket_status": "open",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+        "state": "blocked",
+        "task_id": "T011",
+        "ticket_id": "awf-diw",
+        "ticket_status": "open",
+        "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+        "state": "pending",
+        "task_id": "T012",
+        "ticket_id": "awf-xwm",
+        "ticket_status": "open",
+        "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+        "state": "pending",
+        "task_id": "T013",
+        "ticket_id": "awf-s6n",
+        "ticket_status": "open",
+        "title": "Decide whether the workbench remains CLI/static or becomes a local UI"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "state": "blocked",
+        "task_id": "T014",
+        "ticket_id": "awf-1f9",
+        "ticket_status": "open",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+        "state": "blocked",
+        "task_id": "T015",
+        "ticket_id": "awf-jr7",
+        "ticket_status": "open",
+        "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+        "state": "pending",
+        "task_id": "T016",
+        "ticket_id": "awf-svr",
+        "ticket_status": "open",
+        "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency"
+      },
+      {
+        "done": false,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+        "state": "pending",
+        "task_id": "T017",
+        "ticket_id": "awf-mtv",
+        "ticket_status": "open",
+        "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection"
+      }
+    ],
+    "validation_state": {
+      "checks": [
+        {
+          "command": "uv run awf review-gate",
+          "error_count": 0,
+          "name": "review-gate",
+          "ok": true
+        },
+        {
+          "command": "uv run awf repo-hygiene",
+          "error_count": 0,
+          "name": "repo-hygiene",
+          "ok": true
+        },
+        {
+          "command": "uv run awf workflow-state-lint",
+          "error_count": 0,
+          "name": "workflow-state-lint",
+          "ok": true
+        }
+      ],
+      "credential_free": true,
+      "failed_checks": [],
+      "ok": true,
+      "source": "repo-local shallow workflow checks"
+    }
+  },
+  "review_actions": [
+    {
+      "action": "defer",
+      "human_required": false,
+      "path": ".agent-runs/review-actions/defer-goal-006-t008-action-smoke-20260604T085109Z.json",
+      "requires_response": true,
+      "reviewer": {
+        "agent_id": "codex-goal006-t008",
+        "role": "reviewer"
+      },
+      "schema": "awf.operator-workbench.review-action.v1",
+      "state": "recorded",
+      "target": {
+        "id": "goal-006-t008-action-smoke",
+        "kind": "fixture"
+      }
+    }
+  ],
+  "review_gate": {
+    "actions": [
+      {
+        "action": "defer",
+        "human_required": false,
+        "path": ".agent-runs/review-actions/defer-goal-006-t008-action-smoke-20260604T085109Z.json",
+        "requires_response": true,
+        "reviewer": {
+          "agent_id": "codex-goal006-t008",
+          "role": "reviewer"
+        },
+        "schema": "awf.operator-workbench.review-action.v1",
+        "state": "recorded",
+        "target": {
+          "id": "goal-006-t008-action-smoke",
+          "kind": "fixture"
+        }
+      }
+    ],
+    "evidence_checked": [],
+    "findings": [],
+    "follow_up_tickets": [],
+    "human_required": false,
+    "human_required_count": 0,
+    "reviewer_id": null,
+    "state": "clear",
+    "supported_actions": [
+      "approve",
+      "ask-question",
+      "defer",
+      "request-changes"
+    ]
+  },
+  "roadmap": {
+    "accepted_evidence": [
+      ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+      ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+      ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+      ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+      ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+      ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md"
+    ],
+    "current_goal": "006-operator-workbench-review-ux",
+    "follow_up_epics": [
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#evaluation-workflow-follow-up",
+        "id": "awf-2du",
+        "title": "Follow up Langfuse evaluation workflow proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#phoenix-opik-fallback-follow-up",
+        "id": "awf-4t2",
+        "title": "Follow up Phoenix or Opik fallback comparison"
+      },
+      {
+        "external_ref": "docs/product-baseline/pydantic-ai-review-gated-work-order.md#runnable-work-order-follow-up",
+        "id": "awf-4x7",
+        "title": "Follow up product baseline runnable work-order app proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#recovery-retention-follow-up",
+        "id": "awf-5ae",
+        "title": "Follow up DBOS recovery rehearsal and retention proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#live-model-tool-trace-follow-up",
+        "id": "awf-6zf",
+        "title": "Follow up live model and tool trace coverage proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#tool-context-approval-follow-up",
+        "id": "awf-7ck",
+        "title": "Follow up product tool and context approval boundary proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#langfuse-operations-follow-up",
+        "id": "awf-eas",
+        "title": "Follow up Langfuse production operations proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#production-storage-follow-up",
+        "id": "awf-lkr",
+        "title": "Follow up DBOS production storage proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#worker-topology-follow-up",
+        "id": "awf-ygu",
+        "title": "Follow up DBOS worker and queue topology proof"
+      }
+    ],
+    "goals": [
+      "docs/goals/000-self-hosted-agent-system-roadmap.md",
+      "docs/goals/001-self-hosted-observability-evaluation-control-plane.md",
+      "docs/goals/002-durable-agent-execution-runtime.md",
+      "docs/goals/003-autonomous-multi-agent-delivery-loop.md",
+      "docs/goals/004-candidate-platform-decision-product-baseline.md",
+      "docs/goals/005-self-hosted-deployment-operations-reference.md",
+      "docs/goals/006-operator-workbench-review-ux.md"
+    ],
+    "next_goal": null
+  },
+  "schema": "awf.operator-workbench.status.v1",
+  "scope": {
+    "beads_issue_id": "awf-3c5",
+    "branch": "codex/pydantic-ai-fixture-scaffold",
+    "commit": "781d461",
+    "goal": "006-operator-workbench-review-ux",
+    "objective_id": "agentic-development-foundation",
+    "phase": "Goal 006",
+    "spec_id": "007-operator-workbench-review-ux"
+  },
+  "source_summary": {
+    "claim_count": 1,
+    "increment_path": ".agent-runs/increments/007-operator-workbench-review-ux-goal-006.json",
+    "issue_count": 117,
+    "spec_count": 7,
+    "task_count": 137
+  },
+  "trace_eval": {
+    "gaps": [
+      "self-hosted Langfuse availability is not checked by this credential-free status command"
+    ],
+    "repo_local_eval_links": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json"
+    ],
+    "repo_local_trace_links": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+    ],
+    "self_hosted_langfuse_links": []
+  },
+  "work_queue": {
+    "active_claims": [
+      {
+        "claimed_at": "2026-06-04T08:46:21.723188+00:00",
+        "id": "awf-3c5",
+        "issue": {
+          "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+          "id": "awf-3c5",
+          "status": "open",
+          "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+        },
+        "worker_branch": "codex/awf-3c5-add-durable-review-gate-actions-for-appr",
+        "worker_id": "codex-goal006-t008",
+        "worktree_path": "../self-hosted-agents-worktrees/awf-3c5-add-durable-review-gate-actions-for-appr"
+      }
+    ],
+    "blocked": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "id": "awf-09s",
+        "status": "open",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "id": "awf-1cx",
+        "status": "open",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "id": "awf-1f9",
+        "status": "open",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+        "id": "awf-diw",
+        "status": "open",
+        "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+        "id": "awf-jr7",
+        "status": "open",
+        "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+        "id": "awf-mtv",
+        "status": "open",
+        "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+        "id": "awf-s6n",
+        "status": "open",
+        "title": "Decide whether the workbench remains CLI/static or becomes a local UI"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+        "id": "awf-svr",
+        "status": "open",
+        "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency"
+      }
+    ],
+    "human_required": [],
+    "ready": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "id": "awf-3c5",
+        "status": "open",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      }
+    ],
+    "source": "beads",
+    "stale_claims": []
+  }
+}

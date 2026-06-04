@@ -33,6 +33,7 @@ Required top-level fields:
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace artifacts, eval artifacts, Beads
   comments, and PR evidence.
 - `review_gate`: current verdict, reviewer id, evidence checked, findings, follow-up tickets, and escalation state.
+- `review_actions`: recent durable review-action artifacts and supported review-gate actions.
 - `trace_eval`: repo-local trace/eval links, optional self-hosted Langfuse links, and unavailable-service gaps.
 - `branch_pr`: branch, commit, PR URL, draft or ready state, and GitHub fallback.
 - `handoff`: copy-ready next role or ticket, required files, validation commands, risks, and exact artifact handles.
@@ -188,8 +189,11 @@ Minimal shape:
     "evidence_checked": ["tests/workflow/features/operator_workbench_review_ux.feature"],
     "findings": [],
     "follow_up_tickets": [],
-    "human_required": false
+    "human_required": false,
+    "supported_actions": ["approve", "ask-question", "defer", "request-changes"],
+    "actions": []
   },
+  "review_actions": [],
   "trace_eval": {
     "repo_local_trace_links": [],
     "repo_local_eval_links": [],
@@ -218,6 +222,42 @@ Minimal shape:
     "acceptance": "passed"
   },
   "decision_summaries": [".agent-runs/reviews/example-decision-summary.json"]
+}
+```
+
+## Review Action Artifact
+
+Required top-level fields:
+
+- `schema`: literal `awf.operator-workbench.review-action.v1`.
+- `action_id`: stable id for the action artifact.
+- `recorded_at`: ISO-8601 timestamp.
+- `action`: one of `approve`, `request-changes`, `defer`, or `ask-question`.
+- `state`: action recording state.
+- `target`: target kind and id.
+- `reviewer`: reviewer agent id and role.
+- `source_artifacts`: evidence paths cited by the reviewer.
+- `note`: short note, question, or requested-change summary.
+- `requires_response`: true for request changes, defer, and ask question actions.
+- `human_required`: boolean plus reason; deterministic action capture defaults to false.
+- `decision_record_deferred_to`: pointer to T009 decision records.
+
+Minimal shape:
+
+```json
+{
+  "schema": "awf.operator-workbench.review-action.v1",
+  "action_id": "review-action-approve-awf-example-20260604T000000Z",
+  "recorded_at": "2026-06-04T00:00:00Z",
+  "action": "approve",
+  "state": "recorded",
+  "target": {"kind": "ticket", "id": "awf-example"},
+  "reviewer": {"agent_id": "019e0000-0000-0000-0000-000000000000", "role": "reviewer"},
+  "source_artifacts": [".agent-runs/reports/example.md"],
+  "note": "Accepted after checking the cited evidence.",
+  "requires_response": false,
+  "human_required": {"required": false, "reason": null},
+  "decision_record_deferred_to": "Goal 006 T009 reviewer decision records"
 }
 ```
 

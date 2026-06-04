@@ -160,6 +160,39 @@ def review_gate(json_output: bool = typer.Option(False, "--json", help="Emit typ
     raise typer.Exit(run_core_tuple("review-gate", core.review_gate, json_output=json_output))
 
 
+@app.command("review-action")
+def review_action(
+    action: str = typer.Option(..., "--action", help="approve, request-changes, defer, or ask-question."),
+    target_kind: str = typer.Option(..., "--target-kind", help="ticket, increment, goal, or fixture."),
+    target_id: str = typer.Option(..., "--target-id", help="Target identifier."),
+    reviewer_id: str = typer.Option(..., "--reviewer-id", help="Reviewer or agent id recording the action."),
+    evidence: list[str] = typer.Option([], "--evidence", help="Evidence artifact path. Can be repeated."),
+    note: str = typer.Option("", "--note", help="Short note, question, or requested-change summary."),
+    write: bool = typer.Option(False, "--write", help="Persist the review action artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Record a durable review-gate action without turning it into a final decision record."""
+    data = core.review_action_data(
+        action=action,
+        target_kind=target_kind,
+        target_id=target_id,
+        reviewer_id=reviewer_id,
+        evidence=evidence,
+        note=note,
+        write=write,
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="review-action",
+            summary=data.get("next_action", "review action processed"),
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("repo-hygiene")
 def repo_hygiene(json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output.")) -> None:
     """Enforce root cleanliness, directory size, line length, and alpha compatibility policy."""

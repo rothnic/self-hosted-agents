@@ -59,6 +59,8 @@ TASK_RE = re.compile(
     r"(?: \[(?P<parallel>P)\])?(?: \[(?P<story>[^\]]+)\])? (?P<title>.+)$"
 )
 OBJECTIVE_RE = re.compile(r"^ID:\s*`?([^`\s]+)`?\s*$", re.MULTILINE)
+REVIEW_ACTIONS = {"approve", "request-changes", "defer", "ask-question"}
+REVIEW_TARGET_KINDS = {"ticket", "increment", "goal", "fixture"}
 
 
 @dataclass
@@ -1818,6 +1820,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "evidence_view",
         "evidence_map",
         "review_gate",
+        "review_actions",
         "trace_eval",
         "branch_pr",
         "handoff",
@@ -1840,6 +1843,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "awf.operator-workbench.status.v1",
         "awf.operator-workbench.decision-summary.v1",
         "awf.operator-workbench.evidence-view.v1",
+        "awf.operator-workbench.review-action.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -2314,6 +2318,156 @@ def evidence_view_data(
     }
 
 
+def review_action_artifact(
+    action: str,
+    target_kind: str,
+    target_id: str,
+    reviewer_id: str,
+    evidence: list[str],
+    note: str,
+) -> dict[str, Any]:
+    return {
+        "schema": "awf.operator-workbench.review-action.v1",
+        "action_id": now_id(f"review-action-{action}-{target_id}"),
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        "action": action,
+        "state": "recorded",
+        "target": {
+            "kind": target_kind,
+            "id": target_id,
+        },
+        "reviewer": {
+            "agent_id": reviewer_id,
+            "role": "reviewer",
+        },
+        "source_artifacts": evidence,
+        "note": note,
+        "requires_response": action in {"request-changes", "defer", "ask-question"},
+        "human_required": {
+            "required": False,
+            "reason": None,
+        },
+        "decision_record_deferred_to": "Goal 006 T009 reviewer decision records",
+    }
+
+
+def review_action_data(
+    action: str,
+    target_kind: str,
+    target_id: str,
+    reviewer_id: str,
+    evidence: list[str] | None = None,
+    note: str = "",
+    write: bool = False,
+) -> dict[str, Any]:
+    normalized_action = action.strip().lower()
+    normalized_kind = target_kind.strip().lower()
+    evidence_items = [item for item in (evidence or []) if item]
+    errors = []
+    if normalized_action not in REVIEW_ACTIONS:
+        errors.append(f"action must be one of: {', '.join(sorted(REVIEW_ACTIONS))}")
+    if normalized_kind not in REVIEW_TARGET_KINDS:
+        errors.append(f"target-kind must be one of: {', '.join(sorted(REVIEW_TARGET_KINDS))}")
+    if not target_id.strip():
+        errors.append("target-id is required")
+    if not reviewer_id.strip():
+        errors.append("reviewer-id is required")
+    if errors:
+        return {
+            "ok": False,
+            "write": write,
+            "errors": errors,
+            "next_action": "fix review action input",
+        }
+    artifact = review_action_artifact(
+        action=normalized_action,
+        target_kind=normalized_kind,
+        target_id=target_id.strip(),
+        reviewer_id=reviewer_id.strip(),
+        evidence=evidence_items,
+        note=note,
+    )
+    path = None
+    if write:
+        path = write_json_artifact("review-actions", f"{normalized_action}-{target_id}", artifact)
+    return {
+        "ok": True,
+        "write": write,
+        "path": path,
+        "action": artifact,
+        "supported_actions": sorted(REVIEW_ACTIONS),
+        "nonblocking": True,
+        "next_action": "review action recorded" if write else "review action previewed",
+    }
+
+
+def recent_review_actions(limit: int = 8) -> list[dict[str, Any]]:
+    actions = []
+    for path in recent_artifact_paths(".agent-runs/review-actions", (".json",), limit=limit):
+        data = read_json(ROOT / path) or {}
+        actions.append(
+            {
+                "path": path,
+                "schema": data.get("schema"),
+                "action": data.get("action"),
+                "state": data.get("state"),
+                "target": data.get("target"),
+                "reviewer": data.get("reviewer"),
+                "requires_response": data.get("requires_response"),
+                "human_required": data.get("human_required", {}).get("required"),
+            }
+        )
+    return actions
+
+
+def operator_workbench_review_actions_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "review-actions.md"
+    docs_text = read_text(docs_path)
+    previews = [
+        review_action_data(
+            action=action,
+            target_kind="fixture",
+            target_id=f"goal-006-t008-{action}",
+            reviewer_id="fixture-reviewer",
+            evidence=[".agent-runs/reports/goal-006/t007-evidence-view-20260604.md"],
+            note=f"Fixture preview for {action}",
+            write=False,
+        )
+        for action in sorted(REVIEW_ACTIONS)
+    ]
+    required_terms = [
+        "awf.operator-workbench.review-action.v1",
+        "approve",
+        "request-changes",
+        "defer",
+        "ask-question",
+        ".agent-runs/review-actions/",
+        "T009",
+        "credential-free",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        *[
+            {"name": f"action preview:{item['action']['action']}", "ok": item["ok"], "detail": item["action"]["action"]}
+            for item in previews
+        ],
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.review-action.v1",
+        "supported_actions": sorted(REVIEW_ACTIONS),
+        "previews": [item["action"] for item in previews],
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -2367,6 +2521,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     trace_artifacts = recent_artifact_paths_anywhere((".trace.json",), limit=20)
     eval_artifacts = recent_artifact_paths_anywhere((".evaluation.json",), limit=20)
     review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
+    review_actions = recent_review_actions()
     goal_dashboard = goal_dashboard_data(issues, claims, ready)
     active_goal_evidence = [
         item["path"]
@@ -2468,6 +2623,8 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "follow_up_tickets": [],
             "human_required": bool(review_gate_data.get("human_required")),
             "human_required_count": review_gate_data.get("human_required_count", 0),
+            "actions": review_actions,
+            "supported_actions": sorted(REVIEW_ACTIONS),
         },
         "trace_eval": {
             "repo_local_trace_links": [item["path"] for item in evidence_view["trace_artifacts"]],
@@ -2509,6 +2666,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "acceptance": "not_run_by_operator_status",
             "validation": validation,
         },
+        "review_actions": review_actions,
         "decision_summaries": [],
         "source_summary": {
             "spec_count": len(context.get("specs", [])),
@@ -5581,6 +5739,8 @@ def review_gate(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[
         "spec_errors": spec_errors,
         "human_required": human_required,
         "human_required_count": len(human_required),
+        "review_actions": recent_review_actions(),
+        "supported_actions": sorted(REVIEW_ACTIONS),
     }
     return (0 if data["ok"] else 1), data
 
@@ -6001,6 +6161,24 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_review_actions_data()
+    results.append(
+        {
+            "name": "operator workbench review gate actions are durable and nonblocking",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/review-actions.md"
+            and data["schema"] == "awf.operator-workbench.review-action.v1"
+            and {"approve", "request-changes", "defer", "ask-question"}.issubset(
+                set(data["supported_actions"])
+            )
+            and all(action["human_required"]["required"] is False for action in data["previews"])
+            and all(
+                action["decision_record_deferred_to"] == "Goal 006 T009 reviewer decision records"
+                for action in data["previews"]
+            ),
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -6011,6 +6189,9 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["work_queue"]["source"] == "beads"
             and isinstance(data["work_queue"]["active_claims"], list)
             and isinstance(data["work_queue"]["blocked"], list)
+            and {"approve", "request-changes", "defer", "ask-question"}.issubset(
+                set(data["review_gate"]["supported_actions"])
+            )
             and data["review_gate"]["human_required_count"] == 0
             and data["health"]["acceptance"] == "not_run_by_operator_status"
             and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
@@ -6027,7 +6208,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_goal_id"] == "006"
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
-            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008"}
+            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008", "T009"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -6084,7 +6265,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5"}
+            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s"}
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1

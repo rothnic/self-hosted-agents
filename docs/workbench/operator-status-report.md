@@ -32,7 +32,8 @@ The report is generated from:
 - `evidence_view`: presenter and reviewer reports, run artifacts, traces, evals, Beads comments, branch, and PR fallback.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace/eval artifacts, Beads comments,
   and PR evidence placeholders.
-- `review_gate`: current gate state, findings, and human-required count.
+- `review_gate`: current gate state, findings, human-required count, supported actions, and recent review actions.
+- `review_actions`: recent durable review-action artifacts from `.agent-runs/review-actions/`.
 - `trace_eval`: repo-local trace/eval links plus self-hosted Langfuse fallback state.
 - `branch_pr`: branch and commit with GitHub marked `not_checked` until T010 adds integration.
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.

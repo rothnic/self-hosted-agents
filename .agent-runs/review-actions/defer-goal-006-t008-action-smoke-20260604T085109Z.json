@@ -1,0 +1,25 @@
+{
+  "action": "defer",
+  "action_id": "review-action-defer-goal-006-t008-action-smoke-20260604T085109Z",
+  "decision_record_deferred_to": "Goal 006 T009 reviewer decision records",
+  "human_required": {
+    "reason": null,
+    "required": false
+  },
+  "note": "Credential-free smoke proof for durable review-action capture; not a final T008 reviewer decision.",
+  "recorded_at": "2026-06-04T08:51:09.758598+00:00",
+  "requires_response": true,
+  "reviewer": {
+    "agent_id": "codex-goal006-t008",
+    "role": "reviewer"
+  },
+  "schema": "awf.operator-workbench.review-action.v1",
+  "source_artifacts": [
+    ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md"
+  ],
+  "state": "recorded",
+  "target": {
+    "id": "goal-006-t008-action-smoke",
+    "kind": "fixture"
+  }
+}
