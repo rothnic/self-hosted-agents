@@ -24,11 +24,11 @@ Umbrella goal: [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-r
 3. [Autonomous Multi-Agent Delivery Loop](003-autonomous-multi-agent-delivery-loop.md)
    - Accepted. Let scheduled PM, orchestrator, worker, integrator, and health roles move work safely.
 4. [Candidate Platform Decision And Product Baseline](004-candidate-platform-decision-product-baseline.md)
-   - Recommended next. Choose a primary stack from comparable implementation evidence.
+   - Accepted. Chose a primary stack from comparable implementation evidence.
 5. [Self-Hosted Deployment And Operations Reference](005-self-hosted-deployment-operations-reference.md)
-   - Planned. Run the chosen stack on controlled infrastructure with backups, secrets, and recovery.
+   - Accepted. Ran the chosen stack on controlled infrastructure with backups, secrets, and recovery.
 6. [Operator Workbench And Review UX](006-operator-workbench-review-ux.md)
-   - Planned. Let the human inspect, approve, and steer agent work without reading raw repo internals.
+   - Active. Let the human inspect, approve, and steer agent work without reading raw repo internals.
 
 ## Backlog Rules
 
@@ -43,9 +43,9 @@ Umbrella goal: [Self-Hosted Agent System Roadmap](000-self-hosted-agent-system-r
 
 ## Recommended Kickoff
 
-Start with Goal 000 for the full long-horizon roadmap, or Goal 004 for the next focused product iteration. Goals 001
-through 003 have accepted evidence for the current roadmap increment. Goal 004 should choose the primary product stack
-from comparable implementation evidence and define the first product baseline.
+Start with Goal 000 for the full long-horizon roadmap, or Goal 006 for the next focused product iteration. Goals 001
+through 005 have accepted evidence for the current roadmap increment. Goal 006 should define and build the operator
+workbench for status, evidence, review decisions, and handoffs.
 
 Copy/paste prompt:
 
@@ -53,7 +53,7 @@ Copy/paste prompt:
 /goal Execute docs/goals/000-self-hosted-agent-system-roadmap.md
 in /Users/nroth/workspace/self-hosted-agents. Work through the linked goals in
 order, starting with the first incomplete child goal. Goals 001 through 003 have
-accepted evidence; the next ordered goal is Goal 004. For each child goal, create or update the focused
+accepted evidence; Goals 004 and 005 have accepted evidence; the next ordered goal is Goal 006. For each child goal, create or update the focused
 spec/tasks/backlog, then implement one Beads ticket at a time with validation
 evidence before moving to the next child goal.
 ```

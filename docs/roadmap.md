@@ -156,7 +156,9 @@ independent decision-evidence acceptance, product baseline workflow definition, 
 operating notes, freeze policy for non-selected candidate references, migration notes, and production-hardening
 follow-up epics.
 
-Goal 005 is active. Spec `006-self-hosted-deployment-operations-reference`, increment ledger
-`.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and Beads epic `awf-h2u` now
-define the self-hosted deployment and operations reference backlog. The next ready worker ticket is `awf-n19` / T001:
-add the deployment operations BDD contract for profiles, smoke evidence, and recovery.
+Goal 005 is accepted. Independent reviewer `019e9149-edca-7530-b652-c707f6bf3238` accepted the deployment and
+operations evidence in `.agent-runs/reports/goal-005/t013-independent-review-20260604.md`.
+
+Goal 006 is active. Spec `007-operator-workbench-review-ux` now defines the operator workbench and review UX backlog.
+The next work is to sync that spec into Beads and begin T001: research and define the minimum operator views in
+`docs/workbench/`.

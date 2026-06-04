@@ -1,0 +1,1055 @@
+{
+  "active_claims": [],
+  "active_work_summary": {
+    "active_claims": [],
+    "blocked": [
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-3c5",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "id": "awf-09s",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-09s",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "id": "awf-1cx",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-s6n",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "id": "awf-1f9",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-x12",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+        "id": "awf-288",
+        "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-yu8",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "id": "awf-3c5",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      }
+    ],
+    "counts": {
+      "active_claims": 0,
+      "blocked": 16,
+      "ready": 1,
+      "stale_claims": 0
+    },
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "next_unblocked_issue_id": "awf-x12",
+    "ready": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T001",
+        "id": "awf-x12",
+        "status": "open",
+        "title": "Research and define the minimum operator views in `docs/workbench/`"
+      }
+    ],
+    "stale_claims": [],
+    "summary_schema": "awf.active-work.compact.v1"
+  },
+  "active_worker_branches": [],
+  "active_worktrees": [],
+  "base_branch": "main",
+  "beads_epic_id": "awf-yug",
+  "blocked": [
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:02.273102Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:43.922516Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-3c5",
+          "issue_id": "awf-09s",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:31.230830Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-09s",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T009\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+      "id": "awf-09s",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing",
+      "updated_at": "2026-06-04T06:39:43.922851Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:02.582153Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:44.529037Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-09s",
+          "issue_id": "awf-1cx",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:32.305435Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-1cx",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T010\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+      "id": "awf-1cx",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable",
+      "updated_at": "2026-06-04T06:39:44.529340Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:03.958971Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:47.037371Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-s6n",
+          "issue_id": "awf-1f9",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:36.666581Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-1f9",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T014\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+      "id": "awf-1f9",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Implement the selected interface with restrained operating-tool design",
+      "updated_at": "2026-06-04T06:39:47.037797Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:37:59.757624Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:39.380476Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-x12",
+          "issue_id": "awf-288",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:23.612964Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-288",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T002\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+      "id": "awf-288",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs",
+      "updated_at": "2026-06-04T06:39:39.380813Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:01.961169Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:43.289959Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yu8",
+          "issue_id": "awf-3c5",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:30.182012Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-3c5",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T008\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+      "id": "awf-3c5",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions",
+      "updated_at": "2026-06-04T06:39:43.290279Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:02.919029Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:45.081896Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-1cx",
+          "issue_id": "awf-diw",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:33.441922Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-diw",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T011\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+      "id": "awf-diw",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence",
+      "updated_at": "2026-06-04T06:39:45.082175Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:00.668424Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:40.824683Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-vht",
+          "issue_id": "awf-isu",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:25.865240Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-isu",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T004\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T004",
+      "id": "awf-isu",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation",
+      "updated_at": "2026-06-04T06:39:40.825030Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:04.336772Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:47.699260Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-1f9",
+          "issue_id": "awf-jr7",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:37.753842Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-jr7",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T015\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+      "id": "awf-jr7",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected",
+      "updated_at": "2026-06-04T06:39:47.699631Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:05.039867Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:48.931249Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-svr",
+          "issue_id": "awf-mtv",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:40.002441Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-mtv",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T017\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+      "id": "awf-mtv",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection",
+      "updated_at": "2026-06-04T06:39:48.931617Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:03.586039Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:46.321484Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-xwm",
+          "issue_id": "awf-s6n",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:35.622481Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-s6n",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T013\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+      "id": "awf-s6n",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Decide whether the workbench remains CLI/static or becomes a local UI",
+      "updated_at": "2026-06-04T06:39:46.321849Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:00.987692Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:41.464841Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-isu",
+          "issue_id": "awf-sdh",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:27.060028Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-sdh",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T005\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+      "id": "awf-sdh",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links",
+      "updated_at": "2026-06-04T06:39:41.465193Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:04.705899Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:48.327151Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-jr7",
+          "issue_id": "awf-svr",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:38.879267Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-svr",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T016\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+      "id": "awf-svr",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency",
+      "updated_at": "2026-06-04T06:39:48.327520Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:00.084619Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:40.160115Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-288",
+          "issue_id": "awf-vht",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:24.770006Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-vht",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T003\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T003",
+      "id": "awf-vht",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Define the generated artifact schema for workbench status and decision summaries",
+      "updated_at": "2026-06-04T06:39:40.160602Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:01.305163Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:42.047696Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-sdh",
+          "issue_id": "awf-vty",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:28.101038Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-vty",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T006\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T006",
+      "id": "awf-vty",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add an increment dashboard for tickets, claims, blockers, active workers, and validation state",
+      "updated_at": "2026-06-04T06:39:42.048013Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:03.269594Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:45.644068Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-diw",
+          "issue_id": "awf-xwm",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:34.513345Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-xwm",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T012\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+      "id": "awf-xwm",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions",
+      "updated_at": "2026-06-04T06:39:45.644361Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T06:38:01.643217Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T06:39:42.682379Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-vty",
+          "issue_id": "awf-yu8",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T06:38:29.126524Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-yug",
+          "issue_id": "awf-yu8",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "parent-child"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T007\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+      "id": "awf-yu8",
+      "issue_type": "task",
+      "labels": [
+        "role:worker"
+      ],
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs",
+      "updated_at": "2026-06-04T06:39:42.682728Z"
+    }
+  ],
+  "blocker_reroute": {
+    "blocked": [
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-3c5",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "id": "awf-09s",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-09s",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "id": "awf-1cx",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-s6n",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "id": "awf-1f9",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-x12",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+        "id": "awf-288",
+        "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-yu8",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "id": "awf-3c5",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-1cx",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+        "id": "awf-diw",
+        "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-vht",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T004",
+        "id": "awf-isu",
+        "title": "Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-1f9",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+        "id": "awf-jr7",
+        "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-svr",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+        "id": "awf-mtv",
+        "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-xwm",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+        "id": "awf-s6n",
+        "title": "Decide whether the workbench remains CLI/static or becomes a local UI"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-isu",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+        "id": "awf-sdh",
+        "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-jr7",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+        "id": "awf-svr",
+        "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-288",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T003",
+        "id": "awf-vht",
+        "title": "Define the generated artifact schema for workbench status and decision summaries"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-sdh",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T006",
+        "id": "awf-vty",
+        "title": "Add an increment dashboard for tickets, claims, blockers, active workers, and validation state"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-diw",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+        "id": "awf-xwm",
+        "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-vty",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+        "id": "awf-yu8",
+        "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+      }
+    ],
+    "blocked_count": 16,
+    "can_continue": true,
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "next_unblocked_issue_id": "awf-x12",
+    "ready_count": 1
+  },
+  "child_tickets": [
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T001",
+      "task_id": "T001",
+      "ticket_id": "awf-x12",
+      "ticket_status": "open",
+      "title": "Research and define the minimum operator views in `docs/workbench/`"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T002",
+      "task_id": "T002",
+      "ticket_id": "awf-288",
+      "ticket_status": "open",
+      "title": "Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T003",
+      "task_id": "T003",
+      "ticket_id": "awf-vht",
+      "ticket_status": "open",
+      "title": "Define the generated artifact schema for workbench status and decision summaries"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T004",
+      "task_id": "T004",
+      "ticket_id": "awf-isu",
+      "ticket_status": "open",
+      "title": "Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+      "task_id": "T005",
+      "ticket_id": "awf-sdh",
+      "ticket_status": "open",
+      "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T006",
+      "task_id": "T006",
+      "ticket_id": "awf-vty",
+      "ticket_status": "open",
+      "title": "Add an increment dashboard for tickets, claims, blockers, active workers, and validation state"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+      "task_id": "T007",
+      "ticket_id": "awf-yu8",
+      "ticket_status": "open",
+      "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+      "task_id": "T008",
+      "ticket_id": "awf-3c5",
+      "ticket_status": "open",
+      "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+      "task_id": "T009",
+      "ticket_id": "awf-09s",
+      "ticket_status": "open",
+      "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+      "task_id": "T010",
+      "ticket_id": "awf-1cx",
+      "ticket_status": "open",
+      "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+      "task_id": "T011",
+      "ticket_id": "awf-diw",
+      "ticket_status": "open",
+      "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+      "task_id": "T012",
+      "ticket_id": "awf-xwm",
+      "ticket_status": "open",
+      "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+      "task_id": "T013",
+      "ticket_id": "awf-s6n",
+      "ticket_status": "open",
+      "title": "Decide whether the workbench remains CLI/static or becomes a local UI"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+      "task_id": "T014",
+      "ticket_id": "awf-1f9",
+      "ticket_status": "open",
+      "title": "Implement the selected interface with restrained operating-tool design"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+      "task_id": "T015",
+      "ticket_id": "awf-jr7",
+      "ticket_status": "open",
+      "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+      "task_id": "T016",
+      "ticket_id": "awf-svr",
+      "ticket_status": "open",
+      "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+      "task_id": "T017",
+      "ticket_id": "awf-mtv",
+      "ticket_status": "open",
+      "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection"
+    }
+  ],
+  "exists": true,
+  "feature_branch": "codex/007-operator-workbench-review-ux-goal-006",
+  "human_required": [],
+  "increment_id": "007-operator-workbench-review-ux-goal-006",
+  "learning_proposals": [],
+  "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+  "objective_id": "agentic-development-foundation",
+  "ok": true,
+  "path": ".agent-runs/increments/007-operator-workbench-review-ux-goal-006.json",
+  "phase": "Goal 006",
+  "ready_count": 1,
+  "review_status": "executing",
+  "spec_id": "007-operator-workbench-review-ux",
+  "stale_claims": [],
+  "updated_at": "2026-06-04T06:40:02.713220+00:00",
+  "validation_evidence": []
+}

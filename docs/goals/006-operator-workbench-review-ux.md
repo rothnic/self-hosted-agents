@@ -15,6 +15,18 @@ current goals, active work, blockers, evidence, approvals, traces, evals, and ne
 This goal turns the repo-native operating model into an operator experience. It may start as CLI reports and static
 artifacts, then evolve into a local web or terminal UI if evidence shows that is worth the maintenance cost.
 
+## Current State
+
+Goal 006 is initialized as Spec `007-operator-workbench-review-ux` with an executable Beads backlog. The increment
+ledger is `.agent-runs/increments/007-operator-workbench-review-ux-goal-006.json`, and the Beads parent epic is
+`awf-yug`.
+
+The first implementation phase should keep the workbench CLI/static and repo-backed until a reviewed interface decision
+justifies a local UI. Review evidence should continue to use presenter evidence plus independent reviewer acceptance or
+rejection, not a human-review pause by default.
+
+The next ready worker ticket is T001 / `awf-x12`: research and define the minimum operator views in `docs/workbench/`.
+
 ## Scope
 
 - Define the operator information architecture.
