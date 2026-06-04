@@ -1,0 +1,59 @@
+{
+  "claimed_at": "2026-06-04T00:05:00.608099+00:00",
+  "id": "awf-dys",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:34.281785Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:46:53.601770Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-8nb",
+        "issue_id": "awf-dys",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:48:27.480665Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-dys",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:53.177813Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-uy0",
+        "issue_id": "awf-dys",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T003\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T003",
+    "id": "awf-dys",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Normalize candidate run, trace, evaluation, setup, durable, and gap evidence in `docs/requirements-matrix.md`",
+    "updated_at": "2026-06-02T10:48:28.433842Z"
+  },
+  "worker_branch": "codex/awf-dys-normalize-candidate-run-trace-evaluation",
+  "worker_id": "codex-goal004-t003",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-dys-normalize-candidate-run-trace-evaluation",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-dys-normalize-candidate-run-trace-evaluation ../self-hosted-agents-worktrees/awf-dys-normalize-candidate-run-trace-evaluation <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-dys-normalize-candidate-run-trace-evaluation && git status --short --branch"
+  }
+}

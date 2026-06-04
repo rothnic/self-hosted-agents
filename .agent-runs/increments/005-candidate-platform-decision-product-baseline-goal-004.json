@@ -66,18 +66,18 @@
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 11,
+      "blocked": 10,
       "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-dys",
+    "next_unblocked_issue_id": "awf-yka",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T003",
-        "id": "awf-dys",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
+        "id": "awf-yka",
         "status": "open",
-        "title": "Normalize candidate run, trace, evaluation, setup, durable, and gap evidence in `docs/requirements-matrix.md`"
+        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
       }
     ],
     "stale_claims": [],
@@ -468,45 +468,6 @@
     },
     {
       "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:34.570670Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:48:28.905521Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-yka",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:54.038188Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dys",
-          "issue_id": "awf-yka",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T004\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
-      "id": "awf-yka",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 1,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort",
-      "updated_at": "2026-06-02T10:48:29.810898Z"
-    },
-    {
-      "compaction_level": 0,
       "created_at": "2026-06-02T10:46:35.435540Z",
       "created_by": "nroth",
       "dependencies": [
@@ -673,18 +634,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-dys",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
-        "id": "awf-yka",
-        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-gal",
             "status": null,
             "type": "blocks"
@@ -695,10 +644,10 @@
         "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
       }
     ],
-    "blocked_count": 11,
+    "blocked_count": 10,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-dys",
+    "next_unblocked_issue_id": "awf-yka",
     "ready_count": 1
   },
   "child_tickets": [
@@ -719,11 +668,11 @@
       "title": "Decide whether Mastra TypeScript needs a runnable contrast slice before platform selection"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T003",
       "task_id": "T003",
       "ticket_id": "awf-dys",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Normalize candidate run, trace, evaluation, setup, durable, and gap evidence in `docs/requirements-matrix.md`"
     },
     {
@@ -829,6 +778,6 @@
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-02T11:19:25.179855+00:00",
+  "updated_at": "2026-06-04T00:15:22.744689+00:00",
   "validation_evidence": []
 }

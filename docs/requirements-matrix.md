@@ -1,7 +1,7 @@
 # Requirements Matrix
 
 Date: 2026-05-10
-Last updated: 2026-06-02
+Last updated: 2026-06-03
 
 ## Purpose
 
@@ -62,30 +62,111 @@ missing provider component, record that as a custom critical infrastructure warn
 
 | Candidate | Fit Today | Primary Evidence To Gather | Current Risk |
 | --- | --- | --- | --- |
-| LangGraph Python plus Langfuse | Strong Python orchestration plus self-hostable LLM observability | Trace quality, eval workflow, setup effort | Integration depth must be proven |
+| LangGraph Python plus Langfuse | Python orchestration with partial fixture evidence | Self-hosted trace ingestion, durability, committed artifacts | Integration depth must be proven |
 | LangGraph Python plus Phoenix | Strong Python and OpenInference-style observability path | Local tracing, eval quality, app instrumentation | Deferred until dev experience is better understood |
 | Python app plus MLflow tracing | Strong Python lifecycle and broader experiment tracking | Trace/eval ergonomics for agent workflows | Less specialized LLM observability UX |
-| Pydantic AI + Langfuse/DBOS | Tested typed Python slice with evals and durable local proof | OTel, evals, runtime fit | Production DBOS storage, workers, and recovery are unscored |
-| Mastra TypeScript plus shared contracts | Useful contrast with a TypeScript-native agent framework | Cross-language cost and feature parity | Lower fit with Python preference |
+| Pydantic AI + Langfuse/DBOS | Tested Python slice with evals, trace proof, and durable proof | DBOS operations, live traces, richer evals | Production storage, workers, and recovery unscored |
+| Mastra TypeScript plus shared contracts | Deferred TypeScript contrast without implementation evidence | Reopen only for TypeScript needs or Python-lane uncertainty | Not implementation-comparable |
 | LangSmith baseline | Best-known LangChain/LangGraph comparison point | Feature expectations and integration baseline | Self-hosted access may require Enterprise |
 
 ## Requirement To Candidate Matrix
 
-Legend: `High` means likely strong fit; `Medium` means plausible but needs proof; `Low` means weak fit or non-primary.
+Legend: `High` means strong fit with evidence, `Medium` means plausible but needs proof, and `Low` means weak fit.
+`Deferred` and `Missing` mean Goal 004 must not treat the cell as implementation-backed evidence.
 
 | Requirement | LangGraph + Langfuse | LangGraph + Phoenix | Python + MLflow | Pydantic AI + Langfuse/DBOS | Mastra TS | LangSmith Baseline |
 | --- | --- | --- | --- | --- | --- | --- |
 | R1 Python-first path | High | High | High | High | Low | High |
-| R2 Local/self-hostable observability | High | High | Medium | High | Medium | Low for this project |
-| R3 Evaluation/regression support | Medium | High | Medium | High | Medium | High |
-| R4 Inspectable orchestration | High | High | Medium | Medium | Medium | High |
+| R2 Local/self-hostable observability | High | High | Medium | High | Missing | Low for this project |
+| R3 Evaluation/regression support | Medium | High | Medium | High | Missing | High |
+| R4 Inspectable orchestration | High | High | Medium | Medium | Missing | High |
 | R5 Shared comparison harness | High | High | High | High | High | Medium |
-| R6 Low operator burden | Medium | Medium | Medium | Medium | Medium | Low for self-hosted |
-| R7 Scalable architecture path | Medium | Medium | Medium | High | Medium | High |
+| R6 Low operator burden | Medium | Medium | Medium | Medium | Missing | Low for self-hosted |
+| R7 Scalable architecture path | Medium | Medium | Medium | High | Deferred | High |
 | R8 Roadmap learning loop | High | High | High | High | High | Medium |
-| R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | Medium | High if approved |
-| R10 Product observability evidence | Medium | Medium | Low | High | Medium | High |
-| R11 Durable execution evidence | Low | Low | Medium | High | Medium | High |
+| R9 Low custom critical infrastructure | Medium | Medium | Medium | Medium | Deferred | High if approved |
+| R10 Product observability evidence | Medium | Medium | Low | High | Missing | High |
+| R11 Durable execution evidence | Low | Low | Medium | High | Missing | High |
+
+## Goal 004 Evidence Normalization - 2026-06-03
+
+T001 audited current candidate evidence against `docs/comparison-evidence.md`. T002 decided Mastra TypeScript does not
+need a runnable contrast slice before platform selection. This section normalizes those accepted findings for T003 so
+T004 can score candidates without mixing implementation evidence, research evidence, and deferred contrast intent.
+
+Evidence sources:
+
+- `.agent-runs/reports/goal-004-t001-candidate-evidence-audit-20260602.md`
+- `.agent-runs/reports/goal-004-t002-mastra-contrast-decision-20260602.md`
+- `apps/langgraph-python/README.md`
+- `apps/langgraph-python/implementation-plan.md`
+- `apps/pydantic-ai/README.md`
+- `apps/pydantic-ai/implementation-plan.md`
+- `apps/mastra-ts/README.md`
+- `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json`
+- `.agent-runs/verifications/verify-langfuse-t027-20260531.json`
+- `.agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json`
+- `.agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json`
+
+Legend:
+
+- `proven`: committed repo state contains implementation evidence for this category.
+- `partial`: evidence exists, but a required comparison or promotion property is missing.
+- `missing`: no runnable or inspectable implementation evidence exists in repo state.
+- `deferred`: intentionally retained as future contrast, not implementation-comparable in Goal 004.
+
+### LangGraph Python Plus Langfuse
+
+- Run evidence: `partial`. A runnable deterministic fixture and T001 audit rerun exist, but the audit artifact was
+  transient under `/tmp` rather than committed as a verification artifact.
+- Trace evidence: `partial`. The audit rerun produced a local OTel-style graph trace. Self-hosted Langfuse ingestion,
+  model/tool spans, token/cost fields, and failure views are unproven.
+- Evaluation evidence: `partial`. Deterministic assertion scoring passed in the audit rerun. Datasets, judges,
+  annotation, and trace-linked eval UI are unproven.
+- Setup evidence: `partial`. The README documents the fixture command and sibling artifacts. Self-hosted Langfuse
+  setup effort, reset, recovery, and secrets are unmeasured.
+- Durable evidence: `missing`. Persistence, retries, queues, schedulers, review waits, and recovery are explicit gaps.
+- Gap evidence: `proven`. The README, implementation plan, and this matrix preserve observability, eval, durability,
+  and scalability gaps.
+- Scoring boundary: score as a partial Python comparison slice, not as a final-solution candidate.
+
+### Pydantic AI Plus Langfuse/DBOS
+
+- Run evidence: `proven`. Committed run artifacts record deterministic Pydantic AI fixture execution.
+- Trace evidence: `proven` for tested candidate-slice observability. Repo-local OTel trace export plus self-hosted
+  Langfuse OTLP ingestion and trace retrieval are committed.
+- Evaluation evidence: `proven`. Pydantic Evals records deterministic 5/5 scoring tied to run and trace identities.
+- Setup evidence: `proven` for fixture and service-backed proof. The README and Langfuse docs record commands, env
+  vars, service shape, and fixture safety.
+- Durable evidence: `proven` for local durable proof. DBOS SQLite evidence covers retry, resume, review wait,
+  accepted-review resume, side-effect idempotency, and correlation.
+- Gap evidence: `proven`. Promotion blockers remain explicit for production DBOS, Langfuse operations, live model/tool
+  traces, token/cost/failure coverage, and richer evals.
+- Scoring boundary: score as the strongest tested candidate slice while capping final-solution language.
+
+### Mastra TypeScript Plus Shared Contracts
+
+- Run evidence: `missing`. No runnable app, package manifest, fixture command, or committed run artifact exists.
+- Trace evidence: `missing`. No Mastra trace export, local trace artifact, or self-hosted backend proof exists.
+- Evaluation evidence: `missing`. No deterministic fixture, eval dataset, or eval artifact exists.
+- Setup evidence: `partial`. The README records intended contrast and evidence categories, but no install, service,
+  reset, or recovery procedure.
+- Durable evidence: `missing`. No retry, resume, review wait, side-effect, or durable runtime evidence exists.
+- Gap evidence: `proven`. The README and T002 decision record missing evidence and cross-language ownership risk.
+- Scoring boundary: do not score as implementation-proven; keep as `deferred-before-platform-selection` reference.
+
+T004 scoring rules:
+
+- Use committed repo artifacts as implementation evidence. Research notes and provider docs can explain rationale, but
+  they do not raise implementation scores.
+- Treat the LangGraph audit rerun as `partial` because it proved the command during T001 but did not add a committed
+  verification artifact.
+- Treat Pydantic AI as implementation-backed across all required evidence categories, but preserve final-promotion
+  blockers for production storage, workers, recovery, live model/tool telemetry, and richer evaluation workflows.
+- Treat Mastra as a useful TypeScript reference with `missing implementation evidence` and
+  `deferred-before-platform-selection` disposition. Do not assign implementation-backed scores for observability,
+  evaluation, durable execution, scalability, or operating effort.
 
 ## Human Direction Update - 2026-05-23
 
