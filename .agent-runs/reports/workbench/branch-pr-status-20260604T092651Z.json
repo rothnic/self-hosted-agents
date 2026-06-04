@@ -1,0 +1,43 @@
+{
+  "ahead_by": 0,
+  "base_ref": "main",
+  "behind_by": 0,
+  "branch": "codex/pydantic-ai-fixture-scaffold",
+  "clean": false,
+  "commit": "5f8ebf5",
+  "fallback": "GitHub PR status available through gh",
+  "generated_at": "2026-06-04T09:26:51.087626+00:00",
+  "generated_by": "uv run awf branch-pr-status --json",
+  "git_status": "## codex/pydantic-ai-fixture-scaffold...origin/codex/pydantic-ai-fixture-scaffold\n M docs/workbench/README.md\n M docs/workbench/evidence-view.md\n M docs/workbench/operator-status-report.md\n M docs/workbench/status-artifact-schema.md\n M tools/agent-workflow/src/agent_workflow/cli.py\n M tools/agent-workflow/src/agent_workflow/core.py\n?? .agent-runs/claims/awf-1cx.json\n?? docs/workbench/branch-pr-status.md",
+  "github": {
+    "checked": true,
+    "reason": "gh pr view returned current branch PR",
+    "state": "available",
+    "tool": "gh"
+  },
+  "head_ref": "codex/pydantic-ai-fixture-scaffold",
+  "is_draft": true,
+  "merge_state_status": "DIRTY",
+  "pr_number": 12,
+  "pr_state": "OPEN",
+  "pr_url": "https://github.com/rothnic/self-hosted-agents/pull/12",
+  "remote": "https://github.com/rothnic/self-hosted-agents.git",
+  "review_decision": "",
+  "schema": "awf.operator-workbench.branch-pr.v1",
+  "self_hosted": {
+    "credential_free": false,
+    "external_service_required": false,
+    "fallback_required": false
+  },
+  "source_commands": [
+    "git status --short --branch",
+    "git branch --show-current",
+    "git rev-parse --short HEAD",
+    "git rev-parse --abbrev-ref --symbolic-full-name @{u}",
+    "git rev-list --left-right --count <upstream>...HEAD",
+    "gh pr view --json ..."
+  ],
+  "state": "available",
+  "title": "Build self-hosted agent roadmap and Pydantic AI observability evidence",
+  "upstream": "origin/codex/pydantic-ai-fixture-scaffold"
+}

@@ -12,6 +12,8 @@ names a self-hosted URL.
   sessions.
 - `awf.operator-workbench.decision-summary.v1`: repo-local reviewer decision summary linked from the status artifact.
 - `awf.operator-workbench.review-action.v1`: repo-local review-gate action input linked from the status artifact.
+- `awf.operator-workbench.branch-pr.v1`: repo-local branch and optional GitHub PR status linked from the status
+  artifact.
 
 ## Status Artifact
 
@@ -37,7 +39,8 @@ Required top-level fields:
   escalation state.
 - `review_actions`: recent durable review-action artifacts and supported review-gate actions.
 - `trace_eval`: repo-local trace/eval links, optional self-hosted Langfuse links, and unavailable-service gaps.
-- `branch_pr`: branch, commit, PR URL, draft or ready state, and GitHub fallback.
+- `branch_pr`: branch, commit, upstream, ahead/behind counts, PR URL, draft or ready state, GitHub availability, and
+  repo-local fallback.
 - `handoff`: copy-ready next role or ticket, required files, validation commands, risks, and exact artifact handles.
 - `health`: latest health, repo-hygiene, workflow-state, review-gate, and acceptance summaries.
 - `decision_summaries`: repo-relative paths to decision summary artifacts.
@@ -207,7 +210,8 @@ Minimal shape:
     "commit": "bf0db3d",
     "pr_url": "https://github.com/rothnic/self-hosted-agents/pull/12",
     "state": "draft",
-    "github_fallback": "git status plus PR body"
+    "github": {"state": "available", "checked": true},
+    "github_fallback": "GitHub PR status available through gh"
   },
   "handoff": {
     "next_role": "implementer",
@@ -224,6 +228,55 @@ Minimal shape:
     "acceptance": "passed"
   },
   "decision_summaries": [".agent-runs/review-decisions/example-decision-summary.json"]
+}
+```
+
+## Branch And PR Artifact
+
+Required top-level fields:
+
+- `schema`: literal `awf.operator-workbench.branch-pr.v1`.
+- `generated_at`: ISO-8601 timestamp.
+- `branch`: current Git branch.
+- `commit`: current short commit.
+- `clean`: whether the working tree is clean.
+- `remote`: origin remote URL when configured.
+- `upstream`: upstream branch when configured.
+- `ahead_by` and `behind_by`: upstream comparison counts.
+- `state`: `available` when GitHub PR metadata is available, otherwise `repo-local-fallback`.
+- `pr_url`, `pr_number`, `pr_state`, `is_draft`, `review_decision`, and `merge_state_status`: GitHub PR fields when
+  `gh pr view` succeeds.
+- `github`: availability state, checked flag, reason, and tool.
+- `fallback`: repo-local fallback summary.
+- `self_hosted`: credential-free and external-service-required flags.
+
+Minimal fallback shape:
+
+```json
+{
+  "schema": "awf.operator-workbench.branch-pr.v1",
+  "generated_at": "2026-06-04T00:00:00Z",
+  "branch": "codex/pydantic-ai-fixture-scaffold",
+  "commit": "5f8ebf5",
+  "clean": true,
+  "remote": "https://github.com/rothnic/self-hosted-agents.git",
+  "upstream": "origin/codex/pydantic-ai-fixture-scaffold",
+  "ahead_by": 0,
+  "behind_by": 0,
+  "state": "repo-local-fallback",
+  "pr_url": null,
+  "github": {
+    "state": "unavailable",
+    "checked": true,
+    "reason": "gh pr view failed",
+    "tool": "gh"
+  },
+  "fallback": "repo-local branch, commit, upstream, ahead/behind, and working tree status",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false,
+    "fallback_required": true
+  }
 }
 ```
 

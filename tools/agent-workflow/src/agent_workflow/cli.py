@@ -327,6 +327,26 @@ def operator_status(
     raise typer.Exit(0 if data["health"]["ok"] else 1)
 
 
+@app.command("branch-pr-status")
+def branch_pr_status(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local branch/PR status artifact."),
+    skip_github: bool = typer.Option(False, "--skip-github", help="Skip GitHub lookup and use repo-local fallback."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report branch and PR status with repo-local fallback when GitHub is unavailable."""
+    data = core.branch_pr_status_data(write=write, check_github=not skip_github)
+    print_envelope(
+        CommandEnvelope(
+            ok=True,
+            command="branch-pr-status",
+            summary=data["fallback"],
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

@@ -1845,6 +1845,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "awf.operator-workbench.decision-summary.v1",
         "awf.operator-workbench.evidence-view.v1",
         "awf.operator-workbench.review-action.v1",
+        "awf.operator-workbench.branch-pr.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -2269,8 +2270,7 @@ def evidence_view_data(
     verifications: list[str],
     trace_artifacts: list[str],
     eval_artifacts: list[str],
-    branch_name: str,
-    commit: str,
+    branch_pr: dict[str, Any],
     next_ticket: str | None,
 ) -> dict[str, Any]:
     report_items = [evidence_report_item(path) for path in reports]
@@ -2296,11 +2296,16 @@ def evidence_view_data(
         "eval_artifacts": eval_items,
         "beads_comments": beads_comment_items(issues),
         "branch_pr": {
-            "branch": branch_name,
-            "commit": commit,
-            "pr_url": None,
-            "state": "not_checked",
-            "fallback": "repo-local branch and commit; GitHub PR lookup is deferred to T010",
+            "schema": branch_pr.get("schema"),
+            "branch": branch_pr.get("branch"),
+            "commit": branch_pr.get("commit"),
+            "pr_url": branch_pr.get("pr_url"),
+            "pr_number": branch_pr.get("pr_number"),
+            "pr_state": branch_pr.get("pr_state"),
+            "is_draft": branch_pr.get("is_draft"),
+            "state": branch_pr.get("state"),
+            "github": branch_pr.get("github"),
+            "fallback": branch_pr.get("fallback"),
         },
         "acceptance_state": {
             "presenter_report_count": len(presenter_reports),
@@ -2680,6 +2685,155 @@ def operator_workbench_review_actions_data() -> dict[str, Any]:
     }
 
 
+def parse_json_object(text: str) -> dict[str, Any]:
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def git_output(args: list[str]) -> str | None:
+    proc = run(["git", *args])
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip() or None
+
+
+def branch_pr_status_data(write: bool = False, check_github: bool = True) -> dict[str, Any]:
+    branch_name = git_output(["branch", "--show-current"]) or "unknown"
+    commit = git_output(["rev-parse", "--short", "HEAD"]) or "unknown"
+    status_text = run(["git", "status", "--short", "--branch"]).stdout.strip()
+    remote_url = git_output(["remote", "get-url", "origin"])
+    upstream = git_output(["rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}"])
+    ahead_by = 0
+    behind_by = 0
+    if upstream:
+        counts = git_output(["rev-list", "--left-right", "--count", f"{upstream}...HEAD"])
+        if counts:
+            parts = counts.split()
+            if len(parts) == 2 and all(part.isdigit() for part in parts):
+                behind_by = int(parts[0])
+                ahead_by = int(parts[1])
+    pr_data: dict[str, Any] = {}
+    github_state = "not_checked"
+    github_reason = "GitHub lookup skipped"
+    gh_path = shutil.which("gh")
+    if check_github:
+        if not gh_path:
+            github_state = "unavailable"
+            github_reason = "gh executable not found"
+        else:
+            try:
+                proc = run(
+                    [
+                        "gh",
+                        "pr",
+                        "view",
+                        "--json",
+                        "url,number,state,isDraft,headRefName,baseRefName,title,reviewDecision,mergeStateStatus",
+                    ],
+                    timeout=5,
+                )
+            except subprocess.TimeoutExpired:
+                github_state = "unavailable"
+                github_reason = "gh pr view timed out"
+            else:
+                if proc.returncode == 0:
+                    pr_data = parse_json_object(proc.stdout)
+                    github_state = "available" if pr_data.get("url") else "unavailable"
+                    github_reason = "gh pr view returned current branch PR" if pr_data.get("url") else "gh returned no PR URL"
+                else:
+                    github_state = "unavailable"
+                    github_reason = (proc.stderr or proc.stdout or "gh pr view failed").strip()
+    state = "available" if github_state == "available" else "repo-local-fallback"
+    fallback = (
+        "GitHub PR status available through gh"
+        if github_state == "available"
+        else "repo-local branch, commit, upstream, ahead/behind, and working tree status"
+    )
+    data = {
+        "schema": "awf.operator-workbench.branch-pr.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf branch-pr-status --json",
+        "branch": branch_name,
+        "commit": commit,
+        "clean": git_state_summary(status_text)["clean"],
+        "git_status": status_text,
+        "remote": remote_url,
+        "upstream": upstream,
+        "ahead_by": ahead_by,
+        "behind_by": behind_by,
+        "state": state,
+        "pr_url": pr_data.get("url"),
+        "pr_number": pr_data.get("number"),
+        "pr_state": pr_data.get("state"),
+        "is_draft": pr_data.get("isDraft"),
+        "head_ref": pr_data.get("headRefName"),
+        "base_ref": pr_data.get("baseRefName"),
+        "title": pr_data.get("title"),
+        "review_decision": pr_data.get("reviewDecision"),
+        "merge_state_status": pr_data.get("mergeStateStatus"),
+        "github": {
+            "state": github_state,
+            "checked": check_github,
+            "reason": github_reason,
+            "tool": "gh" if gh_path else None,
+        },
+        "fallback": fallback,
+        "source_commands": [
+            "git status --short --branch",
+            "git branch --show-current",
+            "git rev-parse --short HEAD",
+            "git rev-parse --abbrev-ref --symbolic-full-name @{u}",
+            "git rev-list --left-right --count <upstream>...HEAD",
+            "gh pr view --json ...",
+        ],
+        "self_hosted": {
+            "credential_free": github_state != "available",
+            "external_service_required": False,
+            "fallback_required": github_state != "available",
+        },
+    }
+    if write:
+        data["path"] = write_json_artifact("reports/workbench", "branch-pr-status", data)
+    return data
+
+
+def operator_workbench_branch_pr_status_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "branch-pr-status.md"
+    docs_text = read_text(docs_path)
+    preview = branch_pr_status_data(write=False, check_github=False)
+    required_terms = [
+        "awf.operator-workbench.branch-pr.v1",
+        "uv run awf branch-pr-status",
+        "repo-local fallback",
+        "GitHub",
+        "gh pr view",
+        "credential-free",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "preview schema", "ok": preview["schema"] == "awf.operator-workbench.branch-pr.v1", "detail": ""},
+        {"name": "preview fallback", "ok": preview["state"] == "repo-local-fallback", "detail": preview["fallback"]},
+        {"name": "preview branch", "ok": bool(preview["branch"]), "detail": preview["branch"]},
+        {"name": "preview commit", "ok": bool(preview["commit"]), "detail": preview["commit"]},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.branch-pr.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -2702,8 +2856,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         phase="Goal 006",
     )
     status_text = run(["git", "status", "--short", "--branch"]).stdout.strip()
-    branch_name = run(["git", "branch", "--show-current"]).stdout.strip()
-    commit = run(["git", "rev-parse", "--short", "HEAD"]).stdout.strip()
+    branch_pr = branch_pr_status_data(write=False, check_github=True)
     validation_checks = [
         workflow_check("review-gate"),
         workflow_check("repo-hygiene"),
@@ -2751,8 +2904,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         verifications=verifications,
         trace_artifacts=trace_artifacts,
         eval_artifacts=eval_artifacts,
-        branch_name=branch_name,
-        commit=commit,
+        branch_pr=branch_pr,
         next_ticket=next_ticket,
     )
     data = {
@@ -2787,12 +2939,12 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "goal": "006-operator-workbench-review-ux",
             "spec_id": "007-operator-workbench-review-ux",
             "phase": "Goal 006",
-            "branch": branch_name,
-            "commit": commit,
+            "branch": branch_pr["branch"],
+            "commit": branch_pr["commit"],
             "beads_issue_id": next_ticket,
         },
         "availability": {
-            "github": {"state": "not_checked", "fallback": "git branch and commit status"},
+            "github": {"state": branch_pr["github"]["state"], "fallback": branch_pr["fallback"]},
             "self_hosted_langfuse": {"state": "not_checked", "fallback": "repo-local trace artifacts"},
             "dbos": {"state": "not_checked", "fallback": "repo-local durable smoke evidence"},
             "repo_local_evidence": {"state": "available", "fallback": None},
@@ -2855,11 +3007,8 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "gaps": ["self-hosted Langfuse availability is not checked by this credential-free status command"],
         },
         "branch_pr": {
-            "branch": branch_name,
-            "commit": commit,
-            "pr_url": None,
-            "state": "not_checked",
-            "github_fallback": "git status plus branch commit",
+            **branch_pr,
+            "github_fallback": branch_pr["fallback"],
         },
         "handoff": {
             "next_role": next_owner,
@@ -6420,6 +6569,19 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_branch_pr_status_data()
+    results.append(
+        {
+            "name": "operator workbench branch and PR status has repo-local fallback",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/branch-pr-status.md"
+            and data["schema"] == "awf.operator-workbench.branch-pr.v1"
+            and data["preview"]["github"]["checked"] is False
+            and data["preview"]["state"] == "repo-local-fallback"
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -6427,6 +6589,10 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": data["schema"] == "awf.operator-workbench.status.v1"
             and data["generated_by"] == "uv run awf operator-status --json"
             and data["scope"]["goal"] == "006-operator-workbench-review-ux"
+            and data["branch_pr"]["schema"] == "awf.operator-workbench.branch-pr.v1"
+            and data["branch_pr"]["branch"] == "codex/pydantic-ai-fixture-scaffold"
+            and data["branch_pr"]["github"]["state"] in {"available", "unavailable", "not_checked"}
+            and data["availability"]["github"]["state"] == data["branch_pr"]["github"]["state"]
             and data["work_queue"]["source"] == "beads"
             and isinstance(data["work_queue"]["active_claims"], list)
             and isinstance(data["work_queue"]["blocked"], list)
@@ -6453,7 +6619,8 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_goal_id"] == "006"
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
-            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008", "T009", "T010"}
+            and dashboard["current_phase"]["next_task"]["id"]
+            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -6510,7 +6677,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx"}
+            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx", "awf-diw"}
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1
@@ -6518,8 +6685,13 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and evidence_view["acceptance_state"]["eval_artifact_count"] >= 1
             and evidence_view["acceptance_state"]["beads_issue_with_comments_count"] >= 1
             and evidence_view["branch_pr"]["branch"] == "codex/pydantic-ai-fixture-scaffold"
-            and evidence_view["branch_pr"]["state"] == "not_checked"
-            and "T010" in evidence_view["branch_pr"]["fallback"]
+            and evidence_view["branch_pr"]["schema"] == "awf.operator-workbench.branch-pr.v1"
+            and evidence_view["branch_pr"]["state"] in {"available", "repo-local-fallback"}
+            and evidence_view["branch_pr"]["github"]["state"] in {"available", "unavailable", "not_checked"}
+            and (
+                evidence_view["branch_pr"]["pr_url"]
+                or "repo-local" in evidence_view["branch_pr"]["fallback"]
+            )
             and evidence_view["self_hosted"]["credential_free"] is True
             and evidence_view["self_hosted"]["external_service_required"] is False,
             "data": evidence_view,

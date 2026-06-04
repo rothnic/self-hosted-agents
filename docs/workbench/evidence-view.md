@@ -24,14 +24,14 @@ goal evidence. The view links durable proof surfaces without requiring hosted cr
 - `trace_artifacts`: repo-local `*.trace.json` artifacts from `.agent-runs/`.
 - `eval_artifacts`: repo-local `*.evaluation.json` artifacts from `.agent-runs/`.
 - `beads_comments`: recent Beads issues with durable comments and latest comment handles.
-- `branch_pr`: current branch and commit with explicit PR lookup fallback until T010 adds GitHub integration.
+- `branch_pr`: current branch, commit, optional GitHub PR metadata, and explicit repo-local fallback.
 - `acceptance_state`: counts for report, verification, trace, eval, and Beads comment evidence.
 - `self_hosted`: credential-free validation and external-service fallback declaration.
 
 ## Operating Rules
 
 - Keep repo-local artifacts as the source of truth; hosted views are optional links, not validation requirements.
-- Show PR evidence as branch and commit fallback until the GitHub integration ticket adds live PR status.
+- Show PR evidence as live GitHub metadata when available and branch/commit fallback when GitHub is unavailable.
 - Surface trace and eval artifacts from repo-local JSON files even when self-hosted Langfuse is unavailable.
 - Preserve presenter evidence plus independent reviewer acceptance as the evidence model for goal and increment proof.
 - Do not implement review actions, reviewer decision records, branch/PR API integration, or trace/eval deep-linking in

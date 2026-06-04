@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T09:22:45.415932+00:00",
+  "id": "awf-1cx",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:02.582153Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:44.529037Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-09s",
+        "issue_id": "awf-1cx",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:32.305435Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-1cx",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T010\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+    "id": "awf-1cx",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable",
+    "updated_at": "2026-06-04T06:39:44.529340Z"
+  },
+  "worker_branch": "codex/awf-1cx-add-branch-and-pr-status-integration-wit",
+  "worker_id": "codex-goal006-t010",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-1cx-add-branch-and-pr-status-integration-wit",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-1cx-add-branch-and-pr-status-integration-wit ../self-hosted-agents-worktrees/awf-1cx-add-branch-and-pr-status-integration-wit <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-1cx-add-branch-and-pr-status-integration-wit && git status --short --branch"
+  }
+}

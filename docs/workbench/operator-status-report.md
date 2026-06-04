@@ -36,7 +36,7 @@ The report is generated from:
 - `review_actions`: recent durable review-action artifacts from `.agent-runs/review-actions/`.
 - `decision_summaries`: recent reviewer decision records from `.agent-runs/review-decisions/`.
 - `trace_eval`: repo-local trace/eval links plus self-hosted Langfuse fallback state.
-- `branch_pr`: branch and commit with GitHub marked `not_checked` until T010 adds integration.
+- `branch_pr`: branch, commit, upstream, GitHub PR metadata when available, and repo-local fallback when unavailable.
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.
 
