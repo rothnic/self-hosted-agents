@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T00:28:19.806164+00:00",
+  "id": "awf-a31",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:34.828843Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:30.251721Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-a31",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:54.493416Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yka",
+        "issue_id": "awf-a31",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T005\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
+    "id": "awf-a31",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers",
+    "updated_at": "2026-06-02T10:48:31.226245Z"
+  },
+  "worker_branch": "codex/awf-a31-record-the-platform-decision-adr-with-se",
+  "worker_id": "codex-goal004-t005",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-a31-record-the-platform-decision-adr-with-se",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-a31-record-the-platform-decision-adr-with-se ../self-hosted-agents-worktrees/awf-a31-record-the-platform-decision-adr-with-se <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-a31-record-the-platform-decision-adr-with-se && git status --short --branch"
+  }
+}

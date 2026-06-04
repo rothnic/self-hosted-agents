@@ -66,18 +66,18 @@
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 9,
+      "blocked": 8,
       "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-a31",
+    "next_unblocked_issue_id": "awf-gal",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
-        "id": "awf-a31",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T006",
+        "id": "awf-gal",
         "status": "open",
-        "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers"
+        "title": "Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack"
       }
     ],
     "stale_claims": [],
@@ -351,45 +351,6 @@
     },
     {
       "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:35.168538Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:46:54.928641Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-a31",
-          "issue_id": "awf-gal",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        },
-        {
-          "created_at": "2026-06-02T10:48:31.652474Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-gal",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T006\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T006",
-      "id": "awf-gal",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 1,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack",
-      "updated_at": "2026-06-02T10:48:32.569876Z"
-    },
-    {
-      "compaction_level": 0,
       "created_at": "2026-06-02T10:46:37.581889Z",
       "created_by": "nroth",
       "dependencies": [
@@ -559,18 +520,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-a31",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T006",
-        "id": "awf-gal",
-        "title": "Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-fpn",
             "status": null,
             "type": "blocks"
@@ -593,10 +542,10 @@
         "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
       }
     ],
-    "blocked_count": 9,
+    "blocked_count": 8,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-a31",
+    "next_unblocked_issue_id": "awf-gal",
     "ready_count": 1
   },
   "child_tickets": [
@@ -633,11 +582,11 @@
       "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
       "task_id": "T005",
       "ticket_id": "awf-a31",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers"
     },
     {
@@ -727,6 +676,6 @@
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T00:24:40.817704+00:00",
+  "updated_at": "2026-06-04T00:33:56.334207+00:00",
   "validation_evidence": []
 }
