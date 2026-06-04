@@ -26,6 +26,7 @@ Required top-level fields:
 - `executive_snapshot`: current phase, active role, recommendation, reason, next owner, and risks.
 - `roadmap`: ordered goals, accepted evidence, current goal, next child goal, and follow-up epics.
 - `goal_dashboard`: ordered child goals with accepted evidence links, current phase, next ticket, and follow-up epics.
+- `increment_dashboard`: scoped increment tickets, claims, blockers, active workers, stale claims, and validation state.
 - `work_queue`: ready work, blocked work, human-required work, active claims, stale claims, and Beads source metadata.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace artifacts, eval artifacts, Beads
   comments, and PR evidence.
@@ -100,6 +101,35 @@ Minimal shape:
     "goals": [],
     "accepted_evidence_links": [],
     "follow_up_epics": []
+  },
+  "increment_dashboard": {
+    "schema": "awf.operator-workbench.increment-dashboard.v1",
+    "source": ".agent-runs/increments/007-operator-workbench-review-ux-goal-006.json",
+    "increment_id": "007-operator-workbench-review-ux-goal-006",
+    "spec_id": "007-operator-workbench-review-ux",
+    "phase": "Goal 006",
+    "review_status": "executing",
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "counts": {
+      "total_tickets": 17,
+      "completed_tickets": 5,
+      "open_tickets": 12,
+      "ready_tickets": 1,
+      "blocked_tickets": 11,
+      "active_claims": 1,
+      "active_workers": 1,
+      "stale_claims": 0,
+      "validation_checks": 3
+    },
+    "tickets": [],
+    "ready_tickets": [],
+    "blocked_tickets": [],
+    "active_claims": [],
+    "active_workers": [],
+    "stale_claims": [],
+    "validation_state": {"ok": true, "credential_free": true},
+    "handoff": {"active_ticket": "awf-vty", "resume_claim": ".agent-runs/claims/awf-vty.json"},
+    "self_hosted": {"external_service_required": false}
   },
   "work_queue": {
     "source": "beads",

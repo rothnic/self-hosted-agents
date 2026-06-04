@@ -12,6 +12,7 @@ local UI.
 - `status-artifact-schema.md`: generated status and decision-summary artifact schema for later reports or UI surfaces.
 - `operator-status-report.md`: first consolidated CLI/static status report, source inputs, sections, and fallbacks.
 - `goal-dashboard.md`: long-horizon goal dashboard, current phase, and accepted evidence links.
+- `increment-dashboard.md`: increment dashboard for tickets, claims, blockers, workers, and validation state.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -37,5 +38,5 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T006 should add an increment dashboard for tickets, claims, blockers, active workers, and validation state on top of the
+T007 should add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs on top of the
 consolidated operator status report.

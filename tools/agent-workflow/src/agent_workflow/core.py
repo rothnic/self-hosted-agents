@@ -2084,6 +2084,123 @@ def goal_dashboard_data(
     }
 
 
+def increment_ticket_state(
+    ticket: dict[str, Any],
+    ready_ids: set[str],
+    blocked_ids: set[str],
+    active_claim_ids: set[str],
+) -> str:
+    ticket_id = str(ticket.get("ticket_id") or "")
+    if ticket.get("done") or ticket.get("ticket_status") in {"closed", "resolved", "done"}:
+        return "completed"
+    if ticket_id in active_claim_ids:
+        return "claimed"
+    if ticket_id in ready_ids:
+        return "ready"
+    if ticket_id in blocked_ids:
+        return "blocked"
+    if ticket.get("ticket_status") == "missing":
+        return "missing-ticket"
+    return "pending"
+
+
+def compact_increment_ticket(
+    ticket: dict[str, Any],
+    ready_ids: set[str],
+    blocked_ids: set[str],
+    active_claim_ids: set[str],
+) -> dict[str, Any]:
+    return {
+        "task_id": ticket.get("task_id"),
+        "ticket_id": ticket.get("ticket_id"),
+        "title": ticket.get("title"),
+        "state": increment_ticket_state(ticket, ready_ids, blocked_ids, active_claim_ids),
+        "done": ticket.get("done"),
+        "ticket_status": ticket.get("ticket_status"),
+        "external_ref": ticket.get("external_ref"),
+    }
+
+
+def compact_validation_state(validation: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "ok": validation.get("ok"),
+        "checks": validation.get("checks", []),
+        "failed_checks": [
+            check.get("name")
+            for check in validation.get("checks", [])
+            if not check.get("ok")
+        ],
+        "credential_free": True,
+        "source": "repo-local shallow workflow checks",
+    }
+
+
+def increment_dashboard_data(
+    increment: dict[str, Any],
+    validation: dict[str, Any],
+) -> dict[str, Any]:
+    active_work = increment.get("active_work_summary", {})
+    ready_items = active_work.get("ready", [])
+    blocked_items = active_work.get("blocked", [])
+    active_claims_list = increment.get("active_claims", [])
+    stale_claims = increment.get("stale_claims", [])
+    ready_ids = {str(item.get("id")) for item in ready_items if item.get("id")}
+    blocked_ids = {str(item.get("id")) for item in blocked_items if item.get("id")}
+    active_claim_ids = {str(claim.get("id")) for claim in active_claims_list if claim.get("id")}
+    tickets = [
+        compact_increment_ticket(ticket, ready_ids, blocked_ids, active_claim_ids)
+        for ticket in increment.get("child_tickets", [])
+    ]
+    active_workers = [
+        {
+            "worker_id": claim.get("worker_id"),
+            "ticket_id": claim.get("id"),
+            "worker_branch": claim.get("worker_branch"),
+            "worktree_path": claim.get("worktree_path"),
+            "claim_path": claim.get("path"),
+        }
+        for claim in active_claims_list
+    ]
+    return {
+        "schema": "awf.operator-workbench.increment-dashboard.v1",
+        "source": increment.get("path"),
+        "increment_id": increment.get("increment_id"),
+        "spec_id": increment.get("spec_id"),
+        "phase": increment.get("phase"),
+        "review_status": increment.get("review_status"),
+        "next_action": increment.get("next_action"),
+        "counts": {
+            "total_tickets": len(tickets),
+            "completed_tickets": len([ticket for ticket in tickets if ticket["state"] == "completed"]),
+            "open_tickets": len([ticket for ticket in tickets if ticket["state"] != "completed"]),
+            "ready_tickets": len(ready_items),
+            "blocked_tickets": len(blocked_items),
+            "active_claims": len(active_claims_list),
+            "active_workers": len(active_workers),
+            "stale_claims": len(stale_claims),
+            "validation_checks": len(validation.get("checks", [])),
+        },
+        "tickets": tickets,
+        "ready_tickets": ready_items,
+        "blocked_tickets": blocked_items,
+        "active_claims": [compact_claim_item(claim) for claim in active_claims_list],
+        "active_workers": active_workers,
+        "stale_claims": stale_claims,
+        "validation_state": compact_validation_state(validation),
+        "handoff": {
+            "next_unblocked_issue_id": active_work.get("next_unblocked_issue_id"),
+            "next_action": active_work.get("next_action") or increment.get("next_action"),
+            "active_ticket": active_workers[0]["ticket_id"] if active_workers else None,
+            "resume_claim": active_claims_list[0].get("path") if active_claims_list else None,
+        },
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "repo-local Beads, claims, increment ledger, and workflow checks",
+        },
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -2114,6 +2231,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         workflow_check("workflow-state-lint"),
     ]
     validation = compact_validation_checks(validation_checks)
+    increment_dashboard = increment_dashboard_data(increment, validation)
     active_claim = claims[0] if claims else None
     next_ticket = (
         active_claim.get("id")
@@ -2160,6 +2278,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "artifacts": [
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
                 "docs/workbench/goal-dashboard.md",
+                "docs/workbench/increment-dashboard.md",
                 "docs/workbench/status-artifact-schema.md",
                 ".beads/issues.jsonl",
                 ".agent-runs/claims/",
@@ -2197,6 +2316,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "follow_up_epics": open_follow_up_epics(issues),
         },
         "goal_dashboard": goal_dashboard,
+        "increment_dashboard": increment_dashboard,
         "work_queue": {
             "source": ready.get("source"),
             "ready": compact_work_queue_items(ready.get("ready", [])),
@@ -5784,7 +5904,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": dashboard["schema"] == "awf.operator-workbench.goal-dashboard.v1"
             and dashboard["current_goal_id"] == "006"
             and dashboard["current_phase"]["phase"] == "Goal 006 Phase 2: Repo-Backed Status Surfaces"
-            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006"}
+            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -5798,6 +5918,40 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["review_model"]
             == "presenter evidence plus independent reviewer acceptance or rejection",
             "data": dashboard,
+        }
+    )
+    increment_dashboard = data["increment_dashboard"]
+    active_ticket = next(
+        (
+            ticket
+            for ticket in increment_dashboard["tickets"]
+            if ticket.get("ticket_id") == increment_dashboard["handoff"].get("active_ticket")
+        ),
+        {},
+    )
+    increment_has_active_or_next_work = (
+        increment_dashboard["counts"]["active_claims"] >= 1
+        and increment_dashboard["counts"]["active_workers"] >= 1
+        and active_ticket.get("state") == "claimed"
+    ) or (
+        increment_dashboard["counts"]["completed_tickets"] >= 6
+        and increment_dashboard["counts"]["ready_tickets"] >= 1
+        and increment_dashboard["handoff"].get("next_unblocked_issue_id")
+    )
+    results.append(
+        {
+            "name": "operator workbench increment dashboard is generated",
+            "ok": increment_dashboard["schema"] == "awf.operator-workbench.increment-dashboard.v1"
+            and increment_dashboard["increment_id"] == "007-operator-workbench-review-ux-goal-006"
+            and increment_dashboard["spec_id"] == "007-operator-workbench-review-ux"
+            and increment_dashboard["phase"] == "Goal 006"
+            and increment_dashboard["counts"]["total_tickets"] == 17
+            and increment_dashboard["counts"]["completed_tickets"] >= 5
+            and increment_has_active_or_next_work
+            and increment_dashboard["validation_state"]["credential_free"] is True
+            and increment_dashboard["validation_state"]["ok"] is True
+            and increment_dashboard["self_hosted"]["external_service_required"] is False,
+            "data": increment_dashboard,
         }
     )
     code, data = repo_hygiene_result()
