@@ -8,7 +8,7 @@
 - [X] T001 [US1] Add a self-hosted deployment operations BDD contract for profiles, smoke evidence, and recovery
 - [X] T002 [US1] Define local, development-server, and production-like deployment profiles in `docs/deployment/`
 - [X] T003 [US1] Document service boundaries, ports, volumes, secrets, storage paths, and target machines
-- [ ] T004 [US1] Add environment templates and readiness checks that do not commit credentials
+- [X] T004 [US1] Add environment templates and readiness checks that do not commit credentials
 
 ## Goal 005 Phase 2: Reference Stack Startup And Smoke
 

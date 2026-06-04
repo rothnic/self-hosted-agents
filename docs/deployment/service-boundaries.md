@@ -1,14 +1,15 @@
 # Deployment Service Boundaries
 
-Status: initialized for Goal 005 T003
+Status: updated through Goal 005 T004
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
 ## Purpose
 
 This document names the service boundaries, ports, volumes, storage paths, secrets, and target machines for the
-selected self-hosted stack. It extends `docs/deployment/profiles.md` without adding startup automation, environment
-templates, smoke commands, or runbooks; those are routed to later Goal 005 tickets.
+selected self-hosted stack. It extends `docs/deployment/profiles.md` and is paired with
+`docs/deployment/environment-readiness.md` for environment templates and readiness checks. Startup automation, smoke
+commands, and runbooks are routed to later Goal 005 tickets.
 
 ## Boundary Rules
 
@@ -58,8 +59,8 @@ understood.
 | `8123`, `9000` | ClickHouse for Langfuse | service host only | private network or localhost | Internal analytics storage only. |
 | object storage ports | Langfuse blob storage | service host only | private network or localhost | Internal service; concrete port depends on the chosen deployment. |
 
-Later startup and readiness tickets must verify the actual listening ports for the selected deployment instead of
-treating this table as live service evidence.
+Later startup and smoke tickets must verify the actual listening ports for the selected deployment instead of treating
+this table as live service evidence.
 
 ## Storage Paths And Volumes
 
@@ -138,7 +139,7 @@ Fixture validation must pass when all observability, durable storage, and model-
 
 ## Deferred Work
 
-- T004 adds environment templates and readiness checks for these names and paths.
+- T004 added environment templates and readiness checks for these names and paths.
 - T005 adds or documents startup for the selected profile.
 - T006-T008 add smoke commands, service-backed evidence, and credential-free fallback proof.
 - T009-T012 add backup, restore, reset, diagnostics, recovery, operating burden, and rehearsal evidence.

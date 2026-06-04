@@ -224,6 +224,21 @@ def health_status(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("deployment-readiness")
+def deployment_readiness(
+    profile: str = typer.Option("local", "--profile", help="local, development-server, or production-like."),
+    env_file: str | None = typer.Option(None, "--env-file", help="Optional env file to inspect without printing values."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report deployment runtime, service configuration, secret, and storage readiness."""
+    data = core.deployment_readiness_data(profile=profile, env_file=env_file)
+    print_envelope(
+        CommandEnvelope(ok=data["ok"], command="deployment-readiness", summary="Deployment readiness.", data=data),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("verify")
 def verify(
     profile: str = typer.Option(..., "--profile", help="ticket, increment, health, or pre-merge."),

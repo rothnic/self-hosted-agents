@@ -1,6 +1,6 @@
 # Self-Hosted Deployment Profiles
 
-Status: updated through Goal 005 T003
+Status: updated through Goal 005 T004
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/self_hosted_deployment_operations.feature`
@@ -18,7 +18,8 @@ Goal 005 tickets harden with detailed ports, volumes, environment templates, sta
 fresh-setup evidence.
 
 Detailed service boundaries, ports, volumes, storage paths, secret names, and machine ownership are in
-`docs/deployment/service-boundaries.md`.
+`docs/deployment/service-boundaries.md`. Environment templates and readiness checks are in
+`docs/deployment/environment-readiness.md`.
 
 ## Shared Principles
 
@@ -77,6 +78,7 @@ The local profile must pass when these are unset:
 
 - `uv run awf workflow-fixture-test`
 - `uv run awf verify --profile ticket --json`
+- `uv run awf deployment-readiness --profile local --json`
 - repo-local `.trace.json` and `.evaluation.json` artifacts when a Pydantic AI run is part of the slice
 - explicit gaps when Langfuse, production DBOS storage, live model calls, or service-backed smoke evidence are absent
 
@@ -164,7 +166,7 @@ The production-like profile must use externally managed secrets, never committed
 ## Current Gaps Routed To Later Goal 005 Tickets
 
 - T003 documented detailed service boundaries, ports, volumes, storage paths, and target machine ownership.
-- T004 adds environment templates and readiness checks that report missing prerequisites without exposing secrets.
+- T004 added environment templates and readiness checks that report missing prerequisites without exposing secrets.
 - T005 adds or documents startup for the selected Pydantic AI, Langfuse, and DBOS profile.
 - T006-T008 add deployment smoke and credential-free fallback evidence.
 - T009-T012 add runbooks and fresh-setup rehearsal evidence.

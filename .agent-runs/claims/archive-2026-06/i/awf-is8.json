@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T03:48:29.264326+00:00",
+  "id": "awf-is8",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:09.956638Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:01.147341Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-is8",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:28.875865Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-noh",
+        "issue_id": "awf-is8",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T004\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
+    "id": "awf-is8",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add environment templates and readiness checks that do not commit credentials",
+    "updated_at": "2026-06-04T03:09:01.147682Z"
+  },
+  "worker_branch": "codex/awf-is8-add-environment-templates-and-readiness",
+  "worker_id": "codex-goal005-t004",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-is8-add-environment-templates-and-readiness",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-is8-add-environment-templates-and-readiness ../self-hosted-agents-worktrees/awf-is8-add-environment-templates-and-readiness <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-is8-add-environment-templates-and-readiness && git status --short --branch"
+  }
+}

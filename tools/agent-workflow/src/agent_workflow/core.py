@@ -503,6 +503,306 @@ def install_hooks_data() -> dict[str, Any]:
     }
 
 
+DEPLOYMENT_SECRET_ENV_NAMES = [
+    "LANGFUSE_PUBLIC_KEY",
+    "LANGFUSE_SECRET_KEY",
+    "LANGFUSE_INIT_PROJECT_PUBLIC_KEY",
+    "LANGFUSE_INIT_PROJECT_SECRET_KEY",
+    "LANGFUSE_INIT_USER_PASSWORD",
+    "LOGFIRE_TOKEN",
+    "DBOS_DATABASE_URL",
+    "POSTGRES_PASSWORD",
+    "CLICKHOUSE_PASSWORD",
+    "REDIS_PASSWORD",
+    "MODEL_PROVIDER_API_KEY",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+]
+DEPLOYMENT_CONFIG_ENV_NAMES = [
+    "SHA_DEPLOYMENT_PROFILE",
+    "SHA_REPO_ROOT",
+    "SHA_SERVICE_STATE_ROOT",
+    "LANGFUSE_BASE_URL",
+    "LANGFUSE_PROJECT_ID",
+    "LANGFUSE_INIT_ORG_ID",
+    "LANGFUSE_INIT_ORG_NAME",
+    "LANGFUSE_INIT_PROJECT_ID",
+    "LANGFUSE_INIT_PROJECT_NAME",
+    "LANGFUSE_INIT_USER_EMAIL",
+    "LANGFUSE_INIT_USER_NAME",
+    "DBOS_DATABASE_URL",
+]
+DEPLOYMENT_TEMPLATE_PATHS = {
+    "local": ROOT / "docs" / "deployment" / "env.local.template",
+    "development-server": ROOT / "docs" / "deployment" / "env.development-server.template",
+    "production-like": ROOT / "docs" / "deployment" / "env.production-like.template",
+}
+DEPLOYMENT_PROFILE_CONFIG = {
+    "local": {
+        "target_machine": "MacBook",
+        "required_tools": ["python3", "git", "uv"],
+        "required_paths": [
+            "apps/pydantic-ai/run.py",
+            "apps/pydantic-ai/durable_smoke.py",
+            "docs/deployment/service-boundaries.md",
+            ".beads/issues.jsonl",
+            ".agent-runs/verifications",
+            ".agent-runs/reports",
+        ],
+        "required_env": [],
+        "optional_env": [
+            "LANGFUSE_BASE_URL",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PROJECT_ID",
+            "LOGFIRE_TOKEN",
+            "DBOS_DATABASE_URL",
+            "MODEL_PROVIDER_API_KEY",
+            "OPENAI_API_KEY",
+            "ANTHROPIC_API_KEY",
+        ],
+    },
+    "development-server": {
+        "target_machine": "vps-dev",
+        "required_tools": ["python3", "git", "uv", "docker"],
+        "required_paths": [
+            "apps/pydantic-ai/run.py",
+            "apps/pydantic-ai/durable_smoke.py",
+            "docs/deployment/service-boundaries.md",
+            ".beads/issues.jsonl",
+            ".agent-runs/verifications",
+            ".agent-runs/reports",
+        ],
+        "required_env": [
+            "LANGFUSE_BASE_URL",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PROJECT_ID",
+        ],
+        "optional_env": ["DBOS_DATABASE_URL", "MODEL_PROVIDER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
+    },
+    "production-like": {
+        "target_machine": "vps-gw",
+        "required_tools": ["python3", "git", "uv", "docker"],
+        "required_paths": [
+            "apps/pydantic-ai/run.py",
+            "apps/pydantic-ai/durable_smoke.py",
+            "docs/deployment/service-boundaries.md",
+            ".beads/issues.jsonl",
+            ".agent-runs/verifications",
+            ".agent-runs/reports",
+        ],
+        "required_env": [
+            "LANGFUSE_BASE_URL",
+            "LANGFUSE_PUBLIC_KEY",
+            "LANGFUSE_SECRET_KEY",
+            "LANGFUSE_PROJECT_ID",
+            "DBOS_DATABASE_URL",
+        ],
+        "optional_env": ["MODEL_PROVIDER_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"],
+    },
+}
+
+
+def is_placeholder_secret_value(value: str) -> bool:
+    stripped = value.strip().strip('"').strip("'")
+    return not stripped or stripped.startswith("<") or stripped.startswith("${") or stripped in {"changeme", "unset"}
+
+
+def parse_env_template(path: Path) -> dict[str, Any]:
+    keys: set[str] = set()
+    valued_keys: set[str] = set()
+    secret_value_errors = []
+    parse_errors = []
+    if not path.exists():
+        return {
+            "path": rel(path),
+            "exists": False,
+            "keys": [],
+            "valued_keys": [],
+            "secret_value_errors": [f"missing template: {rel(path)}"],
+            "parse_errors": [],
+        }
+
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("export "):
+            stripped = stripped.removeprefix("export ").strip()
+        if "=" not in stripped:
+            parse_errors.append(f"{rel(path)}:{lineno} is not KEY=value")
+            continue
+        key, value = stripped.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not re.match(r"^[A-Z][A-Z0-9_]*$", key):
+            parse_errors.append(f"{rel(path)}:{lineno} has invalid env key {key!r}")
+            continue
+        keys.add(key)
+        if value and not is_placeholder_secret_value(value):
+            valued_keys.add(key)
+        if key in DEPLOYMENT_SECRET_ENV_NAMES and value and not is_placeholder_secret_value(value):
+            secret_value_errors.append(f"{rel(path)}:{lineno} assigns a non-placeholder value to {key}")
+
+    return {
+        "path": rel(path),
+        "exists": True,
+        "keys": sorted(keys),
+        "valued_keys": sorted(valued_keys),
+        "secret_value_errors": secret_value_errors,
+        "parse_errors": parse_errors,
+    }
+
+
+def parse_env_file(path: Path) -> dict[str, Any]:
+    keys: set[str] = set()
+    valued_keys: set[str] = set()
+    parse_errors = []
+    if not path.exists():
+        return {"path": str(path), "exists": False, "keys": [], "valued_keys": [], "parse_errors": []}
+
+    for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if stripped.startswith("export "):
+            stripped = stripped.removeprefix("export ").strip()
+        if "=" not in stripped:
+            parse_errors.append(f"{path}:{lineno} is not KEY=value")
+            continue
+        key, value = stripped.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not re.match(r"^[A-Z][A-Z0-9_]*$", key):
+            parse_errors.append(f"{path}:{lineno} has invalid env key {key!r}")
+            continue
+        keys.add(key)
+        if value and not is_placeholder_secret_value(value):
+            valued_keys.add(key)
+
+    return {
+        "path": str(path),
+        "exists": True,
+        "keys": sorted(keys),
+        "valued_keys": sorted(valued_keys),
+        "parse_errors": parse_errors,
+    }
+
+
+def deployment_env_templates_data() -> dict[str, Any]:
+    templates = [parse_env_template(path) for path in DEPLOYMENT_TEMPLATE_PATHS.values()]
+    errors = [
+        error
+        for template in templates
+        for error in [*template["secret_value_errors"], *template["parse_errors"]]
+    ]
+    missing = [template["path"] for template in templates if not template["exists"]]
+    errors.extend(f"missing template: {path}" for path in missing)
+    return {
+        "ok": not errors,
+        "templates": templates,
+        "errors": errors,
+        "secret_names": sorted(DEPLOYMENT_SECRET_ENV_NAMES),
+    }
+
+
+def deployment_env_presence(
+    env: dict[str, str],
+    env_file: Path | None,
+) -> dict[str, Any]:
+    file_data = parse_env_file(env_file) if env_file else None
+    file_valued_keys = set(file_data.get("valued_keys", [])) if file_data else set()
+    statuses = []
+    for name in sorted(set(DEPLOYMENT_SECRET_ENV_NAMES + DEPLOYMENT_CONFIG_ENV_NAMES)):
+        present = (name in env and not is_placeholder_secret_value(str(env.get(name, "")))) or name in file_valued_keys
+        statuses.append({"name": name, "present": present, "detail": "set; value redacted" if present else "unset"})
+    return {"env_file": file_data, "statuses": statuses}
+
+
+def deployment_readiness_data(
+    profile: str,
+    env_file: str | None = None,
+    env: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    selected_env = dict(os.environ if env is None else env)
+    config = DEPLOYMENT_PROFILE_CONFIG.get(profile)
+    checks = []
+
+    def add_check(name: str, ok: bool, detail: str, severity: str = "required") -> None:
+        checks.append({"name": name, "ok": ok, "detail": detail, "severity": severity})
+
+    if not config:
+        return {
+            "ok": False,
+            "profile": profile,
+            "known_profiles": sorted(DEPLOYMENT_PROFILE_CONFIG),
+            "checks": [
+                {
+                    "name": "profile",
+                    "ok": False,
+                    "detail": f"unknown profile {profile!r}",
+                    "severity": "required",
+                }
+            ],
+            "missing_required": ["profile"],
+        }
+
+    template_path = DEPLOYMENT_TEMPLATE_PATHS[profile]
+    add_check("profile", True, f"{profile} targets {config['target_machine']}")
+    add_check("environment template", template_path.exists(), rel(template_path))
+
+    template_audit = deployment_env_templates_data()
+    add_check(
+        "templates do not commit secret values",
+        template_audit["ok"],
+        "all template secrets are blank or placeholders" if template_audit["ok"] else "; ".join(template_audit["errors"]),
+    )
+
+    for tool in config["required_tools"]:
+        found = shutil.which(tool)
+        add_check(f"tool:{tool}", bool(found), found or "missing")
+
+    for path_name in config["required_paths"]:
+        path = ROOT / path_name
+        add_check(f"path:{path_name}", path.exists(), "present" if path.exists() else "missing")
+
+    writable_targets = [ROOT / ".agent-runs" / "verifications", Path(tempfile.gettempdir())]
+    for path in writable_targets:
+        ok = path.exists() and os.access(path, os.W_OK)
+        add_check(f"writable:{rel(path)}", ok, "writable" if ok else "missing or not writable")
+
+    env_path = Path(env_file).expanduser() if env_file else None
+    env_presence = deployment_env_presence(selected_env, env_path)
+    if env_file:
+        file_data = env_presence["env_file"] or {}
+        add_check(
+            "env file",
+            bool(file_data.get("exists")) and not file_data.get("parse_errors"),
+            file_data.get("path", str(env_file)),
+        )
+
+    env_status_by_name = {item["name"]: item for item in env_presence["statuses"]}
+    for name in config["required_env"]:
+        status = env_status_by_name[name]
+        add_check(f"required env:{name}", bool(status["present"]), status["detail"])
+    for name in config["optional_env"]:
+        status = env_status_by_name[name]
+        add_check(f"optional env:{name}", True, status["detail"], severity="optional")
+
+    missing_required = [check["name"] for check in checks if check["severity"] == "required" and not check["ok"]]
+    return {
+        "ok": not missing_required,
+        "profile": profile,
+        "target_machine": config["target_machine"],
+        "template": rel(template_path),
+        "checks": checks,
+        "missing_required": missing_required,
+        "env": env_presence,
+        "credential_policy": "secret values are never emitted; local profile must pass with all service credentials unset",
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -3752,6 +4052,43 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = deployment_env_templates_data()
+    results.append(
+        {
+            "name": "deployment env templates do not commit credentials",
+            "ok": data["ok"],
+            "data": data,
+        }
+    )
+    data = deployment_readiness_data(profile="local", env={})
+    results.append(
+        {
+            "name": "local deployment readiness remains credential-free",
+            "ok": data["ok"] and not any(item["present"] for item in data["env"]["statuses"]),
+            "data": data,
+        }
+    )
+    with tempfile.TemporaryDirectory(prefix="awf-deployment-env-") as temp_dir:
+        env_file = Path(temp_dir) / "local.env"
+        env_file.write_text(
+            "\n".join(["LANGFUSE_SECRET_KEY=fixture-secret", "OPENAI_API_KEY=fixture-openai-key", ""]),
+            encoding="utf-8",
+        )
+        data = deployment_readiness_data(profile="local", env_file=str(env_file), env={})
+        serialized = json.dumps(data, sort_keys=True)
+        results.append(
+            {
+                "name": "deployment env file readiness accepts external secrets without printing values",
+                "ok": data["ok"]
+                and "fixture-secret" not in serialized
+                and "fixture-openai-key" not in serialized
+                and any(
+                    item["name"] == "LANGFUSE_SECRET_KEY" and item["detail"] == "set; value redacted"
+                    for item in data["env"]["statuses"]
+                ),
+                "data": data,
+            }
+        )
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()
