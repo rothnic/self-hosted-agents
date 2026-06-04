@@ -803,6 +803,113 @@ def deployment_readiness_data(
     }
 
 
+def deployment_startup_components(profile: str) -> list[dict[str, Any]]:
+    common_components = [
+        {
+            "name": "workflow-control-plane",
+            "kind": "repo-cli",
+            "startup_mode": "ready-by-repo-checkout",
+            "command": "uv run awf ready-work --json",
+            "evidence": [".beads/issues.jsonl", ".agent-runs/claims/", ".agent-runs/increments/"],
+        },
+        {
+            "name": "pydantic-ai-candidate-app",
+            "kind": "repo-cli",
+            "startup_mode": "cli-entrypoint-ready",
+            "command": (
+                "uv run python apps/pydantic-ai/run.py --fixture "
+                "packages/comparison/fixtures/pydantic-ai-decision-slice.json "
+                "--output .agent-runs/verifications/pydantic-ai-startup-run.json --pretty"
+            ),
+            "evidence": [
+                ".agent-runs/verifications/pydantic-ai-startup-run.json",
+                ".agent-runs/verifications/pydantic-ai-startup-run.trace.json",
+                ".agent-runs/verifications/pydantic-ai-startup-run.evaluation.json",
+            ],
+        },
+        {
+            "name": "dbos-durable-runtime",
+            "kind": "repo-cli",
+            "startup_mode": "sqlite-cli-entrypoint-ready",
+            "command": (
+                "uv run python apps/pydantic-ai/durable_smoke.py --fixture "
+                "packages/comparison/fixtures/pydantic-ai-decision-slice.json "
+                "--output .agent-runs/verifications/pydantic-ai-startup-durable.json "
+                "--db-path /tmp/pydantic-ai-startup-dbos.sqlite "
+                "--side-effect-log /tmp/pydantic-ai-startup-dbos-side-effect.jsonl --pretty"
+            ),
+            "evidence": [".agent-runs/verifications/pydantic-ai-startup-durable.json"],
+        },
+    ]
+    langfuse_component = {
+        "name": "self-hosted-langfuse",
+        "kind": "external-compose-service",
+        "startup_mode": "documented-equivalent",
+        "command": "cd ~/data/projects/langfuse && docker compose up -d",
+        "documentation": "docs/orchestration/self-hosted-langfuse.md",
+        "required_for_local_fixture": False,
+        "notes": "Not started by local fixture validation; service-backed proof is routed to later Goal 005 smoke work.",
+    }
+    if profile == "local":
+        return [*common_components, langfuse_component]
+    return [
+        *common_components,
+        {
+            **langfuse_component,
+            "required_for_service_backed_profile": True,
+            "notes": "Run on the selected controlled host with host-local secrets and private ingress.",
+        },
+    ]
+
+
+def deployment_startup_data(
+    profile: str,
+    env_file: str | None = None,
+    write: bool = False,
+    env: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    readiness = deployment_readiness_data(profile=profile, env_file=env_file, env=env)
+    generated_at = datetime.now(timezone.utc).isoformat()
+    profile_config = DEPLOYMENT_PROFILE_CONFIG.get(profile, {})
+    components = deployment_startup_components(profile) if profile_config else []
+    one_command = f"uv run awf deployment-startup --profile {profile} --write --json"
+    startup_mode = "one-command-local-manifest" if profile == "local" else "documented-service-equivalent"
+    manifest = {
+        "schema": "awf.deployment-startup.v1",
+        "generated_at": generated_at,
+        "profile": profile,
+        "target_machine": profile_config.get("target_machine"),
+        "startup_mode": startup_mode,
+        "one_command": one_command,
+        "readiness_ok": readiness["ok"],
+        "components": components,
+        "service_boundaries": "docs/deployment/service-boundaries.md",
+        "environment_readiness": "docs/deployment/environment-readiness.md",
+        "startup_docs": "docs/deployment/startup.md",
+        "credential_policy": readiness.get("credential_policy"),
+        "next_scope": "T006 runs the representative selected-stack smoke workflow; T005 only starts or documents startup.",
+    }
+    manifest_path = None
+    if write and readiness["ok"]:
+        path = ROOT / ".agent-runs" / "manifests" / f"deployment-startup-{profile}-{now_id('run')}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        manifest_path = rel(path)
+    return {
+        "ok": readiness["ok"],
+        "profile": profile,
+        "write": write,
+        "manifest": manifest,
+        "manifest_path": manifest_path,
+        "readiness": readiness,
+        "next_action": (
+            "commit startup manifest evidence or continue to smoke work"
+            if readiness["ok"]
+            else "satisfy missing readiness checks before startup"
+        ),
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4089,6 +4196,20 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "data": data,
             }
         )
+    data = deployment_startup_data(profile="local", env={}, write=False)
+    component_names = {item["name"] for item in data["manifest"]["components"]}
+    results.append(
+        {
+            "name": "local deployment startup exposes one-command manifest without service credentials",
+            "ok": data["ok"]
+            and data["manifest"]["startup_mode"] == "one-command-local-manifest"
+            and data["manifest"]["one_command"] == "uv run awf deployment-startup --profile local --write --json"
+            and data["manifest_path"] is None
+            and {"pydantic-ai-candidate-app", "dbos-durable-runtime", "self-hosted-langfuse"}.issubset(component_names)
+            and not any(item["present"] for item in data["readiness"]["env"]["statuses"]),
+            "data": data,
+        }
+    )
     code, data = repo_hygiene_result()
     results.append({"name": "root repo hygiene passes", "ok": code == 0, "data": data})
     code, data = workflow_state_lint_result()

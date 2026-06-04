@@ -1,0 +1,56 @@
+{
+  "components": [
+    {
+      "command": "uv run awf ready-work --json",
+      "evidence": [
+        ".beads/issues.jsonl",
+        ".agent-runs/claims/",
+        ".agent-runs/increments/"
+      ],
+      "kind": "repo-cli",
+      "name": "workflow-control-plane",
+      "startup_mode": "ready-by-repo-checkout"
+    },
+    {
+      "command": "uv run python apps/pydantic-ai/run.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-startup-run.json --pretty",
+      "evidence": [
+        ".agent-runs/verifications/pydantic-ai-startup-run.json",
+        ".agent-runs/verifications/pydantic-ai-startup-run.trace.json",
+        ".agent-runs/verifications/pydantic-ai-startup-run.evaluation.json"
+      ],
+      "kind": "repo-cli",
+      "name": "pydantic-ai-candidate-app",
+      "startup_mode": "cli-entrypoint-ready"
+    },
+    {
+      "command": "uv run python apps/pydantic-ai/durable_smoke.py --fixture packages/comparison/fixtures/pydantic-ai-decision-slice.json --output .agent-runs/verifications/pydantic-ai-startup-durable.json --db-path /tmp/pydantic-ai-startup-dbos.sqlite --side-effect-log /tmp/pydantic-ai-startup-dbos-side-effect.jsonl --pretty",
+      "evidence": [
+        ".agent-runs/verifications/pydantic-ai-startup-durable.json"
+      ],
+      "kind": "repo-cli",
+      "name": "dbos-durable-runtime",
+      "startup_mode": "sqlite-cli-entrypoint-ready"
+    },
+    {
+      "command": "cd ~/data/projects/langfuse && docker compose up -d",
+      "documentation": "docs/orchestration/self-hosted-langfuse.md",
+      "kind": "external-compose-service",
+      "name": "self-hosted-langfuse",
+      "notes": "Not started by local fixture validation; service-backed proof is routed to later Goal 005 smoke work.",
+      "required_for_local_fixture": false,
+      "startup_mode": "documented-equivalent"
+    }
+  ],
+  "credential_policy": "secret values are never emitted; local profile must pass with all service credentials unset",
+  "environment_readiness": "docs/deployment/environment-readiness.md",
+  "generated_at": "2026-06-04T04:11:11.839167+00:00",
+  "next_scope": "T006 runs the representative selected-stack smoke workflow; T005 only starts or documents startup.",
+  "one_command": "uv run awf deployment-startup --profile local --write --json",
+  "profile": "local",
+  "readiness_ok": true,
+  "schema": "awf.deployment-startup.v1",
+  "service_boundaries": "docs/deployment/service-boundaries.md",
+  "startup_docs": "docs/deployment/startup.md",
+  "startup_mode": "one-command-local-manifest",
+  "target_machine": "MacBook"
+}

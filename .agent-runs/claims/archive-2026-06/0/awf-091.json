@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T04:08:24.223762+00:00",
+  "id": "awf-091",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:10.270655Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:02.464407Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-091",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:29.409588Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-is8",
+        "issue_id": "awf-091",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T005\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T005",
+    "id": "awf-091",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile",
+    "updated_at": "2026-06-04T03:09:02.464698Z"
+  },
+  "worker_branch": "codex/awf-091-add-or-document-one-command-local-startu",
+  "worker_id": "codex-goal005-t005",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-091-add-or-document-one-command-local-startu",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-091-add-or-document-one-command-local-startu ../self-hosted-agents-worktrees/awf-091-add-or-document-one-command-local-startu <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-091-add-or-document-one-command-local-startu && git status --short --branch"
+  }
+}

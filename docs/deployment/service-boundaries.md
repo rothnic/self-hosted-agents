@@ -8,8 +8,9 @@ Acceptance command: `uv run awf workflow-fixture-test`
 
 This document names the service boundaries, ports, volumes, storage paths, secrets, and target machines for the
 selected self-hosted stack. It extends `docs/deployment/profiles.md` and is paired with
-`docs/deployment/environment-readiness.md` for environment templates and readiness checks. Startup automation, smoke
-commands, and runbooks are routed to later Goal 005 tickets.
+`docs/deployment/environment-readiness.md` for environment templates and readiness checks plus
+`docs/deployment/startup.md` for startup commands and documented service equivalents. Smoke commands and runbooks are
+routed to later Goal 005 tickets.
 
 ## Boundary Rules
 
@@ -140,7 +141,7 @@ Fixture validation must pass when all observability, durable storage, and model-
 ## Deferred Work
 
 - T004 added environment templates and readiness checks for these names and paths.
-- T005 adds or documents startup for the selected profile.
+- T005 added or documented startup for the selected profile.
 - T006-T008 add smoke commands, service-backed evidence, and credential-free fallback proof.
 - T009-T012 add backup, restore, reset, diagnostics, recovery, operating burden, and rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

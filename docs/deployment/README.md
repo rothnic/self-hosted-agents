@@ -10,6 +10,7 @@ Start here when an agent needs the deployment profile, target machine, or operat
 - `profiles.md`: local, development-server, and production-like deployment profiles.
 - `service-boundaries.md`: service boundaries, ports, volumes, secret names, storage paths, and target machines.
 - `environment-readiness.md`: environment templates and the `awf deployment-readiness` credential-free readiness check.
+- `startup.md`: one-command local startup and documented service-backed startup equivalents.
 
 ## Current Profile Recommendation
 
@@ -27,5 +28,6 @@ production promotion until backup, restore, reset, health, trace, recovery, and 
 - Deployment profiles define topology and assumptions.
 - Service boundaries define the current port, volume, secret-name, storage-path, and target-machine map.
 - Environment readiness defines credential-free templates and prerequisite checks.
-- Later Goal 005 tickets add startup commands, smoke commands, runbooks, and rehearsal evidence.
+- Startup defines the local one-command manifest and service-backed equivalent commands.
+- Later Goal 005 tickets add smoke commands, runbooks, and rehearsal evidence.
 - Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.
