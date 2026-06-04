@@ -19,6 +19,7 @@ local UI.
   routing.
 - `branch-pr-status.md`: branch and PR status integration with repo-local fallback when GitHub access is unavailable.
 - `trace-eval-links.md`: trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence.
+- `handoff-summary.md`: concise local-session and scheduled-agent handoff summaries with exact artifact handles.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -44,4 +45,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T012 should add concise daily or session handoff summaries for scheduled agents and local sessions.
+T013 should decide whether the workbench remains CLI/static or becomes a local UI.

@@ -1,0 +1,96 @@
+{
+  "audience": "session",
+  "copy_ready": [
+    "Branch `codex/pydantic-ai-fixture-scaffold` at `da87d9c`.",
+    "Goal `006-operator-workbench-review-ux`, spec `007-operator-workbench-review-ux`, phase `Goal 006`.",
+    "Next owner `implementer` continues `awf-xwm`: Add concise daily or session handoff summaries for scheduled agents and local sessions.",
+    "Claim path: `.agent-runs/claims/awf-xwm.json`.",
+    "Validation: `uv run awf workflow-fixture-test`.",
+    "Review gate human-required count: `0`.",
+    "Repo health ok: `True`; work queue source: `beads`.",
+    "Use presenter evidence plus independent reviewer acceptance or rejection for goal evidence."
+  ],
+  "current_state": {
+    "branch": "codex/pydantic-ai-fixture-scaffold",
+    "commit": "da87d9c",
+    "goal": "006-operator-workbench-review-ux",
+    "health_ok": true,
+    "human_required_count": 0,
+    "phase": "Goal 006",
+    "review_gate_state": "accepted",
+    "spec_id": "007-operator-workbench-review-ux"
+  },
+  "exact_artifact_handles": {
+    "branch_pr": "https://github.com/rothnic/self-hosted-agents/pull/12",
+    "claims": [
+      ".agent-runs/claims/awf-xwm.json"
+    ],
+    "eval_links": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json"
+    ],
+    "next_work_source": [
+      "specs/007-operator-workbench-review-ux/tasks.md#T012"
+    ],
+    "presenter_reports": [
+      ".agent-runs/reports/workbench/operator-status-20260604T095811Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T095248Z.json",
+      ".agent-runs/reports/workbench/trace-eval-links-20260604T095246Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T093355Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T092651Z.json"
+    ],
+    "reviewer_reports": [
+      ".agent-runs/reports/goal-006/t011-trace-eval-links-20260604.md",
+      ".agent-runs/reports/goal-006/t010-branch-pr-status-20260604.md",
+      ".agent-runs/reports/goal-006/t009-review-decisions-20260604.md",
+      ".agent-runs/reports/goal-006/t008-review-actions-20260604.md",
+      ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md"
+    ],
+    "status_command": "uv run awf operator-status --write --json",
+    "trace_links": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json"
+    ]
+  },
+  "generated_at": "2026-06-04T10:10:39.445112+00:00",
+  "generated_by": "uv run awf handoff-summary --audience session --json",
+  "local_session": {
+    "first_command": "uv run awf operator-status --json",
+    "resume_prompt": "Continue `awf-xwm` in `006-operator-workbench-review-ux` after reading `uv run awf operator-status --json` and the claim path."
+  },
+  "next_work": {
+    "claim_path": ".agent-runs/claims/awf-xwm.json",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+    "id": "awf-xwm",
+    "status": "open",
+    "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions",
+    "worker_id": "codex-goal006-t012"
+  },
+  "purpose": "reduce context bloat while preserving exact artifact handles",
+  "risks": [],
+  "scheduled_agent": {
+    "first_command": "uv run awf handoff-summary --json",
+    "resume_prompt": "Read the handoff summary and operator status, then continue the claimed ticket or route ready work without relying on prior chat context."
+  },
+  "schema": "awf.operator-workbench.handoff-summary.v1",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false,
+    "fallback": "repo-local status, Beads, claims, reports, traces, evals, and PR fallback"
+  },
+  "summary_line_count": 8,
+  "validation": {
+    "commands": [
+      "uv run awf workflow-fixture-test",
+      "uv run awf verify --profile ticket --json"
+    ],
+    "latest_status": {
+      "acceptance": "not_run_by_operator_status",
+      "repo_hygiene": true,
+      "review_gate": true,
+      "workflow_state_lint": true
+    }
+  }
+}

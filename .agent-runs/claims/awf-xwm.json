@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T10:05:38.736947+00:00",
+  "id": "awf-xwm",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:03.269594Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:45.644068Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-diw",
+        "issue_id": "awf-xwm",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:34.513345Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-xwm",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T012\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+    "id": "awf-xwm",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions",
+    "updated_at": "2026-06-04T06:39:45.644361Z"
+  },
+  "worker_branch": "codex/awf-xwm-add-concise-daily-or-session-handoff-sum",
+  "worker_id": "codex-goal006-t012",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-xwm-add-concise-daily-or-session-handoff-sum",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-xwm-add-concise-daily-or-session-handoff-sum ../self-hosted-agents-worktrees/awf-xwm-add-concise-daily-or-session-handoff-sum <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-xwm-add-concise-daily-or-session-handoff-sum && git status --short --branch"
+  }
+}

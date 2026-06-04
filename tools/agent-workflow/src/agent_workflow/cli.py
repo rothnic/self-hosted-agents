@@ -366,6 +366,30 @@ def trace_eval_links(
     raise typer.Exit(0 if data["repo_local_trace_links"] or data["repo_local_eval_links"] else 1)
 
 
+@app.command("handoff-summary")
+def handoff_summary(
+    audience: str = typer.Option(
+        "session",
+        "--audience",
+        help="Target audience: session, daily, or scheduled.",
+    ),
+    write: bool = typer.Option(False, "--write", help="Write a repo-local handoff summary artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report concise session or scheduled-agent handoff summaries."""
+    data = core.handoff_summary_data(audience=audience, write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=bool(data["copy_ready"]) and data["self_hosted"]["external_service_required"] is False,
+            command="handoff-summary",
+            summary="Handoff summary.",
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["copy_ready"] else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

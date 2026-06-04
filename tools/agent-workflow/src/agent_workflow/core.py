@@ -3016,6 +3016,172 @@ def operator_workbench_trace_eval_links_data() -> dict[str, Any]:
     }
 
 
+def compact_handoff_work_item(status: dict[str, Any]) -> dict[str, Any]:
+    next_ticket = status.get("handoff", {}).get("next_ticket")
+    active_claims = status.get("work_queue", {}).get("active_claims", [])
+    ready_items = status.get("work_queue", {}).get("ready", [])
+    matching_claim = next((claim for claim in active_claims if claim.get("id") == next_ticket), None)
+    matching_ready = next((item for item in ready_items if item.get("id") == next_ticket), None)
+    source = matching_claim or matching_ready or {}
+    issue = source.get("issue") if isinstance(source.get("issue"), dict) else {}
+    return {
+        "id": source.get("id") or issue.get("id") or next_ticket,
+        "title": issue.get("title") or source.get("title"),
+        "status": issue.get("status") or source.get("status") or ("claimed" if matching_claim else "ready"),
+        "external_ref": issue.get("external_ref") or source.get("external_ref"),
+        "claim_path": matching_claim.get("path") if matching_claim else None,
+        "worker_id": matching_claim.get("worker_id") if matching_claim else None,
+    }
+
+
+def handoff_summary_from_status(status: dict[str, Any], audience: str = "session") -> dict[str, Any]:
+    handoff = status.get("handoff", {})
+    scope = status.get("scope", {})
+    health = status.get("health", {})
+    branch_pr = status.get("branch_pr", {})
+    work_queue = status.get("work_queue", {})
+    evidence_map = status.get("evidence_map", {})
+    next_work = compact_handoff_work_item(status)
+    validation_commands = handoff.get("validation_commands", [])
+    claim_paths = [item.get("path") for item in work_queue.get("active_claims", []) if item.get("path")]
+    presenter_reports = evidence_map.get("presenter_reports", [])[:5]
+    reviewer_reports = evidence_map.get("reviewer_reports", [])[:5]
+    trace_links = [
+        item.get("path")
+        for item in status.get("trace_eval", {}).get("repo_local_trace_links", [])[:3]
+        if item.get("path")
+    ]
+    eval_links = [
+        item.get("path")
+        for item in status.get("trace_eval", {}).get("repo_local_eval_links", [])[:3]
+        if item.get("path")
+    ]
+    copy_ready = [
+        f"Branch `{scope.get('branch')}` at `{scope.get('commit')}`.",
+        f"Goal `{scope.get('goal')}`, spec `{scope.get('spec_id')}`, phase `{scope.get('phase')}`.",
+        f"Next owner `{handoff.get('next_role')}` continues `{next_work.get('id')}`: {next_work.get('title')}.",
+        f"Claim path: `{next_work.get('claim_path') or 'none'}`.",
+        f"Validation: `{validation_commands[0] if validation_commands else 'uv run awf workflow-fixture-test'}`.",
+        f"Review gate human-required count: `{status.get('review_gate', {}).get('human_required_count')}`.",
+        f"Repo health ok: `{health.get('ok')}`; work queue source: `{work_queue.get('source')}`.",
+        "Use presenter evidence plus independent reviewer acceptance or rejection for goal evidence.",
+    ]
+    return {
+        "schema": "awf.operator-workbench.handoff-summary.v1",
+        "generated_at": status.get("generated_at") or datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf handoff-summary --json",
+        "audience": audience,
+        "purpose": "reduce context bloat while preserving exact artifact handles",
+        "summary_line_count": len(copy_ready),
+        "copy_ready": copy_ready,
+        "current_state": {
+            "branch": scope.get("branch"),
+            "commit": scope.get("commit"),
+            "goal": scope.get("goal"),
+            "spec_id": scope.get("spec_id"),
+            "phase": scope.get("phase"),
+            "health_ok": health.get("ok"),
+            "review_gate_state": status.get("review_gate", {}).get("state"),
+            "human_required_count": status.get("review_gate", {}).get("human_required_count"),
+        },
+        "next_work": next_work,
+        "validation": {
+            "commands": validation_commands,
+            "latest_status": {
+                "repo_hygiene": health.get("repo_hygiene"),
+                "workflow_state_lint": health.get("workflow_state_lint"),
+                "review_gate": health.get("review_gate"),
+                "acceptance": health.get("acceptance"),
+            },
+        },
+        "risks": handoff.get("risks", []),
+        "exact_artifact_handles": {
+            "claims": claim_paths,
+            "next_work_source": [next_work.get("external_ref")] if next_work.get("external_ref") else [],
+            "presenter_reports": presenter_reports,
+            "reviewer_reports": reviewer_reports,
+            "trace_links": trace_links,
+            "eval_links": eval_links,
+            "branch_pr": branch_pr.get("pr_url") or branch_pr.get("fallback"),
+            "status_command": "uv run awf operator-status --write --json",
+        },
+        "local_session": {
+            "resume_prompt": (
+                f"Continue `{next_work.get('id')}` in `{scope.get('goal')}` after reading "
+                "`uv run awf operator-status --json` and the claim path."
+            ),
+            "first_command": "uv run awf operator-status --json",
+        },
+        "scheduled_agent": {
+            "resume_prompt": (
+                "Read the handoff summary and operator status, then continue the claimed ticket or route ready work "
+                "without relying on prior chat context."
+            ),
+            "first_command": "uv run awf handoff-summary --json",
+        },
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "repo-local status, Beads, claims, reports, traces, evals, and PR fallback",
+        },
+    }
+
+
+def handoff_summary_data(audience: str = "session", write: bool = False) -> dict[str, Any]:
+    if audience not in {"session", "daily", "scheduled"}:
+        audience = "session"
+    status = operator_status_data(write=False)
+    data = handoff_summary_from_status(status, audience=audience)
+    data["generated_by"] = f"uv run awf handoff-summary --audience {audience} --json"
+    if write:
+        data["path"] = write_json_artifact("reports/workbench", f"handoff-summary-{audience}", data)
+    return data
+
+
+def operator_workbench_handoff_summary_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "handoff-summary.md"
+    docs_text = read_text(docs_path)
+    preview = handoff_summary_data(audience="session", write=False)
+    scheduled_preview = handoff_summary_data(audience="scheduled", write=False)
+    required_terms = [
+        "awf.operator-workbench.handoff-summary.v1",
+        "uv run awf handoff-summary",
+        "local sessions",
+        "scheduled agents",
+        "exact artifact handles",
+        "credential-free",
+        "context bloat",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "preview schema", "ok": preview["schema"] == "awf.operator-workbench.handoff-summary.v1", "detail": ""},
+        {"name": "copy ready concise", "ok": 1 <= preview["summary_line_count"] <= 10, "detail": preview["summary_line_count"]},
+        {"name": "session prompt", "ok": bool(preview["local_session"]["resume_prompt"]), "detail": ""},
+        {"name": "scheduled prompt", "ok": bool(scheduled_preview["scheduled_agent"]["resume_prompt"]), "detail": ""},
+        {
+            "name": "exact handles",
+            "ok": bool(preview["exact_artifact_handles"]["claims"])
+            or bool(preview["exact_artifact_handles"]["next_work_source"]),
+            "detail": "",
+        },
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.handoff-summary.v1",
+        "preview": preview,
+        "scheduled_preview": scheduled_preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -3108,6 +3274,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "docs/workbench/goal-dashboard.md",
                 "docs/workbench/increment-dashboard.md",
                 "docs/workbench/evidence-view.md",
+                "docs/workbench/handoff-summary.md",
                 "docs/workbench/status-artifact-schema.md",
                 ".beads/issues.jsonl",
                 ".agent-runs/claims/",
@@ -3230,6 +3397,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "increment_path": increment.get("path"),
         },
     }
+    data["handoff_summary"] = handoff_summary_from_status(data, audience="session")
     if write:
         data["path"] = write_json_artifact("reports/workbench", "operator-status", data)
     return data
@@ -5098,6 +5266,7 @@ def compact_claim_item(claim: dict[str, Any]) -> dict[str, Any]:
     issue_context = issue or work
     return {
         "id": claim.get("id"),
+        "path": claim.get("path"),
         "worker_id": claim.get("worker_id"),
         "worker_branch": claim.get("worker_branch"),
         "worktree_path": claim.get("worktree_path"),
@@ -6780,6 +6949,25 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_handoff_summary_data()
+    results.append(
+        {
+            "name": "operator workbench handoff summaries are concise and artifact-linked",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/handoff-summary.md"
+            and data["schema"] == "awf.operator-workbench.handoff-summary.v1"
+            and data["preview"]["summary_line_count"] <= 10
+            and bool(data["preview"]["copy_ready"])
+            and (
+                bool(data["preview"]["exact_artifact_handles"]["claims"])
+                or bool(data["preview"]["exact_artifact_handles"]["next_work_source"])
+            )
+            and data["preview"]["local_session"]["first_command"] == "uv run awf operator-status --json"
+            and data["scheduled_preview"]["scheduled_agent"]["first_command"] == "uv run awf handoff-summary --json"
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -6810,6 +6998,12 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["review_gate"]["human_required_count"] == 0
             and data["health"]["acceptance"] == "not_run_by_operator_status"
             and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
+            and data["handoff_summary"]["schema"] == "awf.operator-workbench.handoff-summary.v1"
+            and data["handoff_summary"]["summary_line_count"] <= 10
+            and (
+                bool(data["handoff_summary"]["exact_artifact_handles"]["claims"])
+                or bool(data["handoff_summary"]["exact_artifact_handles"]["next_work_source"])
+            )
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
@@ -6824,7 +7018,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
             and dashboard["current_phase"]["next_task"]["id"]
-            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012"}
+            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -6881,7 +7075,15 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx", "awf-diw", "awf-xwm"}
+            and evidence_view["target"]["ticket_id"] in {
+                "awf-yu8",
+                "awf-3c5",
+                "awf-09s",
+                "awf-1cx",
+                "awf-diw",
+                "awf-xwm",
+                "awf-s6n",
+            }
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1
