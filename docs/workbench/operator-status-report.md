@@ -40,6 +40,7 @@ The report is generated from:
 - `branch_pr`: branch, commit, upstream, GitHub PR metadata when available, and repo-local fallback when unavailable.
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.
 - `handoff_summary`: concise local-session and scheduled-agent prompts with exact artifact handles.
+- `interface_decision`: selected CLI/static interface decision plus local UI deferral rationale.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.
 
 ## Self-Hosted Behavior

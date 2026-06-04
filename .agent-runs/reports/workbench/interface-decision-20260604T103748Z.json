@@ -1,0 +1,74 @@
+{
+  "boundaries": [
+    "No local UI is implemented by T013.",
+    "A future UI can be reopened only with evidence that it improves operations without hiding repo artifacts.",
+    "CLI/static workflows remain mandatory for automation and testability."
+  ],
+  "criteria": {
+    "accessibility_small_screen": "cli-static-for-now",
+    "automation_compatibility": "cli-static",
+    "operating_burden": "cli-static",
+    "self_hosting_requirements": "cli-static",
+    "source_of_truth_preservation": "cli-static"
+  },
+  "decision": "cli-static",
+  "decision_status": "selected-for-goal-006",
+  "downstream_routing": {
+    "t014_selected_interface": "Implement the selected CLI/static interface with restrained operating-tool design.",
+    "t015_accessibility_small_screen": "Document why CLI/static remains selected instead of adding UI-only checks.",
+    "t016_scheduled_agents": "Document scheduled-agent usage of workbench artifacts without a fragile UI dependency."
+  },
+  "generated_at": "2026-06-04T10:37:48.828932+00:00",
+  "generated_by": "uv run awf interface-decision --write --json",
+  "options": [
+    {
+      "accessibility_small_screen": "text artifacts are inspectable in terminal, editor, PR, or static renderer",
+      "automation_compatibility": "high",
+      "id": "cli-static",
+      "label": "CLI/static repo artifacts",
+      "operating_burden": "low",
+      "risks": [
+        "less interactive than a UI",
+        "requires disciplined artifact links and concise summaries"
+      ],
+      "selected": true,
+      "self_hosting_requirements": [
+        "repo checkout",
+        "uv run awf commands",
+        "committed .agent-runs artifacts"
+      ]
+    },
+    {
+      "accessibility_small_screen": "would require dedicated accessibility and small-screen checks before acceptance",
+      "automation_compatibility": "medium",
+      "id": "local-ui",
+      "label": "Local web or terminal UI",
+      "operating_burden": "medium",
+      "risks": [
+        "can hide source artifacts",
+        "can bypass CLI workflows",
+        "adds fragile runtime dependency"
+      ],
+      "selected": false,
+      "self_hosting_requirements": [
+        "UI runtime",
+        "asset build or server process",
+        "visual verification"
+      ]
+    }
+  ],
+  "path": ".agent-runs/reports/workbench/interface-decision-20260604T103748Z.json",
+  "rationale": [
+    "Existing CLI/static artifacts already expose status, goals, increment state, evidence, review actions, branch/PR state, trace/eval links, and handoffs.",
+    "A local UI would add implementation, accessibility, small-screen, runtime, and maintenance work before evidence shows it improves operations.",
+    "Scheduled agents can consume CLI/static artifacts directly without a running UI or hidden chat context.",
+    "Deterministic validation remains credential-free and does not depend on hosted services, GitHub, or UI runtime state."
+  ],
+  "schema": "awf.operator-workbench.interface-decision.v1",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false,
+    "fallback": "repo-local CLI/static artifacts remain the selected interface"
+  },
+  "summary": "Keep the Goal 006 workbench CLI/static and repo-backed instead of adding a local UI now."
+}

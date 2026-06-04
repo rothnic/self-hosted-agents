@@ -390,6 +390,25 @@ def handoff_summary(
     raise typer.Exit(0 if data["copy_ready"] else 1)
 
 
+@app.command("interface-decision")
+def interface_decision(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local interface decision artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report whether the workbench remains CLI/static or becomes a local UI."""
+    data = core.interface_decision_data(write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["decision"] == "cli-static" and data["self_hosted"]["external_service_required"] is False,
+            command="interface-decision",
+            summary=data["summary"],
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["decision"] else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

@@ -20,6 +20,7 @@ local UI.
 - `branch-pr-status.md`: branch and PR status integration with repo-local fallback when GitHub access is unavailable.
 - `trace-eval-links.md`: trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence.
 - `handoff-summary.md`: concise local-session and scheduled-agent handoff summaries with exact artifact handles.
+- `interface-decision.md`: decision record selecting CLI/static workbench artifacts instead of a local UI for Goal 006.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -29,8 +30,8 @@ local UI.
 
 ## Current Boundary
 
-The first workbench surface should be CLI/static and generated from repo state. A local web or terminal UI is a later
-interface decision, not a requirement for the first status proof.
+The selected Goal 006 workbench surface is CLI/static and generated from repo state. A local web or terminal UI is not
+part of this goal unless a later reviewed decision reopens the interface choice with stronger evidence.
 
 The workbench must not replace source-of-truth artifacts. It should summarize and link to objectives, goals, specs,
 Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run reports, and reviewer decisions.
@@ -45,4 +46,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T013 should decide whether the workbench remains CLI/static or becomes a local UI.
+T014 should implement the selected CLI/static interface with restrained operating-tool design.

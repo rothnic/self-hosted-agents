@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T10:24:15.431017+00:00",
+  "id": "awf-s6n",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:03.586039Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:46.321484Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-xwm",
+        "issue_id": "awf-s6n",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:35.622481Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-s6n",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T013\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+    "id": "awf-s6n",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Decide whether the workbench remains CLI/static or becomes a local UI",
+    "updated_at": "2026-06-04T06:39:46.321849Z"
+  },
+  "worker_branch": "codex/awf-s6n-decide-whether-the-workbench-remains-cli",
+  "worker_id": "codex-goal006-t013",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-s6n-decide-whether-the-workbench-remains-cli",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-s6n-decide-whether-the-workbench-remains-cli ../self-hosted-agents-worktrees/awf-s6n-decide-whether-the-workbench-remains-cli <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-s6n-decide-whether-the-workbench-remains-cli && git status --short --branch"
+  }
+}

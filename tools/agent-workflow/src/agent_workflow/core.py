@@ -279,6 +279,7 @@ def write_json_artifact(directory: str, prefix: str, data: dict[str, Any]) -> st
     path_dir = ROOT / ".agent-runs" / directory
     path_dir.mkdir(parents=True, exist_ok=True)
     path = path_dir / f"{now_id(prefix)}.json"
+    data["path"] = rel(path)
     path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return rel(path)
 
@@ -3182,6 +3183,117 @@ def operator_workbench_handoff_summary_data() -> dict[str, Any]:
     }
 
 
+def interface_decision_data(write: bool = False) -> dict[str, Any]:
+    data = {
+        "schema": "awf.operator-workbench.interface-decision.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf interface-decision --json",
+        "decision": "cli-static",
+        "decision_status": "selected-for-goal-006",
+        "summary": "Keep the Goal 006 workbench CLI/static and repo-backed instead of adding a local UI now.",
+        "rationale": [
+            "Existing CLI/static artifacts already expose status, goals, increment state, evidence, review "
+            "actions, branch/PR state, trace/eval links, and handoffs.",
+            "A local UI would add implementation, accessibility, small-screen, runtime, and maintenance work "
+            "before evidence shows it improves operations.",
+            "Scheduled agents can consume CLI/static artifacts directly without a running UI or hidden chat context.",
+            "Deterministic validation remains credential-free and does not depend on hosted services, GitHub, or UI runtime state.",
+        ],
+        "options": [
+            {
+                "id": "cli-static",
+                "label": "CLI/static repo artifacts",
+                "selected": True,
+                "operating_burden": "low",
+                "self_hosting_requirements": ["repo checkout", "uv run awf commands", "committed .agent-runs artifacts"],
+                "automation_compatibility": "high",
+                "accessibility_small_screen": "text artifacts are inspectable in terminal, editor, PR, or static renderer",
+                "risks": ["less interactive than a UI", "requires disciplined artifact links and concise summaries"],
+            },
+            {
+                "id": "local-ui",
+                "label": "Local web or terminal UI",
+                "selected": False,
+                "operating_burden": "medium",
+                "self_hosting_requirements": ["UI runtime", "asset build or server process", "visual verification"],
+                "automation_compatibility": "medium",
+                "accessibility_small_screen": "would require dedicated accessibility and small-screen checks before acceptance",
+                "risks": ["can hide source artifacts", "can bypass CLI workflows", "adds fragile runtime dependency"],
+            },
+        ],
+        "criteria": {
+            "operating_burden": "cli-static",
+            "self_hosting_requirements": "cli-static",
+            "accessibility_small_screen": "cli-static-for-now",
+            "automation_compatibility": "cli-static",
+            "source_of_truth_preservation": "cli-static",
+        },
+        "downstream_routing": {
+            "t014_selected_interface": "Implement the selected CLI/static interface with restrained operating-tool design.",
+            "t015_accessibility_small_screen": "Document why CLI/static remains selected instead of adding UI-only checks.",
+            "t016_scheduled_agents": "Document scheduled-agent usage of workbench artifacts without a fragile UI dependency.",
+        },
+        "boundaries": [
+            "No local UI is implemented by T013.",
+            "A future UI can be reopened only with evidence that it improves operations without hiding repo artifacts.",
+            "CLI/static workflows remain mandatory for automation and testability.",
+        ],
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "repo-local CLI/static artifacts remain the selected interface",
+        },
+    }
+    if write:
+        data["generated_by"] = "uv run awf interface-decision --write --json"
+        data["path"] = write_json_artifact("reports/workbench", "interface-decision", data)
+    return data
+
+
+def operator_workbench_interface_decision_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "interface-decision.md"
+    docs_text = read_text(docs_path)
+    preview = interface_decision_data(write=False)
+    required_terms = [
+        "awf.operator-workbench.interface-decision.v1",
+        "uv run awf interface-decision",
+        "CLI/static",
+        "local UI",
+        "operating burden",
+        "self-hosting requirements",
+        "accessibility",
+        "small-screen",
+        "automation compatibility",
+        "credential-free",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "preview schema", "ok": preview["schema"] == "awf.operator-workbench.interface-decision.v1", "detail": ""},
+        {"name": "selected cli static", "ok": preview["decision"] == "cli-static", "detail": preview["decision"]},
+        {
+            "name": "local ui not selected",
+            "ok": not any(item["id"] == "local-ui" and item["selected"] for item in preview["options"]),
+            "detail": "",
+        },
+        {"name": "criteria", "ok": set(preview["criteria"]) >= {"operating_burden", "automation_compatibility"}, "detail": ""},
+        {"name": "downstream routing", "ok": bool(preview["downstream_routing"]["t014_selected_interface"]), "detail": ""},
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.interface-decision.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -3275,6 +3387,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "docs/workbench/increment-dashboard.md",
                 "docs/workbench/evidence-view.md",
                 "docs/workbench/handoff-summary.md",
+                "docs/workbench/interface-decision.md",
                 "docs/workbench/status-artifact-schema.md",
                 ".beads/issues.jsonl",
                 ".agent-runs/claims/",
@@ -3398,7 +3511,9 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         },
     }
     data["handoff_summary"] = handoff_summary_from_status(data, audience="session")
+    data["interface_decision"] = interface_decision_data(write=False)
     if write:
+        data["generated_by"] = "uv run awf operator-status --write --json"
         data["path"] = write_json_artifact("reports/workbench", "operator-status", data)
     return data
 
@@ -6968,6 +7083,20 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_interface_decision_data()
+    results.append(
+        {
+            "name": "operator workbench interface decision selects CLI static",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/interface-decision.md"
+            and data["schema"] == "awf.operator-workbench.interface-decision.v1"
+            and data["preview"]["decision"] == "cli-static"
+            and not any(item["id"] == "local-ui" and item["selected"] for item in data["preview"]["options"])
+            and bool(data["preview"]["downstream_routing"]["t014_selected_interface"])
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -7004,6 +7133,9 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 bool(data["handoff_summary"]["exact_artifact_handles"]["claims"])
                 or bool(data["handoff_summary"]["exact_artifact_handles"]["next_work_source"])
             )
+            and data["interface_decision"]["schema"] == "awf.operator-workbench.interface-decision.v1"
+            and data["interface_decision"]["decision"] == "cli-static"
+            and data["interface_decision"]["self_hosted"]["external_service_required"] is False
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
@@ -7018,7 +7150,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
             and dashboard["current_phase"]["next_task"]["id"]
-            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013"}
+            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -7083,6 +7215,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "awf-diw",
                 "awf-xwm",
                 "awf-s6n",
+                "awf-1f9",
             }
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
