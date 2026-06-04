@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T11:44:56.884296+00:00",
+  "id": "awf-mtv",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:05.039867Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:48.931249Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-svr",
+        "issue_id": "awf-mtv",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:40.002441Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-mtv",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T017\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+    "id": "awf-mtv",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection",
+    "updated_at": "2026-06-04T06:39:48.931617Z"
+  },
+  "worker_branch": "codex/awf-mtv-present-goal-006-workbench-evidence-and",
+  "worker_id": "codex-goal006-t017",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-mtv-present-goal-006-workbench-evidence-and",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-mtv-present-goal-006-workbench-evidence-and ../self-hosted-agents-worktrees/awf-mtv-present-goal-006-workbench-evidence-and <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-mtv-present-goal-006-workbench-evidence-and && git status --short --branch"
+  }
+}

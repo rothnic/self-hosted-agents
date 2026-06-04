@@ -33,4 +33,4 @@
 
 ## Goal 006 Phase 5: Acceptance
 
-- [ ] T017 [US3] Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection
+- [X] T017 [US3] Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection

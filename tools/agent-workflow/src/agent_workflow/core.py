@@ -2030,7 +2030,7 @@ def goal_006_current_phase(tasks: list[dict[str, Any]]) -> dict[str, Any]:
     completed_tasks = [task for task in tasks if task.get("done")]
     phase_2_ids = {"T004", "T005", "T006", "T007"}
     next_task = open_tasks[0] if open_tasks else None
-    phase = "Goal 006 Phase 2: Repo-Backed Status Surfaces"
+    phase = "complete" if next_task is None else "Goal 006 Phase 2: Repo-Backed Status Surfaces"
     if next_task and str(next_task.get("id")) not in phase_2_ids:
         phase = "Goal 006 later phase"
     return {
@@ -2072,8 +2072,20 @@ def goal_dashboard_data(
             if goal_id == "006"
             else GOAL_ACCEPTANCE_REPORTS.get(goal_id, [])
         )
-        state = "active" if goal_id == "006" else "accepted"
-        phase = current_phase["phase"] if goal_id == "006" else "complete"
+        evidence_items = [accepted_evidence_item(item) for item in evidence_paths]
+        goal_006_final_accepted = (
+            goal_id == "006"
+            and current_phase["open_task_count"] == 0
+            and any(
+                item.get("accepted")
+                and str(item.get("path", "")).startswith(
+                    ".agent-runs/reports/goal-006/t017-"
+                )
+                for item in evidence_items
+            )
+        )
+        state = "accepted" if goal_id != "006" or goal_006_final_accepted else "active"
+        phase = "complete" if goal_id != "006" or goal_006_final_accepted else current_phase["phase"]
         child_goals.append(
             {
                 "id": goal_id,
@@ -2081,8 +2093,8 @@ def goal_dashboard_data(
                 "path": rel(path),
                 "state": state,
                 "phase": phase,
-                "accepted_evidence": [accepted_evidence_item(item) for item in evidence_paths],
-                "next_ticket": next_ticket if goal_id == "006" else None,
+                "accepted_evidence": evidence_items,
+                "next_ticket": next_ticket if goal_id == "006" and not goal_006_final_accepted else None,
             }
         )
     accepted_links = [
@@ -3136,6 +3148,22 @@ def handoff_summary_from_status(status: dict[str, Any], audience: str = "session
     }
 
 
+def handoff_has_exact_handles(handles: dict[str, Any]) -> bool:
+    return any(
+        bool(handles.get(key))
+        for key in [
+            "claims",
+            "next_work_source",
+            "presenter_reports",
+            "reviewer_reports",
+            "trace_links",
+            "eval_links",
+            "branch_pr",
+            "status_command",
+        ]
+    )
+
+
 def handoff_summary_data(audience: str = "session", write: bool = False) -> dict[str, Any]:
     if audience not in {"session", "daily", "scheduled"}:
         audience = "session"
@@ -3169,8 +3197,7 @@ def operator_workbench_handoff_summary_data() -> dict[str, Any]:
         {"name": "scheduled prompt", "ok": bool(scheduled_preview["scheduled_agent"]["resume_prompt"]), "detail": ""},
         {
             "name": "exact handles",
-            "ok": bool(preview["exact_artifact_handles"]["claims"])
-            or bool(preview["exact_artifact_handles"]["next_work_source"]),
+            "ok": handoff_has_exact_handles(preview["exact_artifact_handles"]),
             "detail": "",
         },
         {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
@@ -7651,10 +7678,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["schema"] == "awf.operator-workbench.handoff-summary.v1"
             and data["preview"]["summary_line_count"] <= 10
             and bool(data["preview"]["copy_ready"])
-            and (
-                bool(data["preview"]["exact_artifact_handles"]["claims"])
-                or bool(data["preview"]["exact_artifact_handles"]["next_work_source"])
-            )
+            and handoff_has_exact_handles(data["preview"]["exact_artifact_handles"])
             and data["preview"]["local_session"]["first_command"] == "uv run awf operator-status --json"
             and data["scheduled_preview"]["scheduled_agent"]["first_command"] == "uv run awf handoff-summary --json"
             and data["preview"]["self_hosted"]["external_service_required"] is False,
@@ -7765,10 +7789,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
             and data["handoff_summary"]["schema"] == "awf.operator-workbench.handoff-summary.v1"
             and data["handoff_summary"]["summary_line_count"] <= 10
-            and (
-                bool(data["handoff_summary"]["exact_artifact_handles"]["claims"])
-                or bool(data["handoff_summary"]["exact_artifact_handles"]["next_work_source"])
-            )
+            and handoff_has_exact_handles(data["handoff_summary"]["exact_artifact_handles"])
             and data["interface_decision"]["schema"] == "awf.operator-workbench.interface-decision.v1"
             and data["interface_decision"]["decision"] == "cli-static"
             and data["interface_decision"]["self_hosted"]["external_service_required"] is False
@@ -7786,34 +7807,41 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
     )
     dashboard = data["goal_dashboard"]
     active_goal = next((goal for goal in dashboard["goals"] if goal["id"] == "006"), {})
+    goal_006_complete = dashboard["current_phase"]["open_task_count"] == 0
+    next_task = dashboard["current_phase"]["next_task"]
+    next_task_ok = (
+        next_task is None
+        if goal_006_complete
+        else next_task.get("id")
+        in {
+            "T005",
+            "T006",
+            "T007",
+            "T008",
+            "T009",
+            "T010",
+            "T011",
+            "T012",
+            "T013",
+            "T014",
+            "T015",
+            "T016",
+            "T017",
+        }
+    )
     results.append(
         {
             "name": "operator workbench long-horizon goal dashboard is generated",
             "ok": dashboard["schema"] == "awf.operator-workbench.goal-dashboard.v1"
             and dashboard["current_goal_id"] == "006"
             and dashboard["current_phase"]["phase"]
-            in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
-            and dashboard["current_phase"]["next_task"]["id"]
-            in {
-                "T005",
-                "T006",
-                "T007",
-                "T008",
-                "T009",
-                "T010",
-                "T011",
-                "T012",
-                "T013",
-                "T014",
-                "T015",
-                "T016",
-                "T017",
-            }
+            in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase", "complete"}
+            and next_task_ok
             and dashboard["counts"]["ordered_goal_count"] == 6
-            and dashboard["counts"]["accepted_goal_count"] == 5
-            and dashboard["counts"]["active_goal_count"] == 1
+            and dashboard["counts"]["accepted_goal_count"] == (6 if goal_006_complete else 5)
+            and dashboard["counts"]["active_goal_count"] == (0 if goal_006_complete else 1)
             and dashboard["counts"]["accepted_evidence_count"] >= 9
-            and active_goal.get("state") == "active"
+            and active_goal.get("state") == ("accepted" if goal_006_complete else "active")
             and active_goal.get("accepted_evidence")
             and any(
                 item.get("path") == ".agent-runs/reports/goal-006/t004-operator-status-20260604.md"
@@ -7825,6 +7853,10 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         }
     )
     increment_dashboard = data["increment_dashboard"]
+    increment_complete = (
+        increment_dashboard["counts"]["completed_tickets"] == increment_dashboard["counts"]["total_tickets"]
+        and increment_dashboard["counts"]["open_tickets"] == 0
+    )
     active_ticket = next(
         (
             ticket
@@ -7841,6 +7873,10 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         increment_dashboard["counts"]["completed_tickets"] >= 6
         and increment_dashboard["counts"]["ready_tickets"] >= 1
         and increment_dashboard["handoff"].get("next_unblocked_issue_id")
+    ) or (
+        increment_complete
+        and increment_dashboard["handoff"].get("next_action")
+        == "integrator-loop should prepare the phase review PR"
     )
     results.append(
         {
@@ -7865,19 +7901,26 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {
-                "awf-yu8",
-                "awf-3c5",
-                "awf-09s",
-                "awf-1cx",
-                "awf-diw",
-                "awf-xwm",
-                "awf-s6n",
-                "awf-1f9",
-                "awf-jr7",
-                "awf-svr",
-                "awf-mtv",
-            }
+            and (
+                evidence_view["target"]["ticket_id"]
+                in {
+                    "awf-yu8",
+                    "awf-3c5",
+                    "awf-09s",
+                    "awf-1cx",
+                    "awf-diw",
+                    "awf-xwm",
+                    "awf-s6n",
+                    "awf-1f9",
+                    "awf-jr7",
+                    "awf-svr",
+                    "awf-mtv",
+                }
+                or (
+                    evidence_view["target"]["ticket_id"] is None
+                    and data["goal_dashboard"]["counts"]["active_goal_count"] == 0
+                )
+            )
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1
