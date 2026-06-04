@@ -30,30 +30,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
-        "id": "awf-6kf",
-        "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo"
-      },
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
-        "id": "awf-9a9",
-        "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-6kf",
             "status": null,
             "type": "blocks"
@@ -62,22 +38,67 @@
         "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
         "id": "awf-e04",
         "title": "Add product-level BDD contracts for the baseline workflow"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-3mc",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-3u9",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-e04",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-zi9",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
+        "id": "awf-fpn",
+        "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-fpn",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
+        "id": "awf-ivd",
+        "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
       }
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 7,
-      "ready": 1,
+      "blocked": 5,
+      "ready": 2,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-zi9",
+    "next_unblocked_issue_id": "awf-6kf",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T007",
-        "id": "awf-zi9",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
+        "id": "awf-6kf",
         "status": "open",
-        "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
+        "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo"
+      },
+      {
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
+        "id": "awf-9a9",
+        "status": "open",
+        "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs"
       }
     ],
     "stale_claims": [],
@@ -165,84 +186,6 @@
       "status": "open",
       "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes",
       "updated_at": "2026-06-02T10:48:40.914069Z"
-    },
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:35.719676Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:48:34.395439Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-6kf",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:55.827355Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-zi9",
-          "issue_id": "awf-6kf",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T008\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
-      "id": "awf-6kf",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 2,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo",
-      "updated_at": "2026-06-02T10:48:35.285327Z"
-    },
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:36.660114Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:48:38.579135Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-9a9",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:57.242418Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-zi9",
-          "issue_id": "awf-9a9",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T011\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
-      "id": "awf-9a9",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 2,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs",
-      "updated_at": "2026-06-02T10:48:39.534830Z"
     },
     {
       "compaction_level": 0,
@@ -418,30 +361,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T008",
-        "id": "awf-6kf",
-        "title": "Define the first product baseline workflow for the selected stack beyond the comparison demo"
-      },
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-zi9",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
-        "id": "awf-9a9",
-        "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-6kf",
             "status": null,
             "type": "blocks"
@@ -491,11 +410,11 @@
         "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
       }
     ],
-    "blocked_count": 7,
+    "blocked_count": 5,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-zi9",
-    "ready_count": 1
+    "next_unblocked_issue_id": "awf-6kf",
+    "ready_count": 2
   },
   "child_tickets": [
     {
@@ -547,11 +466,11 @@
       "title": "Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T007",
       "task_id": "T007",
       "ticket_id": "awf-zi9",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
     },
     {
@@ -621,10 +540,10 @@
   "ok": true,
   "path": ".agent-runs/increments/005-candidate-platform-decision-product-baseline-goal-004.json",
   "phase": "Goal 004",
-  "ready_count": 1,
+  "ready_count": 2,
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T00:47:37.371811+00:00",
+  "updated_at": "2026-06-04T00:58:32.400177+00:00",
   "validation_evidence": []
 }

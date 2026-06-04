@@ -103,6 +103,9 @@ tasks must add any missing product-baseline or production-hardening Beads items 
 - `.agent-runs/reports/goal-004-t002-mastra-contrast-decision-20260602.md`
 - `.agent-runs/reports/goal-004-t003-evidence-normalization-20260603.md`
 - `.agent-runs/reports/goal-004-t004-candidate-scoring-20260604.md`
+- `.agent-runs/reports/goal-004-t005-platform-decision-adr-20260604.md`
+- `.agent-runs/reports/goal-004-t006-selected-stack-propagation-20260604.md`
+- `.agent-runs/reports/goal-004/t007-platform-decision-acceptance-20260604.md`
 - `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.json`
 - `.agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json`
 - `.agent-runs/verifications/verify-langfuse-t027-20260531.json`
