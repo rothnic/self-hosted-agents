@@ -15,6 +15,10 @@ instrumentation or improves portability.
 
 Approved decision: implement this as the first evidence-producing candidate slice. This is not a final platform choice.
 
+Goal 004 update: this lane is now a frozen comparison reference. ADR 0005 selected Pydantic AI plus Langfuse/DBOS as the
+product baseline, and `docs/candidate-references/frozen-non-selected-candidates.md` records the tradeoffs for keeping
+LangGraph in place without treating it as active product work.
+
 Primary goal: prove that a Python-first LangGraph workflow can run the shared comparable-agent scenario and produce
 reviewable run, trace, evaluation, setup, and gap evidence without assuming LangSmith approval.
 

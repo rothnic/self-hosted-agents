@@ -16,10 +16,11 @@ The repository is organized by purpose so it can grow beyond a single Python app
 
 ## Current App Plan
 
-- `apps/mastra-ts/` will hold the TypeScript Mastra implementation.
-- `apps/langgraph-python/` will hold the Python LangChain/LangGraph implementation.
-- `apps/pydantic-ai/` holds the approved Python Pydantic AI plus Logfire/OpenTelemetry lane. Its T020
-  `implementation-plan.md` is planning-only; runnable scaffolding belongs to T021 and later tickets.
+- `apps/pydantic-ai/` holds the approved Python Pydantic AI plus Langfuse/DBOS product-baseline lane.
+- `apps/langgraph-python/` is a frozen comparison reference for the earlier Python LangGraph slice.
+- `apps/mastra-ts/` is a frozen deferred TypeScript contrast reference.
+
+The non-selected candidate policy lives in `docs/candidate-references/frozen-non-selected-candidates.md`.
 
 Candidate apps should prove behavior through shared BDD contracts and future shared packages, not by sharing app
 internals.

@@ -98,7 +98,9 @@ workflow boundary, contract, operating notes, and follow-up backlog.
   `docs/product-baseline/pydantic-ai-review-gated-work-order.md`. T009 adds the implementation-agnostic BDD contract
   in `tests/workflow/features/product_baseline_work_order.feature`. T010 adds setup and operating notes in
   `docs/product-baseline/pydantic-ai-setup-operating-notes.md`.
-- **Frozen Candidate Reference**: A non-selected candidate retained for comparison history and reusable lessons.
+- **Frozen Candidate Reference**: A non-selected candidate retained for comparison history and reusable lessons. T011
+  records the freeze policy, dispositions, and tradeoffs in
+  `docs/candidate-references/frozen-non-selected-candidates.md`.
 
 ## Success Criteria *(mandatory)*
 

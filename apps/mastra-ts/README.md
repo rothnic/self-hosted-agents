@@ -7,6 +7,10 @@ except for shared contracts and comparison assets.
 
 Status: `deferred-before-platform-selection`.
 
+Current disposition: frozen deferred contrast reference.
+
+Reference policy: `docs/candidate-references/frozen-non-selected-candidates.md`.
+
 Goal 004 T002 decided that Mastra TypeScript does not need a runnable contrast slice before the platform selection.
 Decision evidence is recorded in
 `.agent-runs/reports/goal-004-t002-mastra-contrast-decision-20260602.md`.
@@ -14,6 +18,9 @@ Decision evidence is recorded in
 Mastra remains a useful TypeScript contrast candidate, but current repo state has no runnable app, package manifest,
 fixture, trace export, eval artifact, or durable runtime proof for this lane. Do not score Mastra as
 implementation-proven until a future ticket creates those artifacts.
+
+Do not add product-baseline features here by default. Reopen this lane only when a future TypeScript product need,
+cross-language ownership decision, or accepted ADR makes a runnable Mastra contrast slice necessary.
 
 ## Intended Contrast
 

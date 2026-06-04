@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T01:39:27.642389+00:00",
+  "id": "awf-9a9",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:36.660114Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:38.579135Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-9a9",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:57.242418Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-zi9",
+        "issue_id": "awf-9a9",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T011\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T011",
+    "id": "awf-9a9",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs",
+    "updated_at": "2026-06-02T10:48:39.534830Z"
+  },
+  "worker_branch": "codex/awf-9a9-freeze-or-archive-non-selected-candidate",
+  "worker_id": "codex-goal004-t011",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-9a9-freeze-or-archive-non-selected-candidate",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-9a9-freeze-or-archive-non-selected-candidate ../self-hosted-agents-worktrees/awf-9a9-freeze-or-archive-non-selected-candidate <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-9a9-freeze-or-archive-non-selected-candidate && git status --short --branch"
+  }
+}

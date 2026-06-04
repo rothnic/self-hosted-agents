@@ -150,6 +150,6 @@ rehearsal with reviewer-accepted evidence.
 
 Goal 004 has completed the candidate evidence audit, Mastra contrast decision, evidence normalization, candidate
 scoring, platform decision ADR, decision propagation, independent decision-evidence acceptance, product baseline
-workflow definition, product-level BDD contract, and setup and operating notes. The current ordered work is to freeze
-non-selected candidate lanes, record production hardening follow-up tickets, and capture final Goal 004 increment
-acceptance evidence.
+workflow definition, product-level BDD contract, setup and operating notes, and freeze policy for non-selected
+candidate references. The current ordered work is to add migration notes, record production hardening follow-up tickets,
+and capture final Goal 004 increment acceptance evidence.

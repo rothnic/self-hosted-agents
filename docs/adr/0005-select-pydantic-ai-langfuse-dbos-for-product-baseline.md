@@ -88,8 +88,8 @@ tasks must add any missing product-baseline or production-hardening Beads items 
 ## Consequences
 
 - Future product-baseline work should deepen `apps/pydantic-ai` rather than continue framework selection by default.
-- LangGraph Python and Mastra TypeScript remain documented comparison references until Goal 004 transition tasks freeze
-  or archive them explicitly.
+- LangGraph Python and Mastra TypeScript are frozen comparison references under
+  `docs/candidate-references/frozen-non-selected-candidates.md`.
 - Deterministic validation remains credential-free; service-backed observability proof supplements repo-local
   artifacts instead of replacing them.
 - T006 must propagate this decision to roadmap, objective, requirements matrix, and Beads state.

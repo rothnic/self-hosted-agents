@@ -5,6 +5,14 @@ app except for shared contracts and comparison assets.
 
 Detailed slice plan: `apps/langgraph-python/implementation-plan.md`.
 
+Current disposition: frozen comparison reference.
+
+Reference policy: `docs/candidate-references/frozen-non-selected-candidates.md`.
+
+This lane remains in the repo for comparison history and regression context. Product-baseline work should deepen the
+selected Pydantic AI plus Langfuse/DBOS stack unless a future Beads ticket or ADR explicitly reopens LangGraph-specific
+work.
+
 ## First Slice
 
 Candidate id: `langgraph-python`.
@@ -57,3 +65,6 @@ Use `docs/comparison-evidence.md` as the evidence checklist and `docs/evaluation
 
 Do not build the Phoenix, MLflow, Mastra, or LangSmith comparison paths in this app. Do not declare LangGraph plus
 Langfuse as the final architecture until comparable implementation evidence exists.
+
+Do not add product-baseline features here by default. Keep changes limited to reference maintenance, fixture
+compatibility, or an explicitly reopened comparison ticket.

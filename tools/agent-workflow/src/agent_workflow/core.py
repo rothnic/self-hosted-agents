@@ -2338,8 +2338,8 @@ def stale_claims_for_increment(
                             "is recorded."
                         ),
                         "archive": (
-                            f"Move `{claim_path}` under `.agent-runs/claims/archive-<month>/` only after the "
-                            "Beads issue is closed, blocked with evidence, or explicitly superseded."
+                            f"Move `{claim_path}` under `.agent-runs/claims/archive-<month>/<key>/` only after "
+                            "the Beads issue is closed, blocked with evidence, or explicitly superseded."
                         ),
                     },
                 }
@@ -3039,7 +3039,7 @@ def dry_run_role_transition_fixture() -> dict[str, Any]:
                 "task_id": "T018",
                 "worker_id": "fixture-transition-worker",
                 "ticket_status": "closed",
-                "path": ".agent-runs/claims/archive-2026-06/awf-transition-done.json",
+                "path": ".agent-runs/claims/archive-2026-06/t/awf-transition-done.json",
                 "active": False,
                 "archived": True,
                 "worker_branch": "codex/awf-transition-done-role-transition-fixture",
@@ -3136,15 +3136,27 @@ def claim_archive_dir(checked_at: datetime | None = None) -> Path:
     return ROOT / ".agent-runs" / "claims" / f"archive-{timestamp.strftime('%Y-%m')}"
 
 
+def claim_archive_shard(path: Path) -> str:
+    stem = path.stem
+    if stem.startswith("awf-") and len(stem) > len("awf-"):
+        shard = stem[len("awf-")]
+    elif stem:
+        shard = stem[0]
+    else:
+        shard = "misc"
+    return re.sub(r"[^A-Za-z0-9_.-]", "-", shard.lower())
+
+
 def unique_archive_path(path: Path, archive_dir: Path) -> Path:
-    candidate = archive_dir / path.name
+    shard_dir = archive_dir / claim_archive_shard(path)
+    candidate = shard_dir / path.name
     if not candidate.exists():
         return candidate
     stem = path.stem
     suffix = path.suffix
     counter = 1
     while True:
-        candidate = archive_dir / f"{stem}.{counter}{suffix}"
+        candidate = shard_dir / f"{stem}.{counter}{suffix}"
         if not candidate.exists():
             return candidate
         counter += 1
@@ -3987,7 +3999,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "task_id": "T099",
                 "worker_id": "worker-done",
                 "ticket_status": "closed",
-                "path": ".agent-runs/claims/archive-2026-06/awf-done.json",
+                "path": ".agent-runs/claims/archive-2026-06/d/awf-done.json",
                 "active": False,
                 "archived": True,
                 "worker_branch": "codex/awf-done-closed-worker-ticket",
@@ -4209,7 +4221,11 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
         {
             "name": "cleanup work preserves history while removing obsolete active pointers",
             "ok": cleanup_candidate_ids == {"awf-closed", "awf-missing"}
-            and all(candidate["archive_path"].startswith(".agent-runs/claims/archive-2026-06/") for candidate in cleanup_candidates)
+            and all(
+                candidate["archive_path"].startswith(".agent-runs/claims/archive-2026-06/")
+                for candidate in cleanup_candidates
+            )
+            and all("/c/" in candidate["archive_path"] or "/m/" in candidate["archive_path"] for candidate in cleanup_candidates)
             and {candidate["reason"] for candidate in cleanup_candidates}
             == {"issue-closed", "missing-beads-issue"}
             and worktree_prune_candidates
