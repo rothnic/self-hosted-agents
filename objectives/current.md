@@ -15,8 +15,9 @@ through its linked child goals in order.
 
 Current roadmap checkpoint: Goals 001 through 003 are accepted for this roadmap increment by independent reviewer
 evidence. Goal 004 is the active product iteration. ADR 0005 selects Pydantic AI plus Langfuse and DBOS as the first
-product-baseline stack from comparable implementation evidence. The active follow-on work is to propagate that
-decision through roadmap state, record independent reviewer acceptance, and define the first product baseline workflow.
+product-baseline stack from comparable implementation evidence. Goal 004 has recorded the product baseline workflow,
+BDD contract, setup notes, frozen candidate references, migration notes, and production-hardening follow-up epics. The
+active follow-on work is final Goal 004 increment verification with independent reviewer acceptance.
 
 ## Success Criteria
 

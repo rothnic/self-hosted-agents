@@ -26,7 +26,7 @@
 
 - [X] T011 [US3] Freeze or archive non-selected candidates as comparison references with explicit tradeoffs
 - [X] T012 [US3] Add migration notes for reusable code, fixtures, or evidence from non-selected lanes
-- [ ] T013 [US2] Create follow-up Beads tasks for production hardening gaps that remain after platform selection
+- [X] T013 [US2] Create follow-up Beads tasks for production hardening gaps that remain after platform selection
 
 ## Phase 5: Goal 004 Acceptance
 

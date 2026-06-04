@@ -238,6 +238,20 @@ Decision boundary:
 - Beads state for T006 records this propagation slice. T007 remains responsible for presenting the platform decision
   evidence and recording independent reviewer acceptance or rejection.
 
+### Live Model Tool Trace Follow-up
+
+Goal 004 T013 tracks live or explicitly simulated model/tool trace coverage with `awf-6zf`. This follow-up must prove
+the selected Pydantic AI product-baseline lane captures model calls, tool calls, failure spans, latency, and token or
+cost fields where available. Service-backed Langfuse visibility must remain self-hosted-compatible, and deterministic
+validation must continue to produce repo-local trace artifacts without requiring hosted credentials.
+
+### Tool Context Approval Follow-up
+
+Goal 004 T013 tracks product tool and context approval boundaries with `awf-7ck`. This follow-up must prove the
+selected Pydantic AI product-baseline lane can access repository context and approved tools through typed adapters or
+MCP-style boundaries, records approval and denial behavior, captures trace and evaluation evidence for tool calls, and
+preserves deterministic fixture validation without hosted services or unsafe writes.
+
 ## Human Direction Update - 2026-05-23
 
 Product-grade observability is part of the stack being tested and evaluated. A deterministic fixture path remains

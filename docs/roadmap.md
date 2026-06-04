@@ -152,5 +152,6 @@ Goal 004 has completed the candidate evidence audit, Mastra contrast decision, e
 scoring, platform decision ADR, decision propagation, independent decision-evidence acceptance, product baseline
 workflow definition, product-level BDD contract, setup and operating notes, and freeze policy for non-selected
 candidate references. It has also added migration notes for reusable code, fixtures, and evidence from frozen
-non-selected lanes. The current ordered work is to record production hardening follow-up tickets and capture final
-Goal 004 increment acceptance evidence.
+non-selected lanes. T013 records Goal 004-specific production-hardening follow-up epics: `awf-4x7` for the runnable
+work-order app proof, `awf-6zf` for live model/tool trace coverage, and `awf-7ck` for product tool/context approval
+boundaries. The current ordered work is to capture final Goal 004 increment acceptance evidence.

@@ -2,34 +2,21 @@
   "active_claims": [],
   "active_work_summary": {
     "active_claims": [],
-    "blocked": [
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-fpn",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
-        "id": "awf-ivd",
-        "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
-      }
-    ],
+    "blocked": [],
     "counts": {
       "active_claims": 0,
-      "blocked": 1,
+      "blocked": 0,
       "ready": 1,
       "stale_claims": 0
     },
-    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-fpn",
+    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+    "next_unblocked_issue_id": "awf-ivd",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
-        "id": "awf-fpn",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
+        "id": "awf-ivd",
         "status": "open",
-        "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
+        "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
       }
     ],
     "stale_claims": [],
@@ -39,66 +26,13 @@
   "active_worktrees": [],
   "base_branch": "main",
   "beads_epic_id": "awf-dk3",
-  "blocked": [
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:37.581889Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:48:42.764792Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-ivd",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:59.973314Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-fpn",
-          "issue_id": "awf-ivd",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T014\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
-      "id": "awf-ivd",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 1,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence",
-      "updated_at": "2026-06-02T10:48:43.776969Z"
-    }
-  ],
+  "blocked": [],
   "blocker_reroute": {
-    "blocked": [
-      {
-        "blocking_dependencies": [
-          {
-            "id": "awf-fpn",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
-        "id": "awf-ivd",
-        "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
-      }
-    ],
-    "blocked_count": 1,
+    "blocked": [],
+    "blocked_count": 0,
     "can_continue": true,
-    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-fpn",
+    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+    "next_unblocked_issue_id": "awf-ivd",
     "ready_count": 1
   },
   "child_tickets": [
@@ -199,11 +133,11 @@
       "title": "Add migration notes for reusable code, fixtures, or evidence from non-selected lanes"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
       "task_id": "T013",
       "ticket_id": "awf-fpn",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
     },
     {
@@ -220,7 +154,7 @@
   "human_required": [],
   "increment_id": "005-candidate-platform-decision-product-baseline-goal-004",
   "learning_proposals": [],
-  "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
   "objective_id": "agentic-development-foundation",
   "ok": true,
   "path": ".agent-runs/increments/005-candidate-platform-decision-product-baseline-goal-004.json",
@@ -229,6 +163,6 @@
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T02:15:10.702352+00:00",
+  "updated_at": "2026-06-04T02:37:33.079682+00:00",
   "validation_evidence": []
 }

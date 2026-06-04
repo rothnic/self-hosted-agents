@@ -82,8 +82,19 @@ The selected stack cannot be called the final solution until follow-up work prov
 - Live model/tool trace coverage or explicit simulated equivalents for tokens, cost, failures, and tool-call context.
 - Product-level BDD contracts and setup notes for a baseline workflow that is distinct from the comparison demo.
 
-Tracked follow-up epics include `awf-eas`, `awf-2du`, `awf-4t2`, `awf-lkr`, `awf-ygu`, and `awf-5ae`. Goal 004 later
-tasks must add any missing product-baseline or production-hardening Beads items before final Goal 004 acceptance.
+Tracked follow-up epics include:
+
+- `awf-eas`: Langfuse production operations proof.
+- `awf-2du`: richer Langfuse evaluation workflow proof.
+- `awf-4t2`: Phoenix or Opik fallback comparison.
+- `awf-lkr`: DBOS production storage proof.
+- `awf-ygu`: DBOS worker and queue topology proof.
+- `awf-5ae`: DBOS recovery rehearsal and retention proof.
+- `awf-4x7`: product-baseline runnable work-order app proof.
+- `awf-6zf`: live model and tool trace coverage proof.
+- `awf-7ck`: product tool and context approval boundary proof.
+
+Goal 004 T013 records the Goal 004-specific follow-up epics before final Goal 004 acceptance.
 
 ## Consequences
 

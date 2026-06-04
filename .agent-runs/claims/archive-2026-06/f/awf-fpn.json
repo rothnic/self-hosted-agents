@@ -1,0 +1,77 @@
+{
+  "claimed_at": "2026-06-04T02:19:47.386804+00:00",
+  "id": "awf-fpn",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:37.256982Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:46:59.094858Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-3mc",
+        "issue_id": "awf-fpn",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:46:59.527986Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-3u9",
+        "issue_id": "awf-fpn",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:48:41.381076Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-fpn",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:58.649301Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-e04",
+        "issue_id": "awf-fpn",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-02T10:46:58.221113Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-zi9",
+        "issue_id": "awf-fpn",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T013\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T013",
+    "id": "awf-fpn",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection",
+    "updated_at": "2026-06-02T10:48:42.294805Z"
+  },
+  "worker_branch": "codex/awf-fpn-create-follow-up-beads-tasks-for-product",
+  "worker_id": "codex-goal004-t013",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-fpn-create-follow-up-beads-tasks-for-product",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-fpn-create-follow-up-beads-tasks-for-product ../self-hosted-agents-worktrees/awf-fpn-create-follow-up-beads-tasks-for-product <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-fpn-create-follow-up-beads-tasks-for-product && git status --short --branch"
+  }
+}

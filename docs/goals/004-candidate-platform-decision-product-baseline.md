@@ -28,8 +28,14 @@ This is not final-solution promotion. T008 defines the first product-baseline wo
 `tests/workflow/features/product_baseline_work_order.feature`. T010 adds setup and operating notes in
 `docs/product-baseline/pydantic-ai-setup-operating-notes.md`. T011 freezes non-selected candidate references in
 `docs/candidate-references/frozen-non-selected-candidates.md`. T012 adds candidate-lane migration notes in
-`docs/candidate-references/non-selected-candidate-migration-notes.md`; Goal 004 still needs production-hardening
-follow-up tickets and increment acceptance evidence.
+`docs/candidate-references/non-selected-candidate-migration-notes.md`. T013 adds production-hardening follow-up epics
+for the selected product baseline; Goal 004 still needs final increment acceptance evidence.
+
+T013 follow-up epics:
+
+- `awf-4x7`: product-baseline runnable work-order app proof.
+- `awf-6zf`: live model and tool trace coverage proof.
+- `awf-7ck`: product tool and context approval boundary proof.
 
 ## Scope
 

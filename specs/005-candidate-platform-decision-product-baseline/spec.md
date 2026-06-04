@@ -102,6 +102,9 @@ workflow boundary, contract, operating notes, and follow-up backlog.
   records the freeze policy, dispositions, and tradeoffs in
   `docs/candidate-references/frozen-non-selected-candidates.md`. T012 records migration notes for reusable code,
   fixtures, and evidence in `docs/candidate-references/non-selected-candidate-migration-notes.md`.
+- **Production Hardening Follow-up Backlog**: Beads epics that keep product-baseline promotion blockers visible after
+  platform selection. T013 records `awf-4x7`, `awf-6zf`, and `awf-7ck` for the runnable work-order app, live model/tool
+  trace coverage, and product tool/context approval boundaries.
 
 ## Success Criteria *(mandatory)*
 
