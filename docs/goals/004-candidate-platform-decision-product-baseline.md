@@ -12,14 +12,26 @@ operator burden have enough evidence, the project needs a primary stack and a pr
 
 ## Product Iteration
 
-This goal moves from candidate comparison to platform decision. It keeps non-selected candidates as documented
-alternatives, but focuses future implementation on the selected stack.
+This goal moves from candidate comparison to platform decision. ADR 0005 selects Pydantic AI plus Langfuse and DBOS as
+the primary product-baseline stack. It keeps non-selected candidates as documented alternatives, but focuses future
+implementation on the selected stack.
+
+## Current Decision State
+
+ADR 0005 records Pydantic AI plus Langfuse and DBOS as the selected first product-baseline stack because it is the only
+current candidate with implementation evidence across run, trace, evaluation, setup, durable execution, and gap
+categories. LangGraph Python plus Langfuse remains a comparison reference, Mastra TypeScript remains a deferred
+cross-language reference, and LangSmith remains an external benchmark that does not satisfy the self-hosted constraint.
+
+This is not final-solution promotion. Goal 004 still needs independent reviewer acceptance for the decision evidence,
+product-baseline workflow definition, product-level BDD contracts, setup notes, candidate-lane transition notes,
+production-hardening follow-up tickets, and increment acceptance evidence.
 
 ## Scope
 
 - Complete comparable evidence for LangGraph Python, Pydantic AI, and any needed contrast candidate.
 - Score candidates against the same functional needs map.
-- Identify the selected primary stack and why it wins.
+- Use Pydantic AI plus Langfuse and DBOS as the selected primary stack for product-baseline work.
 - Define the first product baseline workflow beyond the comparison demo.
 - Keep self-hosted observability, evals, durable execution, and review gates in scope.
 - Record explicit reasons rejected candidates are not selected now.
@@ -64,6 +76,8 @@ uv run awf workflow-state-lint --json
 
 - The decision is based on docs or preference rather than implementation evidence.
 - Observability, evals, or durable execution remain unproven for the selected stack.
+- The selected stack is promoted as final before production Langfuse operations, DBOS production storage, worker
+  topology, recovery rehearsal, live model/tool trace coverage, and richer eval workflows have evidence.
 - The product baseline is just the comparison demo renamed.
 - Non-selected candidates are discarded without recorded tradeoffs.
 

@@ -56,8 +56,10 @@ Each candidate solution gets a separate runnable app under `apps/`. Existing app
 - `apps/langgraph-python/`: Python LangGraph/LangChain candidate.
 - `apps/mastra-ts/`: TypeScript Mastra candidate used as a cross-language comparison point.
 
-The active Python-first follow-on lane is Pydantic AI plus self-hosted Langfuse/OpenTelemetry, Pydantic Evals, and DBOS
-smoke evidence. LlamaIndex remains a strong fallback if data/RAG workflows become the dominant functional area.
+ADR 0005 selects Pydantic AI plus self-hosted-compatible Langfuse/OpenTelemetry, Pydantic Evals, and DBOS as the first
+product-baseline stack. This makes `apps/pydantic-ai/` the default product lane for new baseline work. LangGraph Python
+and Mastra TypeScript remain comparison references unless future evidence reopens the decision. LlamaIndex remains a
+strong fallback if data/RAG workflows become the dominant functional area.
 
 ### Phase 4: Evidence Review
 
@@ -107,8 +109,10 @@ spec, tasks, and Beads tickets before implementation.
 Latest CEO-level review: `docs/roadmap-review-2026-05-31.md`.
 
 Phase 6 is implementation-complete and independently reviewed. `apps/pydantic-ai/` now has tested evidence for
-self-hosted-compatible observability, Pydantic Evals, DBOS durable behavior, and requirements-matrix scoring. Neither
-Pydantic AI nor DBOS is a final platform winner.
+self-hosted-compatible observability, Pydantic Evals, DBOS durable behavior, and requirements-matrix scoring. ADR 0005
+selects Pydantic AI plus Langfuse and DBOS as the first product-baseline stack. This is not final-solution promotion;
+production Langfuse operations, richer eval workflows, DBOS production storage, worker topology, recovery rehearsal,
+and live model/tool trace coverage remain follow-up proof gates.
 
 Accepted next direction: Goal 001 is complete for the current roadmap increment. Goal 001 has the required self-hosted
 Langfuse proof, repo-local trace fallback, Pydantic Evals output, fixture-safe service-unavailable behavior, setup docs,
@@ -131,8 +135,8 @@ Langfuse becomes too heavy.
 Alternative directions are documented in the latest review: deepen Langfuse operations before Goal 002, compare Phoenix
 or Opik before accepting Langfuse, or reopen candidate comparison before durable runtime work.
 
-The minimum comparable demo is defined in `docs/comparison-evidence.md`. Candidate apps should continue to implement
-that same decision-ready workflow before roadmap review compares platform quality.
+The minimum comparable demo is defined in `docs/comparison-evidence.md`. Product work should now deepen the selected
+Pydantic AI plus Langfuse/DBOS lane, while candidate apps remain useful comparison references and regression fixtures.
 
 There are no remaining Phase 6 worker tickets. Independent review accepted Goal 001 evidence in
 `.agent-runs/reports/goal-001-evidence-review-20260601.md` and Goal 002 evidence in
@@ -142,5 +146,9 @@ There are no remaining Phase 6 worker tickets. Independent review accepted Goal 
 Goal 003 closed T009 through T021 under `specs/003-automated-increment-orchestration/`, covering scheduled loop
 baselines, stale claims, blocker rerouting, worker branch/worktree guidance, compact verification, integrator handoff,
 review-agent guidance, health issue logging, dry-run fixtures, active-work summaries, cleanup, and an end-to-end
-rehearsal with reviewer-accepted evidence. The next ordered roadmap goal is Goal 004, candidate platform decision and
-product baseline.
+rehearsal with reviewer-accepted evidence.
+
+Goal 004 has completed the candidate evidence audit, Mastra contrast decision, evidence normalization, candidate
+scoring, and platform decision ADR. The current ordered work is to propagate the selected stack through durable state,
+record independent reviewer acceptance for the decision evidence, and define the first product baseline workflow for
+the selected Pydantic AI plus Langfuse/DBOS stack.

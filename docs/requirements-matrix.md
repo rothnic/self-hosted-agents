@@ -62,10 +62,10 @@ missing provider component, record that as a custom critical infrastructure warn
 
 | Candidate | Fit Today | Primary Evidence To Gather | Current Risk |
 | --- | --- | --- | --- |
-| LangGraph Python plus Langfuse | Python orchestration with partial fixture evidence | Self-hosted trace ingestion, durability, committed artifacts | Integration depth must be proven |
+| LangGraph Python plus Langfuse | Comparison reference with partial fixture evidence | Reopen for LangGraph-specific orchestration needs | Durable execution and committed evidence remain weaker |
 | LangGraph Python plus Phoenix | Strong Python and OpenInference-style observability path | Local tracing, eval quality, app instrumentation | Deferred until dev experience is better understood |
 | Python app plus MLflow tracing | Strong Python lifecycle and broader experiment tracking | Trace/eval ergonomics for agent workflows | Less specialized LLM observability UX |
-| Pydantic AI + Langfuse/DBOS | Tested Python slice with evals, trace proof, and durable proof | DBOS operations, live traces, richer evals | Production storage, workers, and recovery unscored |
+| Pydantic AI + Langfuse/DBOS | Selected baseline stack with tested Python evidence | Product BDDs, DBOS operations, live traces, richer evals | Production storage, workers, and recovery unscored |
 | Mastra TypeScript plus shared contracts | Deferred TypeScript contrast without implementation evidence | Reopen only for TypeScript needs or Python-lane uncertainty | Not implementation-comparable |
 | LangSmith baseline | Best-known LangChain/LangGraph comparison point | Feature expectations and integration baseline | Self-hosted access may require Enterprise |
 
@@ -206,6 +206,37 @@ T004 scoring result:
 - Mastra TypeScript remains a deferred TypeScript reference until a future task proves a runnable slice.
 - T005 can record a platform decision from this scorecard without relying on hosted-only services or cloud-only
   evidence, while preserving the production hardening blockers already tracked for later work.
+
+### Goal 004 Platform Decision - 2026-06-04
+
+ADR 0005 selects Pydantic AI plus Langfuse and DBOS as the first product-baseline stack. The decision uses the T001-T004
+implementation evidence rather than hosted-only services or provider preference:
+
+- Pydantic AI provides the Python-first app boundary for product work.
+- Langfuse provides the self-hosted-compatible LLM observability control plane.
+- Repo-local OpenTelemetry trace exports preserve deterministic fixture validation without hosted credentials.
+- Pydantic Evals provides deterministic evaluation artifacts tied to run and trace identity.
+- DBOS provides the first durable execution path with local proof for retry, resume, review wait, side-effect
+  idempotency, and evidence correlation.
+
+Rejected or deferred alternatives:
+
+- LangGraph Python plus Langfuse remains a comparison reference because durable execution proof, self-hosted Langfuse
+  ingestion, product trace depth, and committed verification artifacts are incomplete.
+- Mastra TypeScript remains a deferred TypeScript reference because T002 deferred a runnable contrast slice and T003
+  normalized implementation-dependent evidence as missing or deferred.
+- LangSmith remains an external feature benchmark because self-hosted access cannot be assumed and hosted-only trace
+  inspection does not satisfy this project's self-hosted assessment.
+
+Decision boundary:
+
+- Treat the selected stack as the product-baseline default for Goal 004 T008-T014 and follow-on product work.
+- Do not call the selected stack the final solution until production Langfuse operations, richer eval workflows, DBOS
+  production storage, worker topology, recovery rehearsal, and live model/tool trace coverage have evidence.
+- Preserve deterministic repo-local validation as mandatory. Service-backed observability proof supplements local
+  artifacts; it does not replace them.
+- Beads state for T006 records this propagation slice. T007 remains responsible for presenting the platform decision
+  evidence and recording independent reviewer acceptance or rejection.
 
 ## Human Direction Update - 2026-05-23
 

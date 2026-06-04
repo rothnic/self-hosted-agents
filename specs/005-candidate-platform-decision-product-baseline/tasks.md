@@ -13,7 +13,7 @@
 
 - [X] T004 [US2] Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort
 - [X] T005 [US2] Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers
-- [ ] T006 [US2] Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack
+- [X] T006 [US2] Update roadmap, goal, objective, requirements matrix, and Beads state with the selected primary stack
 - [ ] T007 [US2] Present platform decision evidence and record independent reviewer acceptance or rejection
 
 ## Phase 3: Goal 004 Product Baseline Definition

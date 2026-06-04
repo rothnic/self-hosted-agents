@@ -14,8 +14,9 @@ Current long-horizon goal: execute `docs/goals/000-self-hosted-agent-system-road
 through its linked child goals in order.
 
 Current roadmap checkpoint: Goals 001 through 003 are accepted for this roadmap increment by independent reviewer
-evidence. Goal 004 is the active product iteration: choose the candidate platform from comparable implementation
-evidence and define the first product baseline workflow.
+evidence. Goal 004 is the active product iteration. ADR 0005 selects Pydantic AI plus Langfuse and DBOS as the first
+product-baseline stack from comparable implementation evidence. The active follow-on work is to propagate that
+decision through roadmap state, record independent reviewer acceptance, and define the first product baseline workflow.
 
 ## Success Criteria
 
@@ -48,7 +49,8 @@ evidence and define the first product baseline workflow.
 
 ## Non-Goals
 
-- Do not treat a framework or observability platform as the winner before comparable implementation evidence exists.
+- Do not treat the selected Pydantic AI plus Langfuse/DBOS product baseline as a final solution until production
+  observability, evaluation, durable execution, setup, and recovery blockers have repo-local or self-hosted evidence.
 - Do not automate risky writes without explicit `--write`.
 - Do not let recurring agents bypass review gates; goal and increment evidence requires independent reviewer
   acceptance unless the user explicitly reserves the decision.
