@@ -1,0 +1,707 @@
+{
+  "active_claims": [],
+  "active_work_summary": {
+    "active_claims": [],
+    "blocked": [
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-is8",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T005",
+        "id": "awf-091",
+        "title": "Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T011",
+        "id": "awf-2jm",
+        "title": "Add rollback, recovery, retention, resource, and cost notes for one-engineer operation"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T009",
+        "id": "awf-71o",
+        "title": "Add backup, restore, and reset runbooks for databases, service state, and run evidence"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-n19",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T002",
+        "id": "awf-gdu",
+        "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T010",
+        "id": "awf-hic",
+        "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage"
+      }
+    ],
+    "counts": {
+      "active_claims": 0,
+      "blocked": 12,
+      "ready": 1,
+      "stale_claims": 0
+    },
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "next_unblocked_issue_id": "awf-n19",
+    "ready": [
+      {
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T001",
+        "id": "awf-n19",
+        "status": "open",
+        "title": "Add a self-hosted deployment operations BDD contract for profiles, smoke evidence, and recovery"
+      }
+    ],
+    "stale_claims": [],
+    "summary_schema": "awf.active-work.compact.v1"
+  },
+  "active_worker_branches": [],
+  "active_worktrees": [],
+  "base_branch": "main",
+  "beads_epic_id": "awf-h2u",
+  "blocked": [
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:10.270655Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:29.409588Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-is8",
+          "issue_id": "awf-091",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T005\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T005",
+      "id": "awf-091",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile",
+      "updated_at": "2026-06-04T03:05:29.409968Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:12.163526Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:32.557305Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-rgf",
+          "issue_id": "awf-2jm",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T011\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T011",
+      "id": "awf-2jm",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add rollback, recovery, retention, resource, and cost notes for one-engineer operation",
+      "updated_at": "2026-06-04T03:05:32.557575Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:11.518628Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:31.535050Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-rgf",
+          "issue_id": "awf-71o",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T009\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T009",
+      "id": "awf-71o",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add backup, restore, and reset runbooks for databases, service state, and run evidence",
+      "updated_at": "2026-06-04T03:05:31.535325Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:09.289658Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:27.801914Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-n19",
+          "issue_id": "awf-gdu",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T002\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T002",
+      "id": "awf-gdu",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`",
+      "updated_at": "2026-06-04T03:05:27.802624Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:11.831482Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:32.062837Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-rgf",
+          "issue_id": "awf-hic",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T010\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T010",
+      "id": "awf-hic",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage",
+      "updated_at": "2026-06-04T03:05:32.063132Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:09.956638Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:28.875865Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-noh",
+          "issue_id": "awf-is8",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T004\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
+      "id": "awf-is8",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add environment templates and readiness checks that do not commit credentials",
+      "updated_at": "2026-06-04T03:05:28.876211Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:09.613655Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:28.333560Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-gdu",
+          "issue_id": "awf-noh",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T003\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T003",
+      "id": "awf-noh",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Document service boundaries, ports, volumes, secrets, storage paths, and target machines",
+      "updated_at": "2026-06-04T03:05:28.333892Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:12.460919Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:34.178211Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-2jm",
+          "issue_id": "awf-pt7",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T03:05:33.131073Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-71o",
+          "issue_id": "awf-pt7",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        },
+        {
+          "created_at": "2026-06-04T03:05:33.636679Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-hic",
+          "issue_id": "awf-pt7",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T012\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T012",
+      "id": "awf-pt7",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets",
+      "updated_at": "2026-06-04T03:05:34.178487Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:11.205253Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:30.960895Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-xei",
+          "issue_id": "awf-rgf",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T008\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T008",
+      "id": "awf-rgf",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Prove deterministic validation remains credential-free when deployment services or secrets are absent",
+      "updated_at": "2026-06-04T03:05:30.961174Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:10.570481Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:29.930943Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-091",
+          "issue_id": "awf-t1m",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T006\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T006",
+      "id": "awf-t1m",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Add deployment smoke command or driver for a representative selected-stack workflow",
+      "updated_at": "2026-06-04T03:05:29.931293Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:10.898757Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:30.435522Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-t1m",
+          "issue_id": "awf-xei",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T007\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+      "id": "awf-xei",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 1,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation",
+      "updated_at": "2026-06-04T03:05:30.435876Z"
+    },
+    {
+      "compaction_level": 0,
+      "created_at": "2026-06-04T03:05:12.755589Z",
+      "created_by": "nroth",
+      "dependencies": [
+        {
+          "created_at": "2026-06-04T03:05:34.724292Z",
+          "created_by": "nroth",
+          "depends_on_id": "awf-pt7",
+          "issue_id": "awf-xjv",
+          "metadata": "{}",
+          "thread_id": "",
+          "type": "blocks"
+        }
+      ],
+      "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T013\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+      "id": "awf-xjv",
+      "issue_type": "task",
+      "original_size": 0,
+      "priority": 2,
+      "source_repo": "self-hosted-agents",
+      "status": "open",
+      "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection",
+      "updated_at": "2026-06-04T03:05:34.724592Z"
+    }
+  ],
+  "blocker_reroute": {
+    "blocked": [
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-is8",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T005",
+        "id": "awf-091",
+        "title": "Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T011",
+        "id": "awf-2jm",
+        "title": "Add rollback, recovery, retention, resource, and cost notes for one-engineer operation"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T009",
+        "id": "awf-71o",
+        "title": "Add backup, restore, and reset runbooks for databases, service state, and run evidence"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-n19",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T002",
+        "id": "awf-gdu",
+        "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-rgf",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T010",
+        "id": "awf-hic",
+        "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-noh",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
+        "id": "awf-is8",
+        "title": "Add environment templates and readiness checks that do not commit credentials"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-gdu",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T003",
+        "id": "awf-noh",
+        "title": "Document service boundaries, ports, volumes, secrets, storage paths, and target machines"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-2jm",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-71o",
+            "status": null,
+            "type": "blocks"
+          },
+          {
+            "id": "awf-hic",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T012",
+        "id": "awf-pt7",
+        "title": "Run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-xei",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T008",
+        "id": "awf-rgf",
+        "title": "Prove deterministic validation remains credential-free when deployment services or secrets are absent"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-091",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T006",
+        "id": "awf-t1m",
+        "title": "Add deployment smoke command or driver for a representative selected-stack workflow"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-t1m",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+        "id": "awf-xei",
+        "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation"
+      },
+      {
+        "blocking_dependencies": [
+          {
+            "id": "awf-pt7",
+            "status": null,
+            "type": "blocks"
+          }
+        ],
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+        "id": "awf-xjv",
+        "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
+      }
+    ],
+    "blocked_count": 12,
+    "can_continue": true,
+    "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+    "next_unblocked_issue_id": "awf-n19",
+    "ready_count": 1
+  },
+  "child_tickets": [
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T001",
+      "task_id": "T001",
+      "ticket_id": "awf-n19",
+      "ticket_status": "open",
+      "title": "Add a self-hosted deployment operations BDD contract for profiles, smoke evidence, and recovery"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T002",
+      "task_id": "T002",
+      "ticket_id": "awf-gdu",
+      "ticket_status": "open",
+      "title": "Define local, development-server, and production-like deployment profiles in `docs/deployment/`"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T003",
+      "task_id": "T003",
+      "ticket_id": "awf-noh",
+      "ticket_status": "open",
+      "title": "Document service boundaries, ports, volumes, secrets, storage paths, and target machines"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T004",
+      "task_id": "T004",
+      "ticket_id": "awf-is8",
+      "ticket_status": "open",
+      "title": "Add environment templates and readiness checks that do not commit credentials"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T005",
+      "task_id": "T005",
+      "ticket_id": "awf-091",
+      "ticket_status": "open",
+      "title": "Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T006",
+      "task_id": "T006",
+      "ticket_id": "awf-t1m",
+      "ticket_status": "open",
+      "title": "Add deployment smoke command or driver for a representative selected-stack workflow"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+      "task_id": "T007",
+      "ticket_id": "awf-xei",
+      "ticket_status": "open",
+      "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T008",
+      "task_id": "T008",
+      "ticket_id": "awf-rgf",
+      "ticket_status": "open",
+      "title": "Prove deterministic validation remains credential-free when deployment services or secrets are absent"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T009",
+      "task_id": "T009",
+      "ticket_id": "awf-71o",
+      "ticket_status": "open",
+      "title": "Add backup, restore, and reset runbooks for databases, service state, and run evidence"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T010",
+      "task_id": "T010",
+      "ticket_id": "awf-hic",
+      "ticket_status": "open",
+      "title": "Add health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T011",
+      "task_id": "T011",
+      "ticket_id": "awf-2jm",
+      "ticket_status": "open",
+      "title": "Add rollback, recovery, retention, resource, and cost notes for one-engineer operation"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T012",
+      "task_id": "T012",
+      "ticket_id": "awf-pt7",
+      "ticket_status": "open",
+      "title": "Run a clean-path or fresh setup rehearsal and record evidence, gaps, and follow-up tickets"
+    },
+    {
+      "done": false,
+      "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+      "task_id": "T013",
+      "ticket_id": "awf-xjv",
+      "ticket_status": "open",
+      "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
+    }
+  ],
+  "exists": true,
+  "feature_branch": "codex/006-self-hosted-deployment-operations-reference-goal-005",
+  "human_required": [],
+  "increment_id": "006-self-hosted-deployment-operations-reference-goal-005",
+  "learning_proposals": [],
+  "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
+  "objective_id": "agentic-development-foundation",
+  "ok": true,
+  "path": ".agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json",
+  "phase": "Goal 005",
+  "ready_count": 1,
+  "review_status": "executing",
+  "spec_id": "006-self-hosted-deployment-operations-reference",
+  "stale_claims": [],
+  "updated_at": "2026-06-04T03:08:56.186731+00:00",
+  "validation_evidence": []
+}

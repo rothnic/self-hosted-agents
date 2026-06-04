@@ -16,8 +16,9 @@ through its linked child goals in order.
 Current roadmap checkpoint: Goals 001 through 004 are accepted for this roadmap increment by independent reviewer
 evidence. Goal 004 selected Pydantic AI plus Langfuse and DBOS as the first product-baseline stack from comparable
 implementation evidence, defined the product baseline workflow, added BDD contracts and setup notes, froze non-selected
-candidate references, recorded migration notes, and created production-hardening follow-up epics. The active follow-on
-work is Goal 005: define and prove the self-hosted deployment and operations reference for the selected stack.
+candidate references, recorded migration notes, and created production-hardening follow-up epics. Goal 005 is active:
+Spec `006-self-hosted-deployment-operations-reference` and Beads epic `awf-h2u` are initialized, with `awf-n19` / T001
+as the next ready implementer ticket.
 
 ## Success Criteria
 

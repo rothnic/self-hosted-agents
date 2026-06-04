@@ -154,5 +154,9 @@ Goal 004 is accepted for the current roadmap increment. Independent reviewer
 Mastra contrast decision, evidence normalization, candidate scoring, platform decision ADR, decision propagation,
 independent decision-evidence acceptance, product baseline workflow definition, product-level BDD contract, setup and
 operating notes, freeze policy for non-selected candidate references, migration notes, and production-hardening
-follow-up epics. Goal 005 is the next ordered work: prove the selected stack can run on controlled self-hosted
-infrastructure.
+follow-up epics.
+
+Goal 005 is active. Spec `006-self-hosted-deployment-operations-reference`, increment ledger
+`.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and Beads epic `awf-h2u` now
+define the self-hosted deployment and operations reference backlog. The next ready worker ticket is `awf-n19` / T001:
+add the deployment operations BDD contract for profiles, smoke evidence, and recovery.

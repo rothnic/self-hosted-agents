@@ -25,6 +25,21 @@ management on `vps-gw` when appropriate.
 - Add health checks, logs, traces, and runbooks.
 - Prove a fresh-machine setup path.
 
+## Current State
+
+Goal 005 has been initialized as Spec `006-self-hosted-deployment-operations-reference` with executable Beads backlog.
+The increment ledger is
+`.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and the Beads parent epic is
+`awf-h2u`.
+
+Next ready implementer ticket:
+
+- `awf-n19` / T001: add the self-hosted deployment operations BDD contract for profiles, smoke evidence, and recovery.
+
+The remaining Goal 005 tickets are dependency-blocked behind T001 through T013. T013 presents final Goal 005 evidence,
+and a separate reviewer agent must record acceptance or rejection. Human review is not a progress blocker unless a
+decision is explicitly reserved, missing, or contradicted by evidence.
+
 ## Task Backlog
 
 1. Define local, development-server, and production-like deployment profiles.
