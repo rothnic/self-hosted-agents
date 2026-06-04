@@ -24,6 +24,8 @@ local UI.
 - `interface.md`: selected CLI/static interface command, panels, primary actions, and self-hosted operating boundaries.
 - `accessibility-small-screen.md`: rationale for deferring UI-specific accessibility and small-screen checks while
   CLI/static remains selected.
+- `scheduled-agents.md`: scheduled-agent entrypoints and artifact contract for using the workbench without a fragile UI
+  dependency.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -50,4 +52,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T015 should document why CLI/static remains selected instead of adding UI-only accessibility and small-screen checks.
+T017 should present the completed Goal 006 workbench evidence and record independent reviewer acceptance or rejection.

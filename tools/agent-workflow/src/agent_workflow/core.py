@@ -1830,6 +1830,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "interface_decision",
         "workbench_interface",
         "accessibility_small_screen",
+        "scheduled_agent_usage",
         "health",
         "decision_summaries",
     ]
@@ -1853,6 +1854,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "awf.operator-workbench.branch-pr.v1",
         "awf.operator-workbench.interface.v1",
         "awf.operator-workbench.accessibility-small-screen.v1",
+        "awf.operator-workbench.scheduled-agent-usage.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -3654,6 +3656,211 @@ def operator_workbench_accessibility_small_screen_data() -> dict[str, Any]:
     }
 
 
+def scheduled_agent_workbench_data(write: bool = False) -> dict[str, Any]:
+    data = {
+        "schema": "awf.operator-workbench.scheduled-agent-usage.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": "uv run awf scheduled-agent-workbench --json",
+        "scope": {
+            "goal": "006-operator-workbench-review-ux",
+            "spec_id": "007-operator-workbench-review-ux",
+            "task_id": "T016",
+            "ticket_id": "awf-svr",
+        },
+        "selected_interface": "cli-static",
+        "fragile_ui_dependency": False,
+        "summary": (
+            "Scheduled agents use repo-local CLI/static workbench artifacts and exact commands, not a local UI session."
+        ),
+        "first_commands": [
+            "uv run awf scheduled-agent-workbench --json",
+            "uv run awf handoff-summary --audience scheduled --json",
+            "uv run awf operator-status --json",
+            "uv run awf ready-work --json",
+        ],
+        "role_entrypoints": [
+            {
+                "role": "pm-review",
+                "first_command": "uv run awf operator-status --json",
+                "uses": [
+                    "goal_dashboard",
+                    "increment_dashboard",
+                    "review_gate",
+                    "follow_up_epics",
+                ],
+                "allowed_actions": [
+                    "refresh backlog when ready work runs low",
+                    "record review actions",
+                    "route blockers without stopping unblocked work",
+                ],
+            },
+            {
+                "role": "orchestrator",
+                "first_command": "uv run awf ready-work --json",
+                "uses": [
+                    "work_queue.ready",
+                    ".agent-runs/claims/",
+                    "increment_dashboard.handoff",
+                ],
+                "allowed_actions": [
+                    "claim one unblocked Beads item",
+                    "assign worker branch metadata",
+                    "preserve parent increment boundaries",
+                ],
+            },
+            {
+                "role": "worker",
+                "first_command": "uv run awf handoff-summary --audience scheduled --json",
+                "uses": [
+                    "active claim artifact",
+                    "ticket acceptance command",
+                    "source docs and specs",
+                ],
+                "allowed_actions": [
+                    "implement the claimed ticket only",
+                    "run ticket verification",
+                    "record presenter evidence before completion",
+                ],
+            },
+            {
+                "role": "integrator",
+                "first_command": "uv run awf operator-status --json",
+                "uses": [
+                    "branch_pr",
+                    "evidence_view",
+                    "review_gate",
+                    "increment_dashboard",
+                ],
+                "allowed_actions": [
+                    "verify completed worker evidence",
+                    "present increment evidence",
+                    "request independent reviewer acceptance",
+                ],
+            },
+            {
+                "role": "health",
+                "first_command": "uv run awf health-status --deep --json",
+                "uses": [
+                    "health",
+                    "repo_hygiene",
+                    "workflow_state_lint",
+                    "review_gate",
+                ],
+                "allowed_actions": [
+                    "log repo-local issue evidence",
+                    "stop unsafe mutation",
+                    "leave unblocked implementation work routable",
+                ],
+            },
+        ],
+        "artifact_contract": {
+            "source_of_truth": [
+                ".beads/issues.jsonl",
+                ".agent-runs/claims/",
+                ".agent-runs/reports/",
+                ".agent-runs/review-decisions/",
+                ".agent-runs/verifications/",
+                "docs/workbench/",
+                "specs/007-operator-workbench-review-ux/tasks.md",
+            ],
+            "copy_ready_handles_required": True,
+            "chat_context_required": False,
+            "ui_session_required": False,
+            "browser_runtime_required": False,
+            "terminal_ui_runtime_required": False,
+        },
+        "resilience_rules": [
+            "Start from repo-local commands and artifacts instead of prior chat context.",
+            "Use Beads ready work and claim files for work separation.",
+            "Keep presenter evidence and independent reviewer acceptance as durable artifacts.",
+            "Treat GitHub, self-hosted Langfuse, and other service links as optional enrichment with repo-local fallback.",
+            "Run deterministic validation without hosted credentials before closing work.",
+        ],
+        "ui_dependency_boundary": {
+            "local_ui_required": False,
+            "failure_mode_avoided": "scheduled agents do not need browser state, viewport state, focus state, or live UI sessions",
+            "fallback": "CLI/static commands plus repo-local JSON and Markdown artifacts",
+        },
+        "source_artifacts": [
+            "docs/workbench/scheduled-agents.md",
+            "docs/workbench/handoff-summary.md",
+            "docs/workbench/interface.md",
+            "docs/workbench/operator-status-report.md",
+            "docs/workbench/status-artifact-schema.md",
+            ".agent-runs/reports/workbench/interface/workbench-interface-20260604T105847Z.json",
+        ],
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "hosted_cloud_dependency": False,
+            "fallback": "repo-local workbench artifacts and workflow commands",
+        },
+    }
+    if write:
+        data["generated_by"] = "uv run awf scheduled-agent-workbench --write --json"
+        data["path"] = write_json_artifact("reports/workbench/scheduled-agents", "scheduled-agent-workbench", data)
+    return data
+
+
+def operator_workbench_scheduled_agent_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "scheduled-agents.md"
+    index_path = ROOT / "docs" / "workbench" / "README.md"
+    docs_text = read_text(docs_path)
+    index_text = read_text(index_path)
+    preview = scheduled_agent_workbench_data(write=False)
+    required_terms = [
+        "awf.operator-workbench.scheduled-agent-usage.v1",
+        "uv run awf scheduled-agent-workbench",
+        "scheduled agents",
+        "CLI/static",
+        "fragile UI dependency",
+        "repo-local",
+        "credential-free",
+        "Beads ready work",
+        "claim files",
+        "independent reviewer",
+    ]
+    roles = {item["role"] for item in preview["role_entrypoints"]}
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "docs indexed", "ok": "scheduled-agents.md" in index_text, "detail": rel(index_path)},
+        {
+            "name": "preview schema",
+            "ok": preview["schema"] == "awf.operator-workbench.scheduled-agent-usage.v1",
+            "detail": "",
+        },
+        {"name": "selected cli static", "ok": preview["selected_interface"] == "cli-static", "detail": ""},
+        {"name": "no fragile ui dependency", "ok": preview["fragile_ui_dependency"] is False, "detail": ""},
+        {
+            "name": "role coverage",
+            "ok": {"pm-review", "orchestrator", "worker", "integrator", "health"}.issubset(roles),
+            "detail": ",".join(sorted(roles)),
+        },
+        {
+            "name": "artifact contract avoids ui",
+            "ok": preview["artifact_contract"]["ui_session_required"] is False
+            and preview["artifact_contract"]["chat_context_required"] is False,
+            "detail": "",
+        },
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        {"name": "no hosted dependency", "ok": preview["self_hosted"]["hosted_cloud_dependency"] is False, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "index_path": rel(index_path),
+        "schema": "awf.operator-workbench.scheduled-agent-usage.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -3743,11 +3950,13 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "uv run awf interface-decision --json",
                 "uv run awf workbench-interface --json",
                 "uv run awf accessibility-small-screen --json",
+                "uv run awf scheduled-agent-workbench --json",
             ],
             "artifacts": [
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
                 "docs/workbench/interface.md",
                 "docs/workbench/accessibility-small-screen.md",
+                "docs/workbench/scheduled-agents.md",
                 "docs/workbench/goal-dashboard.md",
                 "docs/workbench/increment-dashboard.md",
                 "docs/workbench/evidence-view.md",
@@ -3878,6 +4087,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     data["handoff_summary"] = handoff_summary_from_status(data, audience="session")
     data["interface_decision"] = interface_decision_data(write=False)
     data["accessibility_small_screen"] = accessibility_small_screen_data(write=False)
+    data["scheduled_agent_usage"] = scheduled_agent_workbench_data(write=False)
     data["workbench_interface"] = workbench_interface_from_status(data)
     if write:
         data["generated_by"] = "uv run awf operator-status --write --json"
@@ -7505,6 +7715,24 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_scheduled_agent_data()
+    results.append(
+        {
+            "name": "operator workbench scheduled-agent usage avoids fragile UI dependency",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/scheduled-agents.md"
+            and data["schema"] == "awf.operator-workbench.scheduled-agent-usage.v1"
+            and data["preview"]["selected_interface"] == "cli-static"
+            and data["preview"]["fragile_ui_dependency"] is False
+            and {"pm-review", "orchestrator", "worker", "integrator", "health"}.issubset(
+                {item["role"] for item in data["preview"]["role_entrypoints"]}
+            )
+            and data["preview"]["artifact_contract"]["ui_session_required"] is False
+            and data["preview"]["artifact_contract"]["chat_context_required"] is False
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -7550,6 +7778,8 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["accessibility_small_screen"]["schema"]
             == "awf.operator-workbench.accessibility-small-screen.v1"
             and data["accessibility_small_screen"]["ui_built"] is False
+            and data["scheduled_agent_usage"]["schema"] == "awf.operator-workbench.scheduled-agent-usage.v1"
+            and data["scheduled_agent_usage"]["fragile_ui_dependency"] is False
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
@@ -7577,6 +7807,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "T014",
                 "T015",
                 "T016",
+                "T017",
             }
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
@@ -7645,6 +7876,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "awf-1f9",
                 "awf-jr7",
                 "awf-svr",
+                "awf-mtv",
             }
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8

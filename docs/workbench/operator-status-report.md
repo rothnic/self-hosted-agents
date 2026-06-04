@@ -44,6 +44,8 @@ The report is generated from:
 - `workbench_interface`: selected CLI/static interface with decision strip, restrained primary actions, panels, and source
   handles.
 - `accessibility_small_screen`: CLI/static accessibility and small-screen rationale plus future UI gate.
+- `scheduled_agent_usage`: scheduled-agent role entrypoints, artifact contract, resilience rules, and no-fragile-UI
+  boundary.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.
 
 ## Self-Hosted Behavior

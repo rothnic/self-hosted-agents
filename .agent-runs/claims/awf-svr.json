@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T11:28:33.715493+00:00",
+  "id": "awf-svr",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:04.705899Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:48.327151Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-jr7",
+        "issue_id": "awf-svr",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:38.879267Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-svr",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T016\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T016",
+    "id": "awf-svr",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Document how scheduled agents use the workbench artifacts without a fragile UI dependency",
+    "updated_at": "2026-06-04T06:39:48.327520Z"
+  },
+  "worker_branch": "codex/awf-svr-document-how-scheduled-agents-use-the-wo",
+  "worker_id": "codex-goal006-t016",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-svr-document-how-scheduled-agents-use-the-wo",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-svr-document-how-scheduled-agents-use-the-wo ../self-hosted-agents-worktrees/awf-svr-document-how-scheduled-agents-use-the-wo <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-svr-document-how-scheduled-agents-use-the-wo && git status --short --branch"
+  }
+}

@@ -457,6 +457,30 @@ def accessibility_small_screen(
     raise typer.Exit(0 if ok else 1)
 
 
+@app.command("scheduled-agent-workbench")
+def scheduled_agent_workbench(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local scheduled-agent usage artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Report how scheduled agents use CLI/static workbench artifacts without a UI dependency."""
+    data = core.scheduled_agent_workbench_data(write=write)
+    ok = (
+        data["selected_interface"] == "cli-static"
+        and data["fragile_ui_dependency"] is False
+        and data["self_hosted"]["external_service_required"] is False
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=ok,
+            command="scheduled-agent-workbench",
+            summary=data["summary"],
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if ok else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

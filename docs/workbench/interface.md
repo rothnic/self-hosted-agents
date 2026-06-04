@@ -78,10 +78,13 @@ eval artifacts remain authoritative.
 
 ## Scheduled Agents
 
-Scheduled agents can use the same interface without a fragile UI dependency. The generated artifact includes
-`scheduled_agent_compatibility` so scheduled agents can start from the same command surface as local sessions:
+Scheduled agents, including scheduled agents in automation loops, can use the same interface without a fragile UI
+dependency. `docs/workbench/scheduled-agents.md`
+defines the fuller role-by-role contract. The generated artifact includes `scheduled_agent_compatibility` so scheduled
+agents can start from the same command surface as local sessions:
 
 ```bash
+uv run awf scheduled-agent-workbench --json
 uv run awf workbench-interface --json
 uv run awf handoff-summary --json
 uv run awf operator-status --json
