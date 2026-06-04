@@ -27,7 +27,7 @@
 ## Goal 006 Phase 4: Interface Decision And Implementation
 
 - [X] T013 [US3] Decide whether the workbench remains CLI/static or becomes a local UI
-- [ ] T014 [US3] Implement the selected interface with restrained operating-tool design
+- [X] T014 [US3] Implement the selected interface with restrained operating-tool design
 - [ ] T015 [US3] Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected
 - [ ] T016 [US3] Document how scheduled agents use the workbench artifacts without a fragile UI dependency
 

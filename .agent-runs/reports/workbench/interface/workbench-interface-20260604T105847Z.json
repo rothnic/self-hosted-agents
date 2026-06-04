@@ -1,0 +1,324 @@
+{
+  "decision_strip": {
+    "current_phase": "implementation",
+    "human_required": false,
+    "next_owner": "implementer",
+    "next_ticket": "awf-1f9",
+    "recommendation": "continue claimed ticket awf-1f9",
+    "review_state": "accepted"
+  },
+  "generated_at": "2026-06-04T10:58:47.851541+00:00",
+  "generated_by": "uv run awf workbench-interface --write --json",
+  "implementation_status": "implemented-for-goal-006-t014",
+  "layout": {
+    "card_nesting": "none",
+    "density": "restrained",
+    "local_ui_runtime": false,
+    "panel_count": 6,
+    "primary_action_limit": 4,
+    "visual_style": "plain text sections, tables, JSON, and exact artifact links"
+  },
+  "mode": "cli-static-console",
+  "operating_boundaries": [
+    "No local web or terminal UI runtime is added for Goal 006 T014.",
+    "The interface summarizes existing repo state and links source artifacts instead of replacing them.",
+    "Review progress is blocked only by missing, contradictory, or explicitly reserved durable evidence.",
+    "Hosted services and external credentials are optional; repo-local trace and eval artifacts remain authoritative."
+  ],
+  "panels": [
+    {
+      "fields": [
+        "current_phase",
+        "next_owner",
+        "recommendation",
+        "risks"
+      ],
+      "id": "decision",
+      "priority": "p1",
+      "source": "executive_snapshot",
+      "summary": "continue claimed ticket awf-1f9",
+      "title": "Decision"
+    },
+    {
+      "fields": [
+        "active_claims",
+        "ready",
+        "blocked",
+        "human_required"
+      ],
+      "id": "work",
+      "priority": "p1",
+      "source": "work_queue",
+      "summary": "Continue claimed ticket `awf-1f9` using `.agent-runs/claims/awf-1f9.json`.",
+      "title": "Work"
+    },
+    {
+      "fields": [
+        "presenter_reports",
+        "reviewer_reports",
+        "verification_artifacts",
+        "trace_artifacts",
+        "eval_artifacts",
+        "beads_comments"
+      ],
+      "id": "evidence",
+      "priority": "p1",
+      "source": "evidence_view",
+      "summary": "Open exact artifact handles before making or reviewing a decision.",
+      "title": "Evidence"
+    },
+    {
+      "fields": [
+        "state",
+        "reviewer_id",
+        "findings",
+        "supported_actions",
+        "human_required"
+      ],
+      "id": "review",
+      "priority": "p1",
+      "source": "review_gate",
+      "summary": "Presenter evidence is accepted or rejected by an independent reviewer agent.",
+      "title": "Review"
+    },
+    {
+      "fields": [
+        "repo_local_trace_links",
+        "repo_local_eval_links",
+        "self_hosted_langfuse_links"
+      ],
+      "id": "trace_eval",
+      "priority": "p2",
+      "source": "trace_eval",
+      "summary": "repo-local trace artifacts",
+      "title": "Trace And Eval"
+    },
+    {
+      "fields": [
+        "branch",
+        "commit",
+        "pr_url",
+        "is_draft",
+        "github"
+      ],
+      "id": "branch_pr",
+      "priority": "p2",
+      "source": "branch_pr",
+      "summary": "GitHub PR status available through gh",
+      "title": "Branch And PR"
+    }
+  ],
+  "path": ".agent-runs/reports/workbench/interface/workbench-interface-20260604T105847Z.json",
+  "primary_actions": [
+    {
+      "command": "uv run awf operator-status --json",
+      "id": "inspect",
+      "label": "Inspect status",
+      "purpose": "Read the full repo-backed status surface.",
+      "target": "operator-status"
+    },
+    {
+      "command": "uv run awf handoff-summary --json",
+      "id": "continue",
+      "label": "Continue work",
+      "purpose": "Continue claimed ticket `awf-1f9` using `.agent-runs/claims/awf-1f9.json`.",
+      "target": "awf-1f9"
+    },
+    {
+      "command": "uv run awf review-decision --target-kind ticket --target-id <ticket-id> --verdict accepted --reviewer-id <agent-id> --evidence <path> --write --json",
+      "id": "review",
+      "label": "Record review",
+      "purpose": "Record independent reviewer acceptance or rejection in a durable repo artifact.",
+      "target": "review-decision"
+    },
+    {
+      "command": "uv run awf workflow-fixture-test",
+      "id": "verify",
+      "label": "Run acceptance",
+      "purpose": "Run credential-free fixture acceptance before closing work.",
+      "target": "acceptance"
+    }
+  ],
+  "scheduled_agent_compatibility": {
+    "compatible": true,
+    "fallback_command": "uv run awf handoff-summary --json",
+    "first_command": "uv run awf workbench-interface --json"
+  },
+  "schema": "awf.operator-workbench.interface.v1",
+  "selected_interface": "cli-static",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false,
+    "fallback": "repo-local status, handoff, evidence, trace, eval, Beads, branch, and PR fallback artifacts"
+  },
+  "source_handles": {
+    "beads_comments": [
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T004",
+        "issue_id": "awf-x3q",
+        "latest_comment_at": "2026-06-02T03:07:08Z",
+        "latest_comment_id": 70,
+        "status": "closed",
+        "title": "Extend the Pydantic AI DBOS smoke with a controlled retry proof"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T007",
+        "issue_id": "awf-xei",
+        "latest_comment_at": "2026-06-04T05:04:47Z",
+        "latest_comment_id": 119,
+        "status": "closed",
+        "title": "Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation"
+      },
+      {
+        "comment_count": 2,
+        "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T013",
+        "issue_id": "awf-xjv",
+        "latest_comment_at": "2026-06-04T06:28:49Z",
+        "latest_comment_id": 131,
+        "status": "closed",
+        "title": "Present Goal 005 deployment evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T012",
+        "issue_id": "awf-xwm",
+        "latest_comment_at": "2026-06-04T10:17:29Z",
+        "latest_comment_id": 143,
+        "status": "closed",
+        "title": "Add concise daily or session handoff summaries for scheduled agents and local sessions"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
+        "issue_id": "awf-yka",
+        "latest_comment_at": "2026-06-04T00:24:30Z",
+        "latest_comment_id": 95,
+        "status": "closed",
+        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+        "issue_id": "awf-yu8",
+        "latest_comment_at": "2026-06-04T08:41:05Z",
+        "latest_comment_id": 138,
+        "status": "closed",
+        "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/004-durable-agent-execution-runtime/tasks.md#T005",
+        "issue_id": "awf-yuz",
+        "latest_comment_at": "2026-06-02T03:25:54Z",
+        "latest_comment_id": 71,
+        "status": "closed",
+        "title": "Harden the restart/resume smoke so run identity survives process interruption"
+      },
+      {
+        "comment_count": 1,
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T007",
+        "issue_id": "awf-zi9",
+        "latest_comment_at": "2026-06-04T00:58:19Z",
+        "latest_comment_id": 98,
+        "status": "closed",
+        "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
+      }
+    ],
+    "claims": [
+      ".agent-runs/claims/awf-1f9.json"
+    ],
+    "docs": [
+      "docs/workbench/interface.md",
+      "docs/workbench/operator-status-report.md",
+      "docs/workbench/status-artifact-schema.md",
+      "docs/workbench/interface-decision.md"
+    ],
+    "eval_artifacts": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.evaluation.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.evaluation.json"
+    ],
+    "pr": "https://github.com/rothnic/self-hosted-agents/pull/12",
+    "presenter_reports": [
+      ".agent-runs/reports/goal-006/t013-interface-decision-20260604.md",
+      ".agent-runs/reports/workbench/operator-status-20260604T104517Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T103821Z.json",
+      ".agent-runs/reports/workbench/interface-decision-20260604T103748Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T101742Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T101041Z.json",
+      ".agent-runs/reports/workbench/handoff-summary-scheduled-20260604T101041Z.json",
+      ".agent-runs/reports/workbench/handoff-summary-session-20260604T101040Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T095811Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T095248Z.json",
+      ".agent-runs/reports/workbench/trace-eval-links-20260604T095246Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T093355Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T092651Z.json",
+      ".agent-runs/reports/workbench/branch-pr-status-20260604T092651Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T091646Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T091005Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T085736Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T085121Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T084119Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T083502Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T082602Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T082055Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T080857Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T080341Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T074012Z.json",
+      ".agent-runs/reports/workbench/operator-status-20260604T073238Z.json"
+    ],
+    "reviewer_reports": [
+      ".agent-runs/reports/goal-006/t012-handoff-summary-20260604.md",
+      ".agent-runs/reports/goal-006/t011-trace-eval-links-20260604.md",
+      ".agent-runs/reports/goal-006/t010-branch-pr-status-20260604.md",
+      ".agent-runs/reports/goal-006/t009-review-decisions-20260604.md",
+      ".agent-runs/reports/goal-006/t008-review-actions-20260604.md",
+      ".agent-runs/reports/goal-006/t007-evidence-view-20260604.md",
+      ".agent-runs/reports/goal-006/t006-increment-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t005-goal-dashboard-20260604.md",
+      ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+      ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+      ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+      ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+      ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+      ".agent-runs/reports/goal-005/t013-independent-review-20260604.md"
+    ],
+    "trace_artifacts": [
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T060414Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/pydantic-ai-run.trace.json",
+      ".agent-runs/reports/goal-005/deployment-smoke-local-20260604T045610Z/pydantic-ai-run.trace.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.trace.json",
+      ".agent-runs/verifications/pydantic-ai-langfuse-run-20260531.trace.json"
+    ],
+    "verification_artifacts": [
+      ".agent-runs/verifications/verify-increment-20260604T024229Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T103037Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102149Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102124Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-health-20260602T102020Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T074617Z.json",
+      ".agent-runs/verifications/verify-ticket-20260602T074546Z.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t009-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t008-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t007-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t006-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t005-20260602.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t004-20260602.json",
+      ".agent-runs/verifications/verify-increment-20260601T002227Z.json",
+      ".agent-runs/verifications/verify-increment-20260531T235614Z.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t025-20260531.json",
+      ".agent-runs/verifications/verify-durable-options-t024-20260531.json",
+      ".agent-runs/verifications/verify-pydantic-evals-t023-20260531.json",
+      ".agent-runs/verifications/pydantic-ai-evals-run-20260531.json"
+    ]
+  },
+  "source_status": {
+    "command": "uv run awf operator-status --json",
+    "path": null,
+    "schema": "awf.operator-workbench.status.v1"
+  }
+}

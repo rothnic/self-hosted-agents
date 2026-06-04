@@ -409,6 +409,30 @@ def interface_decision(
     raise typer.Exit(0 if data["decision"] else 1)
 
 
+@app.command("workbench-interface")
+def workbench_interface(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local selected interface artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Generate the selected CLI/static operator interface from repo state."""
+    data = core.workbench_interface_data(write=write)
+    ok = (
+        data["selected_interface"] == "cli-static"
+        and data["layout"]["local_ui_runtime"] is False
+        and data["self_hosted"]["external_service_required"] is False
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=ok,
+            command="workbench-interface",
+            summary=data["decision_strip"]["recommendation"] or "Workbench interface.",
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if ok else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

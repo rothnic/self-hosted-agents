@@ -1826,6 +1826,9 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "trace_eval",
         "branch_pr",
         "handoff",
+        "handoff_summary",
+        "interface_decision",
+        "workbench_interface",
         "health",
         "decision_summaries",
     ]
@@ -1847,6 +1850,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "awf.operator-workbench.evidence-view.v1",
         "awf.operator-workbench.review-action.v1",
         "awf.operator-workbench.branch-pr.v1",
+        "awf.operator-workbench.interface.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -3294,6 +3298,238 @@ def operator_workbench_interface_decision_data() -> dict[str, Any]:
     }
 
 
+def workbench_interface_from_status(
+    status: dict[str, Any],
+    generated_by: str = "uv run awf workbench-interface --json",
+) -> dict[str, Any]:
+    handoff = status.get("handoff", {})
+    work_queue = status.get("work_queue", {})
+    active_claims = work_queue.get("active_claims", [])
+    active_claim = active_claims[0] if active_claims else {}
+    ready_item = work_queue.get("ready", [{}])[0] if work_queue.get("ready") else {}
+    next_work = active_claim.get("issue") or ready_item
+    review_gate = status.get("review_gate", {})
+    evidence_view = status.get("evidence_view", {})
+    branch_pr = status.get("branch_pr", {})
+    trace_eval = status.get("trace_eval", {})
+    evidence_map = status.get("evidence_map", {})
+    claim_paths = [claim.get("path") for claim in active_claims if claim.get("path")]
+    next_ticket = handoff.get("next_ticket") or next_work.get("id")
+    if claim_paths and next_ticket:
+        continue_detail = f"Continue claimed ticket `{next_ticket}` using `{claim_paths[0]}`."
+    elif next_ticket:
+        continue_detail = f"Claim ready ticket `{next_ticket}` from Beads."
+    else:
+        continue_detail = "No ready ticket; route through next-action and backlog planning."
+    primary_actions = [
+        {
+            "id": "inspect",
+            "label": "Inspect status",
+            "command": "uv run awf operator-status --json",
+            "purpose": "Read the full repo-backed status surface.",
+            "target": "operator-status",
+        },
+        {
+            "id": "continue",
+            "label": "Continue work",
+            "command": "uv run awf handoff-summary --json",
+            "purpose": continue_detail,
+            "target": next_ticket,
+        },
+        {
+            "id": "review",
+            "label": "Record review",
+            "command": (
+                "uv run awf review-decision --target-kind ticket --target-id <ticket-id> "
+                "--verdict accepted --reviewer-id <agent-id> --evidence <path> --write --json"
+            ),
+            "purpose": "Record independent reviewer acceptance or rejection in a durable repo artifact.",
+            "target": "review-decision",
+        },
+        {
+            "id": "verify",
+            "label": "Run acceptance",
+            "command": "uv run awf workflow-fixture-test",
+            "purpose": "Run credential-free fixture acceptance before closing work.",
+            "target": "acceptance",
+        },
+    ]
+    panels = [
+        {
+            "id": "decision",
+            "title": "Decision",
+            "source": "executive_snapshot",
+            "priority": "p1",
+            "fields": ["current_phase", "next_owner", "recommendation", "risks"],
+            "summary": status.get("executive_snapshot", {}).get("recommendation"),
+        },
+        {
+            "id": "work",
+            "title": "Work",
+            "source": "work_queue",
+            "priority": "p1",
+            "fields": ["active_claims", "ready", "blocked", "human_required"],
+            "summary": continue_detail,
+        },
+        {
+            "id": "evidence",
+            "title": "Evidence",
+            "source": "evidence_view",
+            "priority": "p1",
+            "fields": [
+                "presenter_reports",
+                "reviewer_reports",
+                "verification_artifacts",
+                "trace_artifacts",
+                "eval_artifacts",
+                "beads_comments",
+            ],
+            "summary": "Open exact artifact handles before making or reviewing a decision.",
+        },
+        {
+            "id": "review",
+            "title": "Review",
+            "source": "review_gate",
+            "priority": "p1",
+            "fields": ["state", "reviewer_id", "findings", "supported_actions", "human_required"],
+            "summary": "Presenter evidence is accepted or rejected by an independent reviewer agent.",
+        },
+        {
+            "id": "trace_eval",
+            "title": "Trace And Eval",
+            "source": "trace_eval",
+            "priority": "p2",
+            "fields": ["repo_local_trace_links", "repo_local_eval_links", "self_hosted_langfuse_links"],
+            "summary": trace_eval.get("availability", {}).get("self_hosted_langfuse", {}).get("fallback"),
+        },
+        {
+            "id": "branch_pr",
+            "title": "Branch And PR",
+            "source": "branch_pr",
+            "priority": "p2",
+            "fields": ["branch", "commit", "pr_url", "is_draft", "github"],
+            "summary": branch_pr.get("fallback"),
+        },
+    ]
+    return {
+        "schema": "awf.operator-workbench.interface.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_by": generated_by,
+        "selected_interface": "cli-static",
+        "implementation_status": "implemented-for-goal-006-t014",
+        "mode": "cli-static-console",
+        "source_status": {
+            "schema": status.get("schema"),
+            "command": status.get("generated_by"),
+            "path": status.get("path"),
+        },
+        "decision_strip": {
+            "current_phase": status.get("executive_snapshot", {}).get("current_phase"),
+            "next_owner": status.get("executive_snapshot", {}).get("next_owner"),
+            "recommendation": status.get("executive_snapshot", {}).get("recommendation"),
+            "next_ticket": next_ticket,
+            "review_state": review_gate.get("state"),
+            "human_required": review_gate.get("human_required") is True,
+        },
+        "layout": {
+            "density": "restrained",
+            "primary_action_limit": 4,
+            "panel_count": len(panels),
+            "card_nesting": "none",
+            "visual_style": "plain text sections, tables, JSON, and exact artifact links",
+            "local_ui_runtime": False,
+        },
+        "primary_actions": primary_actions,
+        "panels": panels,
+        "source_handles": {
+            "docs": [
+                "docs/workbench/interface.md",
+                "docs/workbench/operator-status-report.md",
+                "docs/workbench/status-artifact-schema.md",
+                "docs/workbench/interface-decision.md",
+            ],
+            "claims": claim_paths,
+            "presenter_reports": evidence_map.get("presenter_reports", []),
+            "reviewer_reports": evidence_map.get("reviewer_reports", []),
+            "verification_artifacts": evidence_map.get("verification_artifacts", []),
+            "trace_artifacts": evidence_map.get("trace_artifacts", []),
+            "eval_artifacts": evidence_map.get("eval_artifacts", []),
+            "pr": branch_pr.get("pr_url") or branch_pr.get("fallback"),
+            "beads_comments": evidence_view.get("beads_comments", []),
+        },
+        "operating_boundaries": [
+            "No local web or terminal UI runtime is added for Goal 006 T014.",
+            "The interface summarizes existing repo state and links source artifacts instead of replacing them.",
+            "Review progress is blocked only by missing, contradictory, or explicitly reserved durable evidence.",
+            "Hosted services and external credentials are optional; repo-local trace and eval artifacts remain authoritative.",
+        ],
+        "scheduled_agent_compatibility": {
+            "compatible": True,
+            "first_command": "uv run awf workbench-interface --json",
+            "fallback_command": "uv run awf handoff-summary --json",
+        },
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "repo-local status, handoff, evidence, trace, eval, Beads, branch, and PR fallback artifacts",
+        },
+    }
+
+
+def workbench_interface_data(write: bool = False) -> dict[str, Any]:
+    status = operator_status_data(write=False)
+    generated_by = "uv run awf workbench-interface --write --json" if write else "uv run awf workbench-interface --json"
+    data = workbench_interface_from_status(status, generated_by=generated_by)
+    if write:
+        data["path"] = write_json_artifact("reports/workbench/interface", "workbench-interface", data)
+    return data
+
+
+def operator_workbench_interface_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "interface.md"
+    index_path = ROOT / "docs" / "workbench" / "README.md"
+    docs_text = read_text(docs_path)
+    index_text = read_text(index_path)
+    preview = workbench_interface_from_status(operator_status_data(write=False))
+    required_terms = [
+        "awf.operator-workbench.interface.v1",
+        "uv run awf workbench-interface",
+        "CLI/static",
+        "restrained",
+        "primary action",
+        "source artifacts",
+        "No local UI runtime",
+        "credential-free",
+        "scheduled agents",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "docs indexed", "ok": "interface.md" in index_text, "detail": rel(index_path)},
+        {"name": "preview schema", "ok": preview["schema"] == "awf.operator-workbench.interface.v1", "detail": ""},
+        {"name": "selected cli static", "ok": preview["selected_interface"] == "cli-static", "detail": ""},
+        {"name": "no local ui runtime", "ok": preview["layout"]["local_ui_runtime"] is False, "detail": ""},
+        {"name": "restrained actions", "ok": len(preview["primary_actions"]) <= 4, "detail": ""},
+        {"name": "panel coverage", "ok": len(preview["panels"]) >= 6, "detail": ""},
+        {"name": "source handles", "ok": bool(preview["source_handles"]["docs"]), "detail": ""},
+        {"name": "credential free", "ok": preview["self_hosted"]["credential_free"] is True, "detail": ""},
+        {"name": "scheduled compatible", "ok": preview["scheduled_agent_compatibility"]["compatible"] is True, "detail": ""},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "index_path": rel(index_path),
+        "schema": "awf.operator-workbench.interface.v1",
+        "preview": preview,
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -3380,9 +3616,12 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "uv run awf review-gate --json",
                 "uv run awf repo-hygiene --json",
                 "uv run awf workflow-state-lint --json",
+                "uv run awf interface-decision --json",
+                "uv run awf workbench-interface --json",
             ],
             "artifacts": [
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
+                "docs/workbench/interface.md",
                 "docs/workbench/goal-dashboard.md",
                 "docs/workbench/increment-dashboard.md",
                 "docs/workbench/evidence-view.md",
@@ -3512,8 +3751,10 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     }
     data["handoff_summary"] = handoff_summary_from_status(data, audience="session")
     data["interface_decision"] = interface_decision_data(write=False)
+    data["workbench_interface"] = workbench_interface_from_status(data)
     if write:
         data["generated_by"] = "uv run awf operator-status --write --json"
+        data["workbench_interface"] = workbench_interface_from_status(data)
         data["path"] = write_json_artifact("reports/workbench", "operator-status", data)
     return data
 
@@ -7097,6 +7338,29 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_interface_data()
+    results.append(
+        {
+            "name": "operator workbench selected CLI static interface is implemented",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/interface.md"
+            and data["schema"] == "awf.operator-workbench.interface.v1"
+            and data["preview"]["selected_interface"] == "cli-static"
+            and data["preview"]["mode"] == "cli-static-console"
+            and data["preview"]["layout"]["density"] == "restrained"
+            and data["preview"]["layout"]["local_ui_runtime"] is False
+            and len(data["preview"]["primary_actions"]) <= 4
+            and {"inspect", "continue", "review", "verify"}.issubset(
+                {item["id"] for item in data["preview"]["primary_actions"]}
+            )
+            and {"decision", "work", "evidence", "review", "trace_eval", "branch_pr"}.issubset(
+                {item["id"] for item in data["preview"]["panels"]}
+            )
+            and data["preview"]["scheduled_agent_compatibility"]["compatible"] is True
+            and data["preview"]["self_hosted"]["external_service_required"] is False,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -7136,6 +7400,9 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["interface_decision"]["schema"] == "awf.operator-workbench.interface-decision.v1"
             and data["interface_decision"]["decision"] == "cli-static"
             and data["interface_decision"]["self_hosted"]["external_service_required"] is False
+            and data["workbench_interface"]["schema"] == "awf.operator-workbench.interface.v1"
+            and data["workbench_interface"]["selected_interface"] == "cli-static"
+            and data["workbench_interface"]["layout"]["local_ui_runtime"] is False
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
@@ -7150,7 +7417,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
             and dashboard["current_phase"]["next_task"]["id"]
-            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014"}
+            in {"T005", "T006", "T007", "T008", "T009", "T010", "T011", "T012", "T013", "T014", "T015"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -7216,6 +7483,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "awf-xwm",
                 "awf-s6n",
                 "awf-1f9",
+                "awf-jr7",
             }
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8

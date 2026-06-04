@@ -41,6 +41,8 @@ The report is generated from:
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.
 - `handoff_summary`: concise local-session and scheduled-agent prompts with exact artifact handles.
 - `interface_decision`: selected CLI/static interface decision plus local UI deferral rationale.
+- `workbench_interface`: selected CLI/static interface with decision strip, restrained primary actions, panels, and source
+  handles.
 - `health`: shallow validation summaries for repo hygiene, workflow-state lint, and review gate.
 
 ## Self-Hosted Behavior
