@@ -32,7 +32,11 @@ The increment ledger is
 `.agent-runs/increments/006-self-hosted-deployment-operations-reference-goal-005.json`, and the Beads parent epic is
 `awf-h2u`.
 
-Completed through T012:
+Accepted on 2026-06-04 by independent reviewer agent `019e9149-edca-7530-b652-c707f6bf3238`. Presenter evidence is in
+`.agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md`, and reviewer acceptance is in
+`.agent-runs/reports/goal-005/t013-independent-review-20260604.md`.
+
+Completed through T013:
 
 - T001 / `awf-n19`: self-hosted deployment operations BDD contract.
 - T002 / `awf-gdu`: local, development-server, and production-like deployment profiles.
@@ -46,14 +50,14 @@ Completed through T012:
 - T010 / `awf-hic`: health, log, trace, and diagnostics runbooks for app, observability, durable runtime, and storage.
 - T011 / `awf-2jm`: rollback, recovery, retention, resource, and cost notes for one-engineer operation.
 - T012 / `awf-pt7`: local clean-path backup, restore, readiness, and smoke rehearsal with gaps and follow-up routing.
+- T013 / `awf-xjv`: Goal 005 evidence presentation and independent reviewer acceptance.
 
-Next ready implementer ticket:
+Next roadmap step:
 
-- `awf-xjv` / T013: present Goal 005 deployment evidence and record independent reviewer acceptance or rejection.
+- Goal 006: `docs/goals/006-operator-workbench-review-ux.md`.
 
-The remaining Goal 005 tickets are dependency-ordered through T013. T013 presents final Goal 005 evidence, and a
-separate reviewer agent must record acceptance or rejection. Human review is not a progress blocker unless a decision is
-explicitly reserved, missing, or contradicted by evidence.
+Goal 005 has no remaining implementation tickets after T013 closure. Human review is not a progress blocker unless a
+decision is explicitly reserved, missing, or contradicted by evidence.
 
 ## Task Backlog
 

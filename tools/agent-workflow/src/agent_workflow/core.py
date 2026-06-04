@@ -1541,6 +1541,125 @@ def deployment_clean_path_rehearsal_data() -> dict[str, Any]:
     }
 
 
+def deployment_goal_005_acceptance_data() -> dict[str, Any]:
+    report_path = ROOT / ".agent-runs" / "reports" / "goal-005" / "t013-goal-005-evidence-20260604.md"
+    review_path = ROOT / ".agent-runs" / "reports" / "goal-005" / "t013-independent-review-20260604.md"
+    report_text = read_text(report_path)
+    review_text = read_text(review_path)
+    required_report_sections = [
+        "## Scope",
+        "## Completed Work",
+        "## Definition Of Done Mapping",
+        "## Requirement Mapping",
+        "## Reviewer-Accepted Task Evidence",
+        "## Validation",
+        "## Follow-Up Promotion Gates",
+        "## Acceptance Request",
+    ]
+    required_report_terms = [
+        "awf-xjv",
+        "awf-n19",
+        "awf-gdu",
+        "awf-noh",
+        "awf-is8",
+        "awf-091",
+        "awf-t1m",
+        "awf-xei",
+        "awf-rgf",
+        "awf-71o",
+        "awf-hic",
+        "awf-2jm",
+        "awf-pt7",
+        "docs/deployment/profiles.md",
+        "docs/deployment/service-boundaries.md",
+        "uv run awf deployment-smoke --profile local --write --json",
+        "deployment-credential-free-fallback-20260604T051344Z/credential-free-fallback.json",
+        "t012-clean-path-rehearsal-20260604.md",
+        "uv run awf workflow-fixture-test --json",
+        "uv run awf review-gate --json",
+        "awf-eas",
+        "awf-lkr",
+        "awf-5ae",
+        "awf-4x7",
+        "awf-6zf",
+        "awf-7ck",
+    ]
+    required_review_terms = [
+        "Outcome: accepted",
+        "Reviewer agent:",
+        "Goal 005",
+        "no human-review gate",
+        "not blockers",
+        "awf-eas",
+        "awf-lkr",
+        "awf-5ae",
+        "awf-4x7",
+        "awf-6zf",
+        "awf-7ck",
+    ]
+    checks = [
+        {
+            "name": "presenter report exists",
+            "ok": report_path.exists(),
+            "detail": rel(report_path),
+        },
+        {
+            "name": "review report exists",
+            "ok": review_path.exists(),
+            "detail": rel(review_path),
+        },
+        *[
+            {
+                "name": f"presenter section:{section}",
+                "ok": section in report_text,
+                "detail": section,
+            }
+            for section in required_report_sections
+        ],
+        *[
+            {
+                "name": f"presenter term:{term}",
+                "ok": term in report_text,
+                "detail": term,
+            }
+            for term in required_report_terms
+        ],
+        *[
+            {
+                "name": f"review term:{term}",
+                "ok": term in review_text,
+                "detail": term,
+            }
+            for term in required_review_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "report_path": rel(report_path),
+        "review_path": rel(review_path),
+        "checks": checks,
+        "missing": missing,
+        "completed_tasks": [
+            "T001",
+            "T002",
+            "T003",
+            "T004",
+            "T005",
+            "T006",
+            "T007",
+            "T008",
+            "T009",
+            "T010",
+            "T011",
+            "T012",
+            "T013",
+        ],
+        "review_boundary": "independent-reviewer-acceptance",
+        "follow_up_issues": ["awf-eas", "awf-lkr", "awf-5ae", "awf-4x7", "awf-6zf", "awf-7ck"],
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4936,6 +5055,21 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"backup", "restore", "readiness", "deployment smoke"}.issubset(set(data["rehearsed_surfaces"]))
             and {"awf-eas", "awf-lkr", "awf-5ae", "awf-4t2"}.issubset(set(data["follow_up_issues"]))
             and {"Self-hosted Langfuse", "Production DBOS storage"}.issubset(set(data["service_backed_gaps"])),
+            "data": data,
+        }
+    )
+    data = deployment_goal_005_acceptance_data()
+    results.append(
+        {
+            "name": "deployment goal 005 evidence has independent reviewer acceptance",
+            "ok": data["ok"]
+            and data["report_path"] == ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md"
+            and data["review_path"] == ".agent-runs/reports/goal-005/t013-independent-review-20260604.md"
+            and data["review_boundary"] == "independent-reviewer-acceptance"
+            and {"T001", "T012", "T013"}.issubset(set(data["completed_tasks"]))
+            and {"awf-eas", "awf-lkr", "awf-5ae", "awf-4x7", "awf-6zf", "awf-7ck"}.issubset(
+                set(data["follow_up_issues"])
+            ),
             "data": data,
         }
     )

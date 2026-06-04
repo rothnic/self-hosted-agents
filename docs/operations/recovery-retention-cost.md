@@ -235,7 +235,7 @@ An acceptable T011 report names:
 
 ## Current Gaps
 
-- T011 documents rollback, recovery, retention, resource, and cost procedures but does not rehearse them.
+- T012 rehearsed the local clean-path backup, restore, readiness, and smoke path. Service-backed recovery remains a
+  promotion follow-up.
 - Production DBOS storage retention and recovery still require controlled service-backed proof.
 - Langfuse backup retention and object storage recovery still require host-local service evidence.
-- T012 must record a clean-path or fresh setup rehearsal with commands, evidence, and remaining gaps.
