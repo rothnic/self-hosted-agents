@@ -15,6 +15,8 @@ local UI.
 - `increment-dashboard.md`: increment dashboard for tickets, claims, blockers, workers, and validation state.
 - `evidence-view.md`: evidence view for run artifacts, traces, evals, Beads comments, branches, and PR fallback.
 - `review-actions.md`: durable review-gate actions for approve, request changes, defer, and ask questions.
+- `review-decisions.md`: durable reviewer decision records with verdict, evidence checked, findings, and follow-up
+  routing.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -40,5 +42,4 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T009 should add reviewer decision records with verdict, evidence checked, findings, and follow-up routing on top of the
-durable review-action surface.
+T010 should add branch and PR status integration with repo-local fallback when GitHub access is unavailable.

@@ -193,6 +193,71 @@ def review_action(
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("review-decision")
+def review_decision(
+    verdict: str = typer.Option(..., "--verdict", help="accepted, rejected, deferred, question, or human-required."),
+    target_kind: str = typer.Option(..., "--target-kind", help="ticket, increment, goal, or fixture."),
+    target_id: str = typer.Option(..., "--target-id", help="Target identifier."),
+    reviewer_id: str = typer.Option(..., "--reviewer-id", help="Reviewer or agent id recording the decision."),
+    evidence_checked: list[str] = typer.Option(
+        [],
+        "--evidence-checked",
+        help="Evidence item checked by the reviewer. Can be repeated.",
+    ),
+    source_artifact: list[str] = typer.Option(
+        [],
+        "--source-artifact",
+        help="Presenter or validation artifact supporting the decision. Can be repeated.",
+    ),
+    finding: list[str] = typer.Option(
+        [],
+        "--finding",
+        help="Finding as severity|summary|required action. Can be repeated.",
+    ),
+    follow_up_ticket: list[str] = typer.Option(
+        [],
+        "--follow-up-ticket",
+        help="Existing or proposed Beads follow-up id. Can be repeated.",
+    ),
+    note: str = typer.Option("", "--note", help="Decision note."),
+    spec_id: str = typer.Option("", "--spec-id", help="Optional Spec Kit id."),
+    task_id: str = typer.Option("", "--task-id", help="Optional task id."),
+    human_required_reason: str = typer.Option(
+        "",
+        "--human-required-reason",
+        help="Reason human escalation is required, if any.",
+    ),
+    write: bool = typer.Option(False, "--write", help="Persist the review decision artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Record a durable reviewer decision with evidence checked and follow-up routing."""
+    data = core.review_decision_data(
+        verdict=verdict,
+        target_kind=target_kind,
+        target_id=target_id,
+        reviewer_id=reviewer_id,
+        evidence_checked=evidence_checked,
+        source_artifacts=source_artifact,
+        findings=finding,
+        follow_up_tickets=follow_up_ticket,
+        note=note,
+        spec_id=spec_id,
+        task_id=task_id,
+        human_required_reason=human_required_reason,
+        write=write,
+    )
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="review-decision",
+            summary=data.get("next_action", "review decision processed"),
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
 @app.command("repo-hygiene")
 def repo_hygiene(json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output.")) -> None:
     """Enforce root cleanliness, directory size, line length, and alpha compatibility policy."""

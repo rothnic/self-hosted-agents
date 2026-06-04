@@ -61,6 +61,7 @@ TASK_RE = re.compile(
 OBJECTIVE_RE = re.compile(r"^ID:\s*`?([^`\s]+)`?\s*$", re.MULTILINE)
 REVIEW_ACTIONS = {"approve", "request-changes", "defer", "ask-question"}
 REVIEW_TARGET_KINDS = {"ticket", "increment", "goal", "fixture"}
+REVIEW_VERDICTS = {"accepted", "rejected", "deferred", "question", "human-required"}
 
 
 @dataclass
@@ -2420,6 +2421,217 @@ def recent_review_actions(limit: int = 8) -> list[dict[str, Any]]:
     return actions
 
 
+def parse_review_finding(value: str) -> dict[str, Any]:
+    parts = [part.strip() for part in value.split("|", 2)]
+    if len(parts) == 1:
+        return {"severity": "info", "summary": parts[0], "required_action": None}
+    if len(parts) == 2:
+        return {"severity": parts[0] or "info", "summary": parts[1], "required_action": None}
+    return {"severity": parts[0] or "info", "summary": parts[1], "required_action": parts[2] or None}
+
+
+def review_decision_artifact(
+    verdict: str,
+    target_kind: str,
+    target_id: str,
+    reviewer_id: str,
+    evidence_checked: list[str],
+    source_artifacts: list[str],
+    findings: list[str],
+    follow_up_tickets: list[str],
+    note: str,
+    spec_id: str | None = None,
+    task_id: str | None = None,
+    human_required_reason: str | None = None,
+) -> dict[str, Any]:
+    human_required = verdict == "human-required" or bool(human_required_reason)
+    return {
+        "schema": "awf.operator-workbench.decision-summary.v1",
+        "decision_id": now_id(f"review-decision-{verdict}-{target_id}"),
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+        "verdict": verdict,
+        "outcome": verdict,
+        "target": {
+            "kind": target_kind,
+            "id": target_id,
+            "spec_id": spec_id,
+            "task_id": task_id,
+        },
+        "reviewer": {
+            "agent_id": reviewer_id,
+            "role": "reviewer",
+        },
+        "evidence_checked": evidence_checked,
+        "findings": [parse_review_finding(item) for item in findings],
+        "follow_up_tickets": follow_up_tickets,
+        "follow_up_routing": {
+            "required": bool(follow_up_tickets),
+            "tickets": follow_up_tickets,
+            "next_owner": "implementer" if follow_up_tickets else None,
+        },
+        "human_required": {
+            "required": human_required,
+            "reason": human_required_reason if human_required else None,
+        },
+        "source_artifacts": source_artifacts,
+        "note": note,
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+        },
+    }
+
+
+def review_decision_data(
+    verdict: str,
+    target_kind: str,
+    target_id: str,
+    reviewer_id: str,
+    evidence_checked: list[str] | None = None,
+    source_artifacts: list[str] | None = None,
+    findings: list[str] | None = None,
+    follow_up_tickets: list[str] | None = None,
+    note: str = "",
+    spec_id: str | None = None,
+    task_id: str | None = None,
+    human_required_reason: str | None = None,
+    write: bool = False,
+) -> dict[str, Any]:
+    normalized_verdict = verdict.strip().lower()
+    normalized_kind = target_kind.strip().lower()
+    checked_items = [item for item in (evidence_checked or []) if item]
+    source_items = [item for item in (source_artifacts or []) if item]
+    finding_items = [item for item in (findings or []) if item]
+    follow_up_items = [item for item in (follow_up_tickets or []) if item]
+    errors = []
+    if normalized_verdict not in REVIEW_VERDICTS:
+        errors.append(f"verdict must be one of: {', '.join(sorted(REVIEW_VERDICTS))}")
+    if normalized_kind not in REVIEW_TARGET_KINDS:
+        errors.append(f"target-kind must be one of: {', '.join(sorted(REVIEW_TARGET_KINDS))}")
+    if not target_id.strip():
+        errors.append("target-id is required")
+    if not reviewer_id.strip():
+        errors.append("reviewer-id is required")
+    if not checked_items:
+        errors.append("at least one evidence-checked item is required")
+    if errors:
+        return {
+            "ok": False,
+            "write": write,
+            "errors": errors,
+            "next_action": "fix review decision input",
+        }
+    artifact = review_decision_artifact(
+        verdict=normalized_verdict,
+        target_kind=normalized_kind,
+        target_id=target_id.strip(),
+        reviewer_id=reviewer_id.strip(),
+        evidence_checked=checked_items,
+        source_artifacts=source_items,
+        findings=finding_items,
+        follow_up_tickets=follow_up_items,
+        note=note,
+        spec_id=spec_id.strip() if spec_id else None,
+        task_id=task_id.strip() if task_id else None,
+        human_required_reason=human_required_reason.strip() if human_required_reason else None,
+    )
+    path = None
+    if write:
+        path = write_json_artifact("review-decisions", f"{normalized_verdict}-{target_id}", artifact)
+    return {
+        "ok": True,
+        "write": write,
+        "path": path,
+        "decision": artifact,
+        "supported_verdicts": sorted(REVIEW_VERDICTS),
+        "nonblocking": artifact["human_required"]["required"] is False,
+        "next_action": "review decision recorded" if write else "review decision previewed",
+    }
+
+
+def recent_review_decisions(limit: int = 8) -> list[dict[str, Any]]:
+    decisions = []
+    for path in recent_artifact_paths(".agent-runs/review-decisions", (".json",), limit=limit):
+        data = read_json(ROOT / path) or {}
+        decisions.append(
+            {
+                "path": path,
+                "schema": data.get("schema"),
+                "verdict": data.get("verdict", data.get("outcome")),
+                "outcome": data.get("outcome", data.get("verdict")),
+                "target": data.get("target"),
+                "reviewer": data.get("reviewer"),
+                "evidence_checked": data.get("evidence_checked", []),
+                "finding_count": len(data.get("findings", [])),
+                "findings": data.get("findings", []),
+                "follow_up_tickets": data.get("follow_up_tickets", []),
+                "follow_up_routing": data.get("follow_up_routing", {}),
+                "human_required": data.get("human_required", {}).get("required"),
+            }
+        )
+    return decisions
+
+
+def operator_workbench_review_decisions_data() -> dict[str, Any]:
+    docs_path = ROOT / "docs" / "workbench" / "review-decisions.md"
+    docs_text = read_text(docs_path)
+    preview = review_decision_data(
+        verdict="accepted",
+        target_kind="fixture",
+        target_id="goal-006-t009-fixture",
+        reviewer_id="fixture-reviewer",
+        evidence_checked=["uv run awf workflow-fixture-test"],
+        source_artifacts=[".agent-runs/reports/goal-006/t008-review-actions-20260604.md"],
+        findings=[],
+        follow_up_tickets=[],
+        note="Fixture preview for accepted decision record.",
+        spec_id="007-operator-workbench-review-ux",
+        task_id="T009",
+        write=False,
+    )
+    request_changes = review_decision_data(
+        verdict="rejected",
+        target_kind="ticket",
+        target_id="awf-fixture",
+        reviewer_id="fixture-reviewer",
+        evidence_checked=["docs/workbench/review-decisions.md"],
+        source_artifacts=[".agent-runs/reports/example.md"],
+        findings=["major|Missing evidence link|Add a presenter report artifact"],
+        follow_up_tickets=["awf-follow-up"],
+        note="Fixture preview for follow-up routing.",
+        write=False,
+    )
+    required_terms = [
+        "awf.operator-workbench.decision-summary.v1",
+        ".agent-runs/review-decisions/",
+        "verdict",
+        "evidence_checked",
+        "findings",
+        "follow_up_routing",
+        "human_required",
+        "credential-free",
+    ]
+    checks = [
+        {"name": "docs exist", "ok": docs_path.exists(), "detail": rel(docs_path)},
+        {"name": "accepted preview", "ok": preview["ok"], "detail": "accepted"},
+        {"name": "follow-up preview", "ok": request_changes["ok"], "detail": "rejected"},
+        *[
+            {"name": f"term:{term}", "ok": term in docs_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "docs_path": rel(docs_path),
+        "schema": "awf.operator-workbench.decision-summary.v1",
+        "supported_verdicts": sorted(REVIEW_VERDICTS),
+        "previews": [preview["decision"], request_changes["decision"]],
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def operator_workbench_review_actions_data() -> dict[str, Any]:
     docs_path = ROOT / "docs" / "workbench" / "review-actions.md"
     docs_text = read_text(docs_path)
@@ -2522,6 +2734,9 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     eval_artifacts = recent_artifact_paths_anywhere((".evaluation.json",), limit=20)
     review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
     review_actions = recent_review_actions()
+    review_decisions = recent_review_decisions()
+    latest_review_decision = review_decisions[0] if review_decisions else {}
+    latest_human_required = latest_review_decision.get("human_required") is True
     goal_dashboard = goal_dashboard_data(issues, claims, ready)
     active_goal_evidence = [
         item["path"]
@@ -2563,6 +2778,8 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 ".agent-runs/claims/",
                 ".agent-runs/reports/",
                 ".agent-runs/verifications/",
+                ".agent-runs/review-actions/",
+                ".agent-runs/review-decisions/",
             ],
         },
         "scope": {
@@ -2616,15 +2833,20 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "pr_evidence": [evidence_view["branch_pr"]],
         },
         "review_gate": {
-            "state": "clear" if review_gate_data.get("ok") else "blocked",
-            "reviewer_id": None,
-            "evidence_checked": [],
-            "findings": review_gate_data.get("blocked_files", []) + review_gate_data.get("spec_errors", []),
-            "follow_up_tickets": [],
-            "human_required": bool(review_gate_data.get("human_required")),
-            "human_required_count": review_gate_data.get("human_required_count", 0),
+            "state": latest_review_decision.get("verdict") or ("clear" if review_gate_data.get("ok") else "blocked"),
+            "reviewer_id": latest_review_decision.get("reviewer", {}).get("agent_id"),
+            "evidence_checked": latest_review_decision.get("evidence_checked", []),
+            "findings": latest_review_decision.get("findings", [])
+            or review_gate_data.get("blocked_files", [])
+            + review_gate_data.get("spec_errors", []),
+            "follow_up_tickets": latest_review_decision.get("follow_up_tickets", []),
+            "decision_records": review_decisions,
+            "human_required": bool(review_gate_data.get("human_required")) or latest_human_required,
+            "human_required_count": review_gate_data.get("human_required_count", 0)
+            + (1 if latest_human_required else 0),
             "actions": review_actions,
             "supported_actions": sorted(REVIEW_ACTIONS),
+            "supported_verdicts": sorted(REVIEW_VERDICTS),
         },
         "trace_eval": {
             "repo_local_trace_links": [item["path"] for item in evidence_view["trace_artifacts"]],
@@ -2667,7 +2889,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "validation": validation,
         },
         "review_actions": review_actions,
-        "decision_summaries": [],
+        "decision_summaries": [item["path"] for item in review_decisions],
         "source_summary": {
             "spec_count": len(context.get("specs", [])),
             "task_count": len(context.get("tasks", [])),
@@ -5740,7 +5962,9 @@ def review_gate(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[
         "human_required": human_required,
         "human_required_count": len(human_required),
         "review_actions": recent_review_actions(),
+        "review_decisions": recent_review_decisions(),
         "supported_actions": sorted(REVIEW_ACTIONS),
+        "supported_verdicts": sorted(REVIEW_VERDICTS),
     }
     return (0 if data["ok"] else 1), data
 
@@ -6179,6 +6403,23 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "data": data,
         }
     )
+    data = operator_workbench_review_decisions_data()
+    results.append(
+        {
+            "name": "operator workbench reviewer decisions are durable and evidence-linked",
+            "ok": data["ok"]
+            and data["docs_path"] == "docs/workbench/review-decisions.md"
+            and data["schema"] == "awf.operator-workbench.decision-summary.v1"
+            and {"accepted", "rejected", "deferred", "question", "human-required"}.issubset(
+                set(data["supported_verdicts"])
+            )
+            and all(decision["evidence_checked"] for decision in data["previews"])
+            and all("follow_up_routing" in decision for decision in data["previews"])
+            and data["previews"][0]["human_required"]["required"] is False
+            and data["previews"][1]["follow_up_routing"]["required"] is True,
+            "data": data,
+        }
+    )
     data = operator_status_data(write=False)
     results.append(
         {
@@ -6192,6 +6433,10 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"approve", "request-changes", "defer", "ask-question"}.issubset(
                 set(data["review_gate"]["supported_actions"])
             )
+            and {"accepted", "rejected", "deferred", "question", "human-required"}.issubset(
+                set(data["review_gate"]["supported_verdicts"])
+            )
+            and isinstance(data["decision_summaries"], list)
             and data["review_gate"]["human_required_count"] == 0
             and data["health"]["acceptance"] == "not_run_by_operator_status"
             and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
@@ -6208,7 +6453,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and dashboard["current_goal_id"] == "006"
             and dashboard["current_phase"]["phase"]
             in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
-            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008", "T009"}
+            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008", "T009", "T010"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -6265,7 +6510,7 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
             and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
             and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
-            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s"}
+            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5", "awf-09s", "awf-1cx"}
             and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
             and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
             and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1

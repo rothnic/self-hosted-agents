@@ -19,7 +19,7 @@
 ## Goal 006 Phase 3: Review Actions And Handoffs
 
 - [X] T008 [US2] Add durable review-gate actions for approve, request changes, defer, and ask questions
-- [ ] T009 [US2] Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing
+- [X] T009 [US2] Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing
 - [ ] T010 [US2] Add branch and PR status integration with repo-local fallback when GitHub access is unavailable
 - [ ] T011 [US2] Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence
 - [ ] T012 [US2] Add concise daily or session handoff summaries for scheduled agents and local sessions

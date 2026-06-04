@@ -10,7 +10,8 @@ names a self-hosted URL.
 
 - `awf.operator-workbench.status.v1`: generated status surface for the project owner, scheduled agents, and local
   sessions.
-- `awf.operator-workbench.decision-summary.v1`: generated review decision summary linked from the status artifact.
+- `awf.operator-workbench.decision-summary.v1`: repo-local reviewer decision summary linked from the status artifact.
+- `awf.operator-workbench.review-action.v1`: repo-local review-gate action input linked from the status artifact.
 
 ## Status Artifact
 
@@ -32,7 +33,8 @@ Required top-level fields:
   and PR fallback.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace artifacts, eval artifacts, Beads
   comments, and PR evidence.
-- `review_gate`: current verdict, reviewer id, evidence checked, findings, follow-up tickets, and escalation state.
+- `review_gate`: current verdict, reviewer id, evidence checked, findings, follow-up tickets, decision records, and
+  escalation state.
 - `review_actions`: recent durable review-action artifacts and supported review-gate actions.
 - `trace_eval`: repo-local trace/eval links, optional self-hosted Langfuse links, and unavailable-service gaps.
 - `branch_pr`: branch, commit, PR URL, draft or ready state, and GitHub fallback.
@@ -221,7 +223,7 @@ Minimal shape:
     "review_gate": "passed",
     "acceptance": "passed"
   },
-  "decision_summaries": [".agent-runs/reviews/example-decision-summary.json"]
+  "decision_summaries": [".agent-runs/review-decisions/example-decision-summary.json"]
 }
 ```
 
@@ -270,12 +272,15 @@ Required top-level fields:
 - `recorded_at`: ISO-8601 timestamp.
 - `target`: goal, increment, ticket, branch, PR, or artifact being reviewed.
 - `reviewer`: reviewer agent id and role.
+- `verdict`: one of `accepted`, `rejected`, `deferred`, `question`, or `human-required`.
 - `outcome`: one of `accepted`, `rejected`, `deferred`, `question`, or `human-required`.
 - `evidence_checked`: artifact paths, command summaries, trace/eval links, and PR links inspected by the reviewer.
 - `findings`: ordered findings with severity, summary, and required action.
 - `follow_up_tickets`: Beads ids or proposed tickets required after the decision.
+- `follow_up_routing`: whether follow-up work is required, linked tickets, and the next owner.
 - `human_required`: boolean plus reason when true.
 - `source_artifacts`: presenter evidence and validation artifacts that justify the decision.
+- `self_hosted`: credential-free and external-service-required flags.
 
 Minimal shape:
 
@@ -294,6 +299,7 @@ Minimal shape:
     "agent_id": "019e0000-0000-0000-0000-000000000000",
     "role": "reviewer"
   },
+  "verdict": "accepted",
   "outcome": "accepted",
   "evidence_checked": [
     "docs/workbench/status-artifact-schema.md",
@@ -301,13 +307,22 @@ Minimal shape:
   ],
   "findings": [],
   "follow_up_tickets": [],
+  "follow_up_routing": {
+    "required": false,
+    "tickets": [],
+    "next_owner": null
+  },
   "human_required": {
     "required": false,
     "reason": null
   },
   "source_artifacts": [
     ".agent-runs/reports/goal-006/t003-status-schema-20260604.md"
-  ]
+  ],
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false
+  }
 }
 ```
 

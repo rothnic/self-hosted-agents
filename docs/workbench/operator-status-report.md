@@ -34,6 +34,7 @@ The report is generated from:
   and PR evidence placeholders.
 - `review_gate`: current gate state, findings, human-required count, supported actions, and recent review actions.
 - `review_actions`: recent durable review-action artifacts from `.agent-runs/review-actions/`.
+- `decision_summaries`: recent reviewer decision records from `.agent-runs/review-decisions/`.
 - `trace_eval`: repo-local trace/eval links plus self-hosted Langfuse fallback state.
 - `branch_pr`: branch and commit with GitHub marked `not_checked` until T010 adds integration.
 - `handoff`: exact next role or ticket, files, validation commands, risks, and artifact handles.

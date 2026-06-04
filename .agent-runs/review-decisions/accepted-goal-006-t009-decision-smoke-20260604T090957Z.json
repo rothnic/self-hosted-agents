@@ -1,0 +1,40 @@
+{
+  "decision_id": "review-decision-accepted-goal-006-t009-decision-smoke-20260604T090957Z",
+  "evidence_checked": [
+    "uv run awf workflow-fixture-test",
+    "docs/workbench/review-decisions.md"
+  ],
+  "findings": [],
+  "follow_up_routing": {
+    "next_owner": null,
+    "required": false,
+    "tickets": []
+  },
+  "follow_up_tickets": [],
+  "human_required": {
+    "reason": null,
+    "required": false
+  },
+  "note": "Credential-free smoke proof for durable reviewer decision record capture; not final T009 reviewer acceptance.",
+  "outcome": "accepted",
+  "recorded_at": "2026-06-04T09:09:57.791199+00:00",
+  "reviewer": {
+    "agent_id": "codex-goal006-t009",
+    "role": "reviewer"
+  },
+  "schema": "awf.operator-workbench.decision-summary.v1",
+  "self_hosted": {
+    "credential_free": true,
+    "external_service_required": false
+  },
+  "source_artifacts": [
+    ".agent-runs/reports/goal-006/t008-review-actions-20260604.md"
+  ],
+  "target": {
+    "id": "goal-006-t009-decision-smoke",
+    "kind": "fixture",
+    "spec_id": "007-operator-workbench-review-ux",
+    "task_id": "T009"
+  },
+  "verdict": "accepted"
+}
