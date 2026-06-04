@@ -28,6 +28,8 @@ Required top-level fields:
 - `goal_dashboard`: ordered child goals with accepted evidence links, current phase, next ticket, and follow-up epics.
 - `increment_dashboard`: scoped increment tickets, claims, blockers, active workers, stale claims, and validation state.
 - `work_queue`: ready work, blocked work, human-required work, active claims, stale claims, and Beads source metadata.
+- `evidence_view`: evidence links grouped by presenter/reviewer reports, runs, traces, evals, Beads comments, branch,
+  and PR fallback.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace artifacts, eval artifacts, Beads
   comments, and PR evidence.
 - `review_gate`: current verdict, reviewer id, evidence checked, findings, follow-up tickets, and escalation state.
@@ -138,6 +140,38 @@ Minimal shape:
     "human_required": [],
     "active_claims": [".agent-runs/claims/awf-vht.json"],
     "stale_claims": []
+  },
+  "evidence_view": {
+    "schema": "awf.operator-workbench.evidence-view.v1",
+    "source": "repo-local artifacts and Beads comments",
+    "target": {
+      "goal": "006-operator-workbench-review-ux",
+      "spec_id": "007-operator-workbench-review-ux",
+      "ticket_id": "awf-yu8"
+    },
+    "presenter_reports": [],
+    "reviewer_reports": [],
+    "run_artifacts": [],
+    "trace_artifacts": [],
+    "eval_artifacts": [],
+    "beads_comments": [],
+    "branch_pr": {
+      "branch": "codex/pydantic-ai-fixture-scaffold",
+      "commit": "5c099ff",
+      "pr_url": null,
+      "state": "not_checked",
+      "fallback": "repo-local branch and commit; GitHub PR lookup is deferred to T010"
+    },
+    "acceptance_state": {
+      "presenter_report_count": 0,
+      "reviewer_report_count": 0,
+      "accepted_report_count": 0,
+      "verification_artifact_count": 0,
+      "trace_artifact_count": 0,
+      "eval_artifact_count": 0,
+      "beads_issue_with_comments_count": 0
+    },
+    "self_hosted": {"credential_free": true, "external_service_required": false}
   },
   "evidence_map": {
     "presenter_reports": [".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md"],

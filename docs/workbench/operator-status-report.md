@@ -29,6 +29,7 @@ The report is generated from:
 - `goal_dashboard`: ordered child goals, current Goal 006 phase, next ticket, and accepted evidence links.
 - `increment_dashboard`: scoped Goal 006 tickets, claims, blockers, active workers, and validation state.
 - `work_queue`: Beads-ready work, blocked work, human-required work, active claims, and stale claims.
+- `evidence_view`: presenter and reviewer reports, run artifacts, traces, evals, Beads comments, branch, and PR fallback.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace/eval artifacts, Beads comments,
   and PR evidence placeholders.
 - `review_gate`: current gate state, findings, and human-required count.

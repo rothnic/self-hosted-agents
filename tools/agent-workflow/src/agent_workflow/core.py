@@ -1812,7 +1812,10 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
         "availability",
         "executive_snapshot",
         "roadmap",
+        "goal_dashboard",
+        "increment_dashboard",
         "work_queue",
+        "evidence_view",
         "evidence_map",
         "review_gate",
         "trace_eval",
@@ -1836,6 +1839,7 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
     required_terms = [
         "awf.operator-workbench.status.v1",
         "awf.operator-workbench.decision-summary.v1",
+        "awf.operator-workbench.evidence-view.v1",
         "available",
         "unavailable",
         "not_checked",
@@ -1887,6 +1891,15 @@ def recent_artifact_paths(directory: str, suffixes: tuple[str, ...], limit: int 
     if not base.exists():
         return []
     paths = [path for path in base.rglob("*") if path.is_file() and path.name.endswith(suffixes)]
+    return [rel(path) for path in sorted(paths, key=lambda item: item.stat().st_mtime, reverse=True)[:limit]]
+
+
+def recent_artifact_paths_anywhere(suffixes: tuple[str, ...], limit: int = 8) -> list[str]:
+    paths = [
+        path
+        for path in (ROOT / ".agent-runs").rglob("*")
+        if path.is_file() and path.name.endswith(suffixes)
+    ]
     return [rel(path) for path in sorted(paths, key=lambda item: item.stat().st_mtime, reverse=True)[:limit]]
 
 
@@ -2201,6 +2214,106 @@ def increment_dashboard_data(
     }
 
 
+def evidence_report_item(path: str) -> dict[str, Any]:
+    text = read_text(ROOT / path)
+    lowered_path = path.lower()
+    reviewer_like = "review" in lowered_path or "reviewer outcome" in text.lower()
+    return {
+        "path": path,
+        "kind": "reviewer-report" if reviewer_like else "presenter-report",
+        "accepted": report_records_acceptance(text),
+        "mentions_independent_reviewer": "independent reviewer" in text.lower(),
+    }
+
+
+def verification_artifact_item(path: str) -> dict[str, Any]:
+    name = Path(path).name
+    if name.endswith(".trace.json"):
+        kind = "trace"
+    elif name.endswith(".evaluation.json"):
+        kind = "evaluation"
+    else:
+        kind = "run-or-verification"
+    return {"path": path, "kind": kind}
+
+
+def beads_comment_items(issues: list[dict[str, Any]], limit: int = 8) -> list[dict[str, Any]]:
+    items = []
+    for issue in issues:
+        comments = issue.get("comments", [])
+        if not comments:
+            continue
+        latest = comments[-1]
+        items.append(
+            {
+                "issue_id": issue.get("id"),
+                "title": issue.get("title"),
+                "status": issue.get("status"),
+                "external_ref": issue.get("external_ref"),
+                "comment_count": len(comments),
+                "latest_comment_id": latest.get("id"),
+                "latest_comment_at": latest.get("created_at"),
+            }
+        )
+    return items[-limit:]
+
+
+def evidence_view_data(
+    issues: list[dict[str, Any]],
+    reports: list[str],
+    verifications: list[str],
+    trace_artifacts: list[str],
+    eval_artifacts: list[str],
+    branch_name: str,
+    commit: str,
+    next_ticket: str | None,
+) -> dict[str, Any]:
+    report_items = [evidence_report_item(path) for path in reports]
+    verification_items = [verification_artifact_item(path) for path in verifications]
+    trace_items = [verification_artifact_item(path) for path in trace_artifacts]
+    eval_items = [verification_artifact_item(path) for path in eval_artifacts]
+    presenter_reports = [item for item in report_items if item["kind"] == "presenter-report"]
+    reviewer_reports = [item for item in report_items if item["kind"] == "reviewer-report"]
+    return {
+        "schema": "awf.operator-workbench.evidence-view.v1",
+        "source": "repo-local artifacts and Beads comments",
+        "target": {
+            "goal": "006-operator-workbench-review-ux",
+            "spec_id": "007-operator-workbench-review-ux",
+            "ticket_id": next_ticket,
+        },
+        "presenter_reports": presenter_reports,
+        "reviewer_reports": reviewer_reports,
+        "run_artifacts": [
+            item for item in verification_items if item["kind"] == "run-or-verification"
+        ],
+        "trace_artifacts": trace_items,
+        "eval_artifacts": eval_items,
+        "beads_comments": beads_comment_items(issues),
+        "branch_pr": {
+            "branch": branch_name,
+            "commit": commit,
+            "pr_url": None,
+            "state": "not_checked",
+            "fallback": "repo-local branch and commit; GitHub PR lookup is deferred to T010",
+        },
+        "acceptance_state": {
+            "presenter_report_count": len(presenter_reports),
+            "reviewer_report_count": len(reviewer_reports),
+            "accepted_report_count": len([item for item in report_items if item["accepted"]]),
+            "verification_artifact_count": len(verification_items),
+            "trace_artifact_count": len(trace_items),
+            "eval_artifact_count": len(eval_items),
+            "beads_issue_with_comments_count": len(beads_comment_items(issues)),
+        },
+        "self_hosted": {
+            "credential_free": True,
+            "external_service_required": False,
+            "fallback": "repo-local run, trace, eval, Beads, branch, and PR-placeholder evidence",
+        },
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -2249,10 +2362,10 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         if ready.get("ready")
         else increment.get("next_action")
     )
-    reports = recent_artifact_paths(".agent-runs/reports", (".md", ".json"))
-    verifications = recent_artifact_paths(".agent-runs/verifications", (".json",))
-    trace_artifacts = recent_artifact_paths(".agent-runs/traces", (".json",))
-    eval_artifacts = recent_artifact_paths(".agent-runs/evals", (".json",))
+    reports = recent_artifact_paths(".agent-runs/reports", (".md", ".json"), limit=40)
+    verifications = recent_artifact_paths(".agent-runs/verifications", (".json",), limit=20)
+    trace_artifacts = recent_artifact_paths_anywhere((".trace.json",), limit=20)
+    eval_artifacts = recent_artifact_paths_anywhere((".evaluation.json",), limit=20)
     review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
     goal_dashboard = goal_dashboard_data(issues, claims, ready)
     active_goal_evidence = [
@@ -2262,6 +2375,16 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
         for item in goal["accepted_evidence"]
         if item.get("accepted")
     ]
+    evidence_view = evidence_view_data(
+        issues=issues,
+        reports=reports,
+        verifications=verifications,
+        trace_artifacts=trace_artifacts,
+        eval_artifacts=eval_artifacts,
+        branch_name=branch_name,
+        commit=commit,
+        next_ticket=next_ticket,
+    )
     data = {
         "schema": "awf.operator-workbench.status.v1",
         "generated_at": generated_at,
@@ -2279,10 +2402,12 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
                 "docs/workbench/goal-dashboard.md",
                 "docs/workbench/increment-dashboard.md",
+                "docs/workbench/evidence-view.md",
                 "docs/workbench/status-artifact-schema.md",
                 ".beads/issues.jsonl",
                 ".agent-runs/claims/",
                 ".agent-runs/reports/",
+                ".agent-runs/verifications/",
             ],
         },
         "scope": {
@@ -2325,18 +2450,15 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "active_claims": [compact_claim_item(claim) for claim in claims],
             "stale_claims": increment.get("stale_claims", []),
         },
+        "evidence_view": evidence_view,
         "evidence_map": {
-            "presenter_reports": [path for path in reports if "/t" in path or "/planning" in path],
-            "reviewer_reports": [path for path in reports if "review" in path.lower()],
-            "verification_artifacts": verifications,
-            "trace_artifacts": trace_artifacts,
-            "eval_artifacts": eval_artifacts,
-            "beads_comments": [
-                {"issue_id": issue.get("id"), "comment_count": len(issue.get("comments", []))}
-                for issue in issues
-                if issue.get("comments")
-            ][-8:],
-            "pr_evidence": [],
+            "presenter_reports": [item["path"] for item in evidence_view["presenter_reports"]],
+            "reviewer_reports": [item["path"] for item in evidence_view["reviewer_reports"]],
+            "verification_artifacts": [item["path"] for item in evidence_view["run_artifacts"]],
+            "trace_artifacts": [item["path"] for item in evidence_view["trace_artifacts"]],
+            "eval_artifacts": [item["path"] for item in evidence_view["eval_artifacts"]],
+            "beads_comments": evidence_view["beads_comments"],
+            "pr_evidence": [evidence_view["branch_pr"]],
         },
         "review_gate": {
             "state": "clear" if review_gate_data.get("ok") else "blocked",
@@ -2348,8 +2470,8 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "human_required_count": review_gate_data.get("human_required_count", 0),
         },
         "trace_eval": {
-            "repo_local_trace_links": trace_artifacts,
-            "repo_local_eval_links": eval_artifacts,
+            "repo_local_trace_links": [item["path"] for item in evidence_view["trace_artifacts"]],
+            "repo_local_eval_links": [item["path"] for item in evidence_view["eval_artifacts"]],
             "self_hosted_langfuse_links": [],
             "gaps": ["self-hosted Langfuse availability is not checked by this credential-free status command"],
         },
@@ -5903,8 +6025,9 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             "name": "operator workbench long-horizon goal dashboard is generated",
             "ok": dashboard["schema"] == "awf.operator-workbench.goal-dashboard.v1"
             and dashboard["current_goal_id"] == "006"
-            and dashboard["current_phase"]["phase"] == "Goal 006 Phase 2: Repo-Backed Status Surfaces"
-            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007"}
+            and dashboard["current_phase"]["phase"]
+            in {"Goal 006 Phase 2: Repo-Backed Status Surfaces", "Goal 006 later phase"}
+            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006", "T007", "T008"}
             and dashboard["counts"]["ordered_goal_count"] == 6
             and dashboard["counts"]["accepted_goal_count"] == 5
             and dashboard["counts"]["active_goal_count"] == 1
@@ -5952,6 +6075,28 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and increment_dashboard["validation_state"]["ok"] is True
             and increment_dashboard["self_hosted"]["external_service_required"] is False,
             "data": increment_dashboard,
+        }
+    )
+    evidence_view = data["evidence_view"]
+    results.append(
+        {
+            "name": "operator workbench evidence view links artifacts comments branch and PR fallback",
+            "ok": evidence_view["schema"] == "awf.operator-workbench.evidence-view.v1"
+            and evidence_view["target"]["goal"] == "006-operator-workbench-review-ux"
+            and evidence_view["target"]["spec_id"] == "007-operator-workbench-review-ux"
+            and evidence_view["target"]["ticket_id"] in {"awf-yu8", "awf-3c5"}
+            and evidence_view["acceptance_state"]["presenter_report_count"] >= 1
+            and evidence_view["acceptance_state"]["accepted_report_count"] >= 8
+            and evidence_view["acceptance_state"]["verification_artifact_count"] >= 1
+            and evidence_view["acceptance_state"]["trace_artifact_count"] >= 1
+            and evidence_view["acceptance_state"]["eval_artifact_count"] >= 1
+            and evidence_view["acceptance_state"]["beads_issue_with_comments_count"] >= 1
+            and evidence_view["branch_pr"]["branch"] == "codex/pydantic-ai-fixture-scaffold"
+            and evidence_view["branch_pr"]["state"] == "not_checked"
+            and "T010" in evidence_view["branch_pr"]["fallback"]
+            and evidence_view["self_hosted"]["credential_free"] is True
+            and evidence_view["self_hosted"]["external_service_required"] is False,
+            "data": evidence_view,
         }
     )
     code, data = repo_hygiene_result()

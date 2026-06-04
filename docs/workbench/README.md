@@ -13,6 +13,7 @@ local UI.
 - `operator-status-report.md`: first consolidated CLI/static status report, source inputs, sections, and fallbacks.
 - `goal-dashboard.md`: long-horizon goal dashboard, current phase, and accepted evidence links.
 - `increment-dashboard.md`: increment dashboard for tickets, claims, blockers, workers, and validation state.
+- `evidence-view.md`: evidence view for run artifacts, traces, evals, Beads comments, branches, and PR fallback.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -38,5 +39,5 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T007 should add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs on top of the
+T008 should add durable review-gate actions for approve, request changes, defer, and ask questions on top of the
 consolidated operator status report.

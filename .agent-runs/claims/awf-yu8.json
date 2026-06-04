@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T08:31:24.033516+00:00",
+  "id": "awf-yu8",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:01.643217Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:42.682379Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-vty",
+        "issue_id": "awf-yu8",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:29.126524Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-yu8",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T007\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T007",
+    "id": "awf-yu8",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs",
+    "updated_at": "2026-06-04T06:39:42.682728Z"
+  },
+  "worker_branch": "codex/awf-yu8-add-an-evidence-view-linking-run-artifac",
+  "worker_id": "codex-goal006-t007",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-yu8-add-an-evidence-view-linking-run-artifac",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-yu8-add-an-evidence-view-linking-run-artifac ../self-hosted-agents-worktrees/awf-yu8-add-an-evidence-view-linking-run-artifac <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-yu8-add-an-evidence-view-linking-run-artifac && git status --short --branch"
+  }
+}
