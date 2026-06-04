@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T00:19:20.901181+00:00",
+  "id": "awf-yka",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:34.570670Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:28.905521Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-yka",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:54.038188Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dys",
+        "issue_id": "awf-yka",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T004\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
+    "id": "awf-yka",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort",
+    "updated_at": "2026-06-02T10:48:29.810898Z"
+  },
+  "worker_branch": "codex/awf-yka-score-candidates-against-infrastructure",
+  "worker_id": "codex-goal004-t004",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-yka-score-candidates-against-infrastructure",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-yka-score-candidates-against-infrastructure ../self-hosted-agents-worktrees/awf-yka-score-candidates-against-infrastructure <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-yka-score-candidates-against-infrastructure && git status --short --branch"
+  }
+}

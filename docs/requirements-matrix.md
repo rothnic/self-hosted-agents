@@ -1,7 +1,7 @@
 # Requirements Matrix
 
 Date: 2026-05-10
-Last updated: 2026-06-03
+Last updated: 2026-06-04
 
 ## Purpose
 
@@ -167,6 +167,45 @@ T004 scoring rules:
 - Treat Mastra as a useful TypeScript reference with `missing implementation evidence` and
   `deferred-before-platform-selection` disposition. Do not assign implementation-backed scores for observability,
   evaluation, durable execution, scalability, or operating effort.
+
+### Goal 004 Candidate Scores - 2026-06-04
+
+These scores apply `docs/evaluation-criteria.md` to the normalized T003 evidence. They are implementation-evidence
+scores for the current Goal 004 platform-decision checkpoint, not final-solution acceptance.
+
+Legend: scores use the 1-4 rubric in `docs/evaluation-criteria.md`; `N/S` means not scored because the candidate lacks
+implementation evidence for the criterion in current repo state.
+
+| Candidate | Infrastructure Ownership | Observability | Evaluation | Durable Execution | Scalability | Operating Effort | Decision Use |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| LangGraph Python plus Langfuse | 2 | 2 | 2 | 1 | 2 | 2 | Partial Python comparison slice |
+| Pydantic AI plus Langfuse/DBOS | 3 | 4 | 3 | 4 | 2 | 2 | Strongest implementation-backed candidate slice |
+| Mastra TypeScript plus shared contracts | N/S | N/S | N/S | N/S | N/S | N/S | Deferred TypeScript reference, not implementation-comparable |
+
+Score basis:
+
+- **LangGraph Python plus Langfuse** earns partial scores where the repo has fixture and audit evidence, but it remains
+  capped by missing committed verification artifacts, unproven self-hosted Langfuse ingestion, unproven product trace
+  depth, and no durable execution proof. It remains useful as the earlier Python comparison slice, not as the leading
+  product baseline.
+- **Pydantic AI plus Langfuse/DBOS** has the highest evidence-backed scores because the repo contains deterministic run
+  artifacts, repo-local trace export, self-hosted Langfuse OTLP ingestion evidence, Pydantic Evals output, and DBOS
+  local durable proof for retry, resume, review wait, side-effect idempotency, and evidence correlation. Its scalability
+  and operating-effort scores stay at `2` because production DBOS storage, worker topology, recovery rehearsal,
+  Langfuse operations, and richer evaluation workflows remain follow-up work.
+- **Mastra TypeScript plus shared contracts** is not assigned numeric implementation scores because T002 explicitly
+  deferred the runnable contrast slice and T003 normalized implementation-dependent evidence as `missing` or
+  `deferred`. It can inform future cross-language comparison, but T004 must not treat it as a scored implementation
+  candidate.
+
+T004 scoring result:
+
+- Pydantic AI plus Langfuse/DBOS is the leading evidence-backed candidate for the next platform-decision step.
+- LangGraph Python plus Langfuse remains a partial Python comparison reference with durability and committed evidence
+  gaps.
+- Mastra TypeScript remains a deferred TypeScript reference until a future task proves a runnable slice.
+- T005 can record a platform decision from this scorecard without relying on hosted-only services or cloud-only
+  evidence, while preserving the production hardening blockers already tracked for later work.
 
 ## Human Direction Update - 2026-05-23
 

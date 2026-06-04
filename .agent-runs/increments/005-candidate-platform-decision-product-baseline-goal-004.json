@@ -54,30 +54,30 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-yka",
+            "id": "awf-6kf",
             "status": null,
             "type": "blocks"
           }
         ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
-        "id": "awf-a31",
-        "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers"
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T009",
+        "id": "awf-e04",
+        "title": "Add product-level BDD contracts for the baseline workflow"
       }
     ],
     "counts": {
       "active_claims": 0,
-      "blocked": 10,
+      "blocked": 9,
       "ready": 1,
       "stale_claims": 0
     },
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-yka",
+    "next_unblocked_issue_id": "awf-a31",
     "ready": [
       {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
-        "id": "awf-yka",
+        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
+        "id": "awf-a31",
         "status": "open",
-        "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
+        "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers"
       }
     ],
     "stale_claims": [],
@@ -243,45 +243,6 @@
       "status": "open",
       "title": "Freeze or archive non-selected candidates as comparison references with explicit tradeoffs",
       "updated_at": "2026-06-02T10:48:39.534830Z"
-    },
-    {
-      "compaction_level": 0,
-      "created_at": "2026-06-02T10:46:34.828843Z",
-      "created_by": "nroth",
-      "dependencies": [
-        {
-          "created_at": "2026-06-02T10:48:30.251721Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-dk3",
-          "issue_id": "awf-a31",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "parent-child"
-        },
-        {
-          "created_at": "2026-06-02T10:46:54.493416Z",
-          "created_by": "nroth",
-          "depends_on_id": "awf-yka",
-          "issue_id": "awf-a31",
-          "metadata": "{}",
-          "thread_id": "",
-          "type": "blocks"
-        }
-      ],
-      "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T005\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
-      "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
-      "id": "awf-a31",
-      "issue_type": "task",
-      "labels": [
-        "goal:004",
-        "role:worker"
-      ],
-      "original_size": 0,
-      "priority": 1,
-      "source_repo": "self-hosted-agents",
-      "status": "open",
-      "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers",
-      "updated_at": "2026-06-02T10:48:31.226245Z"
     },
     {
       "compaction_level": 0,
@@ -559,18 +520,6 @@
       {
         "blocking_dependencies": [
           {
-            "id": "awf-yka",
-            "status": null,
-            "type": "blocks"
-          }
-        ],
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T005",
-        "id": "awf-a31",
-        "title": "Record the platform decision ADR with selected stack, rejected alternatives, rationale, and promotion blockers"
-      },
-      {
-        "blocking_dependencies": [
-          {
             "id": "awf-6kf",
             "status": null,
             "type": "blocks"
@@ -644,10 +593,10 @@
         "title": "Present platform decision evidence and record independent reviewer acceptance or rejection"
       }
     ],
-    "blocked_count": 10,
+    "blocked_count": 9,
     "can_continue": true,
     "next_action": "orchestrator-loop should keep assigning unblocked work while pm-review-loop triages blockers",
-    "next_unblocked_issue_id": "awf-yka",
+    "next_unblocked_issue_id": "awf-a31",
     "ready_count": 1
   },
   "child_tickets": [
@@ -676,11 +625,11 @@
       "title": "Normalize candidate run, trace, evaluation, setup, durable, and gap evidence in `docs/requirements-matrix.md`"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T004",
       "task_id": "T004",
       "ticket_id": "awf-yka",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Score candidates against infrastructure ownership, observability, evaluation, durable execution, scalability, and operating effort"
     },
     {
@@ -778,6 +727,6 @@
   "review_status": "executing",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T00:15:22.744689+00:00",
+  "updated_at": "2026-06-04T00:24:40.817704+00:00",
   "validation_evidence": []
 }
