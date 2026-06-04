@@ -6,19 +6,12 @@
     "counts": {
       "active_claims": 0,
       "blocked": 0,
-      "ready": 1,
+      "ready": 0,
       "stale_claims": 0
     },
-    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-ivd",
-    "ready": [
-      {
-        "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
-        "id": "awf-ivd",
-        "status": "open",
-        "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
-      }
-    ],
+    "next_action": "integrator-loop should prepare the phase review PR",
+    "next_unblocked_issue_id": null,
+    "ready": [],
     "stale_claims": [],
     "summary_schema": "awf.active-work.compact.v1"
   },
@@ -30,10 +23,10 @@
   "blocker_reroute": {
     "blocked": [],
     "blocked_count": 0,
-    "can_continue": true,
-    "next_action": "orchestrator-loop should assign unclaimed unblocked work",
-    "next_unblocked_issue_id": "awf-ivd",
-    "ready_count": 1
+    "can_continue": false,
+    "next_action": "no blocker reroute needed",
+    "next_unblocked_issue_id": null,
+    "ready_count": 0
   },
   "child_tickets": [
     {
@@ -141,11 +134,11 @@
       "title": "Create follow-up Beads tasks for production hardening gaps that remain after platform selection"
     },
     {
-      "done": false,
+      "done": true,
       "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
       "task_id": "T014",
       "ticket_id": "awf-ivd",
-      "ticket_status": "open",
+      "ticket_status": "closed",
       "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence"
     }
   ],
@@ -154,15 +147,15 @@
   "human_required": [],
   "increment_id": "005-candidate-platform-decision-product-baseline-goal-004",
   "learning_proposals": [],
-  "next_action": "orchestrator-loop should assign unclaimed unblocked work",
+  "next_action": "integrator-loop should prepare the phase review PR",
   "objective_id": "agentic-development-foundation",
   "ok": true,
   "path": ".agent-runs/increments/005-candidate-platform-decision-product-baseline-goal-004.json",
   "phase": "Goal 004",
-  "ready_count": 1,
-  "review_status": "executing",
+  "ready_count": 0,
+  "review_status": "ready-for-increment-review",
   "spec_id": "005-candidate-platform-decision-product-baseline",
   "stale_claims": [],
-  "updated_at": "2026-06-04T02:37:33.079682+00:00",
+  "updated_at": "2026-06-04T02:54:29.649695+00:00",
   "validation_evidence": []
 }

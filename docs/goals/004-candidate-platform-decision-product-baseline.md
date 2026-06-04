@@ -29,7 +29,9 @@ This is not final-solution promotion. T008 defines the first product-baseline wo
 `docs/product-baseline/pydantic-ai-setup-operating-notes.md`. T011 freezes non-selected candidate references in
 `docs/candidate-references/frozen-non-selected-candidates.md`. T012 adds candidate-lane migration notes in
 `docs/candidate-references/non-selected-candidate-migration-notes.md`. T013 adds production-hardening follow-up epics
-for the selected product baseline; Goal 004 still needs final increment acceptance evidence.
+for the selected product baseline. T014 records final Goal 004 increment acceptance in
+`.agent-runs/reports/goal-004/t014-increment-acceptance-20260604.md` with independent reviewer acceptance from
+`019e9084-eeef-7cc2-bcb7-cc21785c372c`.
 
 T013 follow-up epics:
 

@@ -1,0 +1,50 @@
+{
+  "claimed_at": "2026-06-04T02:41:39.174373+00:00",
+  "id": "awf-ivd",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-02T10:46:37.581889Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-02T10:48:42.764792Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-dk3",
+        "issue_id": "awf-ivd",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-02T10:46:59.973314Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-fpn",
+        "issue_id": "awf-ivd",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 005-candidate-platform-decision-product-baseline\nTask: T014\nSource: specs/005-candidate-platform-decision-product-baseline/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/005-candidate-platform-decision-product-baseline/tasks.md#T014",
+    "id": "awf-ivd",
+    "issue_type": "task",
+    "labels": [
+      "goal:004",
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Run Goal 004 increment verification and record reviewer-accepted completion evidence",
+    "updated_at": "2026-06-02T10:48:43.776969Z"
+  },
+  "worker_branch": "codex/awf-ivd-run-goal-004-increment-verification-and",
+  "worker_id": "codex-goal004-t014",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-ivd-run-goal-004-increment-verification-and",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-ivd-run-goal-004-increment-verification-and ../self-hosted-agents-worktrees/awf-ivd-run-goal-004-increment-verification-and <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-ivd-run-goal-004-increment-verification-and && git status --short --branch"
+  }
+}

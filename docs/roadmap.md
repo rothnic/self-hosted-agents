@@ -148,10 +148,11 @@ baselines, stale claims, blocker rerouting, worker branch/worktree guidance, com
 review-agent guidance, health issue logging, dry-run fixtures, active-work summaries, cleanup, and an end-to-end
 rehearsal with reviewer-accepted evidence.
 
-Goal 004 has completed the candidate evidence audit, Mastra contrast decision, evidence normalization, candidate
-scoring, platform decision ADR, decision propagation, independent decision-evidence acceptance, product baseline
-workflow definition, product-level BDD contract, setup and operating notes, and freeze policy for non-selected
-candidate references. It has also added migration notes for reusable code, fixtures, and evidence from frozen
-non-selected lanes. T013 records Goal 004-specific production-hardening follow-up epics: `awf-4x7` for the runnable
-work-order app proof, `awf-6zf` for live model/tool trace coverage, and `awf-7ck` for product tool/context approval
-boundaries. The current ordered work is to capture final Goal 004 increment acceptance evidence.
+Goal 004 is accepted for the current roadmap increment. Independent reviewer
+`019e9084-eeef-7cc2-bcb7-cc21785c372c` accepted the final Goal 004 increment evidence in
+`.agent-runs/reports/goal-004/t014-increment-acceptance-20260604.md`. Goal 004 completed the candidate evidence audit,
+Mastra contrast decision, evidence normalization, candidate scoring, platform decision ADR, decision propagation,
+independent decision-evidence acceptance, product baseline workflow definition, product-level BDD contract, setup and
+operating notes, freeze policy for non-selected candidate references, migration notes, and production-hardening
+follow-up epics. Goal 005 is the next ordered work: prove the selected stack can run on controlled self-hosted
+infrastructure.

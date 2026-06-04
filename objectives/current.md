@@ -13,11 +13,11 @@ evaluation, orchestration, scalability, and operating effort.
 Current long-horizon goal: execute `docs/goals/000-self-hosted-agent-system-roadmap.md` as the parent goal, working
 through its linked child goals in order.
 
-Current roadmap checkpoint: Goals 001 through 003 are accepted for this roadmap increment by independent reviewer
-evidence. Goal 004 is the active product iteration. ADR 0005 selects Pydantic AI plus Langfuse and DBOS as the first
-product-baseline stack from comparable implementation evidence. Goal 004 has recorded the product baseline workflow,
-BDD contract, setup notes, frozen candidate references, migration notes, and production-hardening follow-up epics. The
-active follow-on work is final Goal 004 increment verification with independent reviewer acceptance.
+Current roadmap checkpoint: Goals 001 through 004 are accepted for this roadmap increment by independent reviewer
+evidence. Goal 004 selected Pydantic AI plus Langfuse and DBOS as the first product-baseline stack from comparable
+implementation evidence, defined the product baseline workflow, added BDD contracts and setup notes, froze non-selected
+candidate references, recorded migration notes, and created production-hardening follow-up epics. The active follow-on
+work is Goal 005: define and prove the self-hosted deployment and operations reference for the selected stack.
 
 ## Success Criteria
 

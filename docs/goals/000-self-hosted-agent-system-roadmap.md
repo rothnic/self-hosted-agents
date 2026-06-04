@@ -16,9 +16,9 @@ child goals below; each child goal owns its own specs, tasks, Beads backlog, evi
 3. [Autonomous Multi-Agent Delivery Loop](003-autonomous-multi-agent-delivery-loop.md)
    - Accepted. Made scheduled PM, orchestrator, worker, integrator, and health roles reliable.
 4. [Candidate Platform Decision And Product Baseline](004-candidate-platform-decision-product-baseline.md)
-   - Recommended next. Choose the primary stack and define the first product workflow.
+   - Accepted. Chose Pydantic AI plus Langfuse/DBOS as the product baseline and defined the first product workflow.
 5. [Self-Hosted Deployment And Operations Reference](005-self-hosted-deployment-operations-reference.md)
-   - Prove the selected stack can run on controlled infrastructure.
+   - Recommended next. Prove the selected stack can run on controlled infrastructure.
 6. [Operator Workbench And Review UX](006-operator-workbench-review-ux.md)
    - Give the human a self-hosted interface for review, approval, and steering.
 
@@ -36,8 +36,8 @@ is explicitly reserved, missing, or contradicted by the evidence.
 ```text
 /goal Execute docs/goals/000-self-hosted-agent-system-roadmap.md
 in /Users/nroth/workspace/self-hosted-agents. Work through the linked goals in
-order, starting with the first incomplete child goal. Goals 001 through 003 have
-accepted evidence; the next ordered goal is Goal 004. For each child goal, create or update the focused
+order, starting with the first incomplete child goal. Goals 001 through 004 have
+accepted evidence; the next ordered goal is Goal 005. For each child goal, create or update the focused
 spec/tasks/backlog, then implement one Beads ticket at a time with validation
 evidence before moving to the next child goal.
 ```

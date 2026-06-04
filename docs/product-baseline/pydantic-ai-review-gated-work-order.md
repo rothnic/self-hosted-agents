@@ -175,3 +175,10 @@ T009 converted this definition into implementation-agnostic BDD contracts in
 `tests/workflow/drivers/README.md`. T010 adds setup and operating notes in
 `docs/product-baseline/pydantic-ai-setup-operating-notes.md`. Later implementation tickets should add the runnable
 product boundary and its evidence artifacts.
+
+## Runnable Work-order Follow-up
+
+Goal 004 T013 tracks the runnable product-boundary proof with Beads epic `awf-4x7`. That follow-up should implement the
+Pydantic AI work-order app boundary from this document, consume goal/spec/Beads input, emit the typed work-order fields
+defined above, capture repo-local run, trace, eval, and review evidence, enforce independent reviewer acceptance, and
+preserve deterministic validation without hosted credentials.
