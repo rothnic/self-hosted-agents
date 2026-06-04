@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T05:08:28.022265+00:00",
+  "id": "awf-rgf",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:11.205253Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:06.277094Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-rgf",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:30.960895Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-xei",
+        "issue_id": "awf-rgf",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T008\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T008",
+    "id": "awf-rgf",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 1,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Prove deterministic validation remains credential-free when deployment services or secrets are absent",
+    "updated_at": "2026-06-04T03:09:06.277417Z"
+  },
+  "worker_branch": "codex/awf-rgf-prove-deterministic-validation-remains-c",
+  "worker_id": "codex-goal005-t008",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-rgf-prove-deterministic-validation-remains-c",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-rgf-prove-deterministic-validation-remains-c ../self-hosted-agents-worktrees/awf-rgf-prove-deterministic-validation-remains-c <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-rgf-prove-deterministic-validation-remains-c && git status --short --branch"
+  }
+}

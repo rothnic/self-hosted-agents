@@ -944,6 +944,7 @@ def deployment_smoke_data(
     durable_artifact = durable.get("artifact", {}) if isinstance(durable.get("artifact"), dict) else {}
     durable_dbos = durable_artifact.get("dbos", {}) if isinstance(durable_artifact.get("dbos"), dict) else {}
     durable_ai = durable_artifact.get("pydantic_ai", {}) if isinstance(durable_artifact.get("pydantic_ai"), dict) else {}
+    env_present_names = [item["name"] for item in readiness["env"]["statuses"] if item["present"]]
     health_checks = [
         {"name": "deployment-readiness", "ok": readiness["ok"], "required": True, "source": "awf deployment-readiness"},
         {"name": "deployment-startup", "ok": startup["ok"], "required": True, "source": "awf deployment-startup"},
@@ -961,7 +962,7 @@ def deployment_smoke_data(
         },
         {
             "name": "self-hosted-langfuse",
-            "ok": profile != "local" and bool(readiness["env"]["present_names"]),
+            "ok": profile != "local" and bool(env_present_names),
             "required": False,
             "source": "docs/orchestration/self-hosted-langfuse.md",
             "status": "not-required-for-local-fixture" if profile == "local" else "requires self-hosted env",
@@ -1005,7 +1006,7 @@ def deployment_smoke_data(
             "self_hosted_langfuse": {
                 "available_in_profile": profile != "local",
                 "required_for_local_fixture": False,
-                "status": "service-backed proof deferred to T007/T008" if profile == "local" else "requires env",
+                "status": "not-required-for-local-fixture" if profile == "local" else "requires self-hosted env",
             },
         },
         "durable_execution": {
@@ -1029,7 +1030,7 @@ def deployment_smoke_data(
             "network_required": False,
         },
         "gaps": [
-            "Self-hosted Langfuse service-backed trace ingestion is deferred to T007/T008.",
+            "Self-hosted Langfuse service-backed trace ingestion requires operator-provided host-local env.",
             "Production DBOS storage is deferred to later operations proof.",
         ],
     }
@@ -1063,6 +1064,119 @@ def deployment_smoke_data(
         "candidate": candidate,
         "durable": durable,
         "next_action": "commit smoke command evidence or continue to correlated evidence capture",
+    }
+
+
+def deployment_credential_free_fallback_data(
+    write: bool = False,
+    candidate_data: dict[str, Any] | None = None,
+    durable_data: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    absent_env: dict[str, str] = {}
+    proof_id = now_id("deployment-credential-free-fallback")
+    proof_dir = ROOT / ".agent-runs" / "reports" / "goal-005" / proof_id if write else None
+    local_readiness = deployment_readiness_data(profile="local", env=absent_env)
+    if write:
+        local_candidate = candidate_data or pydantic_ai_candidate_smoke_result(artifact_dir=proof_dir)
+        local_durable = durable_data or pydantic_ai_durable_smoke_result(artifact_dir=proof_dir)
+    else:
+        local_candidate = candidate_data
+        local_durable = durable_data
+    local_smoke = deployment_smoke_data(
+        profile="local",
+        env=absent_env,
+        write=False,
+        candidate_data=local_candidate,
+        durable_data=local_durable,
+    )
+    local_env_present = [item["name"] for item in local_readiness["env"]["statuses"] if item["present"]]
+
+    service_profiles = []
+    for profile in ["development-server", "production-like"]:
+        readiness = deployment_readiness_data(profile=profile, env=absent_env)
+        smoke = deployment_smoke_data(profile=profile, env=absent_env, write=False)
+        missing_env = [
+            item.removeprefix("required env:")
+            for item in readiness["missing_required"]
+            if item.startswith("required env:")
+        ]
+        service_profiles.append(
+            {
+                "profile": profile,
+                "target_machine": readiness.get("target_machine"),
+                "readiness_ok": readiness["ok"],
+                "smoke_ok": smoke["ok"],
+                "evidence_path": smoke["evidence_path"],
+                "missing_required": readiness["missing_required"],
+                "missing_secret_names": sorted(missing_env),
+                "candidate_skipped": smoke["evidence"]["run"]["run_id"] is None,
+                "durable_skipped": smoke["evidence"]["durable_execution"]["durable_run_id"] is None,
+                "deterministic_validation": smoke["evidence"]["deterministic_validation"],
+            }
+        )
+
+    proof = {
+        "schema": "awf.deployment-credential-free-fallback.v1",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "proof_id": proof_id,
+        "command_used": "uv run awf deployment-fallback-proof --write --json",
+        "acceptance_command": "uv run awf workflow-fixture-test",
+        "absent_environment": {
+            "mode": "empty-env",
+            "present_names": [],
+            "credential_policy": "deterministic validation uses an empty env and never requires hosted tokens",
+        },
+        "local_profile": {
+            "profile": "local",
+            "readiness_ok": local_readiness["ok"],
+            "smoke_ok": local_smoke["ok"],
+            "env_present_names": local_env_present,
+            "required": local_smoke["evidence"]["required"],
+            "deterministic_validation": local_smoke["evidence"]["deterministic_validation"],
+            "run": local_smoke["evidence"]["run"],
+            "observability": local_smoke["evidence"]["observability"],
+            "durable_execution": local_smoke["evidence"]["durable_execution"],
+        },
+        "service_backed_profiles": service_profiles,
+        "gaps": [
+            "Self-hosted Langfuse service-backed proof still requires operator-provided host-local secrets.",
+            "Production DBOS storage proof still requires a later controlled storage profile.",
+        ],
+    }
+    service_profiles_fail_fast = all(
+        not item["readiness_ok"]
+        and not item["smoke_ok"]
+        and item["evidence_path"] is None
+        and bool(item["missing_secret_names"])
+        and item["candidate_skipped"]
+        and item["durable_skipped"]
+        for item in service_profiles
+    )
+    deterministic_flags = proof["local_profile"]["deterministic_validation"]
+    required = {
+        "local_readiness_ok": local_readiness["ok"],
+        "local_smoke_ok": local_smoke["ok"],
+        "local_env_empty": not local_env_present,
+        "local_no_hosted_credentials": deterministic_flags["hosted_credentials_required"] is False,
+        "local_no_external_model": deterministic_flags["external_model_required"] is False,
+        "local_no_network": deterministic_flags["network_required"] is False,
+        "service_profiles_fail_fast_without_secrets": service_profiles_fail_fast,
+    }
+    proof["required"] = required
+    proof["passed"] = all(required.values())
+
+    evidence_path = None
+    if write and proof["passed"]:
+        path = (proof_dir or ROOT / ".agent-runs" / "reports" / "goal-005" / proof_id) / "credential-free-fallback.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(proof, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        evidence_path = rel(path)
+
+    return {
+        "ok": proof["passed"],
+        "write": write,
+        "evidence_path": evidence_path,
+        "proof": proof,
     }
 
 
@@ -4387,6 +4501,26 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["evidence"]["required"]["durable_available"]
             and data["evidence"]["required"]["observability_available"]
             and data["evidence"]["required"]["credential_free"],
+            "data": data,
+        }
+    )
+    data = deployment_credential_free_fallback_data(
+        write=False,
+        candidate_data=pydantic_ai_data,
+        durable_data=durable_data,
+    )
+    results.append(
+        {
+            "name": "deployment fallback proof keeps deterministic validation credential-free",
+            "ok": data["ok"]
+            and data["evidence_path"] is None
+            and data["proof"]["schema"] == "awf.deployment-credential-free-fallback.v1"
+            and data["proof"]["local_profile"]["smoke_ok"]
+            and data["proof"]["required"]["local_no_hosted_credentials"]
+            and data["proof"]["required"]["local_no_external_model"]
+            and data["proof"]["required"]["local_no_network"]
+            and data["proof"]["required"]["service_profiles_fail_fast_without_secrets"]
+            and all(item["missing_secret_names"] for item in data["proof"]["service_backed_profiles"]),
             "data": data,
         }
     )

@@ -1,6 +1,6 @@
 # Deployment Service Boundaries
 
-Status: updated through Goal 005 T007
+Status: updated through Goal 005 T008
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -145,6 +145,6 @@ Fixture validation must pass when all observability, durable storage, and model-
 - T005 added or documented startup for the selected profile.
 - T006 added the selected-stack smoke command.
 - T007 captured committed local smoke evidence across the app, observability, durable runtime, and health boundaries.
-- T008 adds credential-free fallback proof for absent deployment services or secrets.
+- T008 captured credential-free fallback proof for absent deployment services or secrets.
 - T009-T012 add backup, restore, reset, diagnostics, recovery, operating burden, and rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

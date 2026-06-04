@@ -1,6 +1,6 @@
 # Deployment Smoke
 
-Status: captured through Goal 005 T007
+Status: captured through Goal 005 T008
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -45,6 +45,24 @@ The same evidence bundle includes the durable child artifacts referenced by the 
 - `pydantic-ai-run.trace.json`
 - `pydantic-ai-run.evaluation.json`
 - `pydantic-ai-durable-smoke.json`
+
+## Credential-Free Fallback Proof
+
+T008 adds a focused fallback proof command:
+
+```bash
+uv run awf deployment-fallback-proof --write --json
+```
+
+The command writes `awf.deployment-credential-free-fallback.v1` evidence under
+`.agent-runs/reports/goal-005/<proof-id>/`. The committed T008 proof is:
+
+- `.agent-runs/reports/goal-005/deployment-credential-free-fallback-20260604T051344Z/credential-free-fallback.json`
+- `.agent-runs/reports/goal-005/t008-credential-free-fallback-20260604.md`
+
+The proof uses an empty environment to show that the local deterministic profile passes without Langfuse, Logfire,
+DBOS database, model-provider, or cloud credentials. It also shows that `development-server` and `production-like`
+profiles fail fast on missing self-hosted configuration without running candidate or durable service work.
 
 ## Service-Backed Boundary
 

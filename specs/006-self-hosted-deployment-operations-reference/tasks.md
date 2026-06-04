@@ -15,7 +15,7 @@
 - [X] T005 [US2] Add or document one-command local startup for the selected Pydantic AI, Langfuse, and DBOS profile
 - [X] T006 [US2] Add deployment smoke command or driver for a representative selected-stack workflow
 - [X] T007 [US2] Capture repo-local deployment smoke evidence with run, trace, eval, durable, and health correlation
-- [ ] T008 [US2] Prove deterministic validation remains credential-free when deployment services or secrets are absent
+- [X] T008 [US2] Prove deterministic validation remains credential-free when deployment services or secrets are absent
 
 ## Goal 005 Phase 3: Operations Runbooks
 

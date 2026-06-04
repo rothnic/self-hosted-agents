@@ -1,6 +1,6 @@
 # Environment And Readiness
 
-Status: initialized for Goal 005 T004
+Status: updated through Goal 005 T008
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -45,3 +45,16 @@ external host-local secrets.
 
 `LOGFIRE_TOKEN` remains an optional operator-provided export name only. It is not required evidence for the self-hosted
 assessment and must not make deterministic validation depend on hosted Logfire.
+
+## Fallback Proof
+
+T008 records the absence behavior with:
+
+```bash
+uv run awf deployment-fallback-proof --write --json
+```
+
+The proof runs with an empty environment. The `local` profile must pass readiness and smoke with no hosted credentials,
+external model provider, network dependency, or service-backed deployment secrets. The `development-server` and
+`production-like` profiles must report missing required self-hosted configuration and skip candidate/durable smoke work
+instead of silently depending on hosted services.

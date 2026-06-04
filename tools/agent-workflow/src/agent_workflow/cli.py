@@ -259,13 +259,32 @@ def deployment_startup(
 def deployment_smoke(
     profile: str = typer.Option("local", "--profile", help="local, development-server, or production-like."),
     env_file: str | None = typer.Option(None, "--env-file", help="Optional env file to inspect without printing values."),
-    write: bool = typer.Option(False, "--write", help="Write repo-local smoke evidence under .agent-runs/verifications."),
+    write: bool = typer.Option(False, "--write", help="Write repo-local smoke evidence under .agent-runs/reports."),
     json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
 ) -> None:
     """Run the representative selected-stack deployment smoke workflow."""
     data = core.deployment_smoke_data(profile=profile, env_file=env_file, write=write)
     print_envelope(
         CommandEnvelope(ok=data["ok"], command="deployment-smoke", summary="Deployment smoke.", data=data),
+        json_output,
+    )
+    raise typer.Exit(0 if data["ok"] else 1)
+
+
+@app.command("deployment-fallback-proof")
+def deployment_fallback_proof(
+    write: bool = typer.Option(False, "--write", help="Write repo-local fallback proof under .agent-runs/reports."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Prove deterministic deployment validation remains credential-free."""
+    data = core.deployment_credential_free_fallback_data(write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["ok"],
+            command="deployment-fallback-proof",
+            summary="Deployment credential-free fallback proof.",
+            data=data,
+        ),
         json_output,
     )
     raise typer.Exit(0 if data["ok"] else 1)
