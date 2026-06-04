@@ -1660,6 +1660,76 @@ def deployment_goal_005_acceptance_data() -> dict[str, Any]:
     }
 
 
+def operator_workbench_views_data() -> dict[str, Any]:
+    index_path = ROOT / "docs" / "workbench" / "README.md"
+    views_path = ROOT / "docs" / "workbench" / "operator-views.md"
+    index_text = read_text(index_path)
+    views_text = read_text(views_path)
+    required_views = [
+        "Executive Snapshot",
+        "Roadmap And Goals",
+        "Increment And Work Queue",
+        "Evidence Map",
+        "Review Gate",
+        "Trace And Eval",
+        "Branch And PR",
+        "Handoff",
+        "Health And Operations",
+    ]
+    required_sources = [
+        "uv run awf next-action --json",
+        "uv run awf context-index --json",
+        "uv run awf ready-work --json",
+        ".agent-runs/reports/",
+        ".agent-runs/verifications/",
+        ".agent-runs/claims/",
+        ".beads/issues.jsonl",
+    ]
+    required_terms = [
+        "CLI/static",
+        "repo-backed",
+        "credential-free",
+        "GitHub",
+        "self-hosted Langfuse",
+        "presenter evidence plus independent reviewer acceptance or rejection",
+        "Beads remains the executable backlog",
+        "human-required",
+        "T002 defines BDD expectations",
+    ]
+    checks = [
+        {"name": "index exists", "ok": index_path.exists(), "detail": rel(index_path)},
+        {"name": "view catalog exists", "ok": views_path.exists(), "detail": rel(views_path)},
+        *[
+            {"name": f"index term:{term}", "ok": term in index_text, "detail": term}
+            for term in ["Operator Workbench", "View Index", "Operating Rules"]
+        ],
+        *[
+            {"name": f"view:{view}", "ok": view in views_text, "detail": view}
+            for view in required_views
+        ],
+        *[
+            {"name": f"source:{source}", "ok": source in views_text, "detail": source}
+            for source in required_sources
+        ],
+        *[
+            {"name": f"term:{term}", "ok": term in views_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "index_path": rel(index_path),
+        "views_path": rel(views_path),
+        "checks": checks,
+        "missing": missing,
+        "views": required_views,
+        "first_surface": "CLI/static",
+        "source_of_truth": ["Beads", "Spec Kit", ".agent-runs", "workflow commands", "PR evidence"],
+        "fallbacks": ["GitHub unavailable", "self-hosted Langfuse unavailable"],
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -5070,6 +5140,29 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"awf-eas", "awf-lkr", "awf-5ae", "awf-4x7", "awf-6zf", "awf-7ck"}.issubset(
                 set(data["follow_up_issues"])
             ),
+            "data": data,
+        }
+    )
+    data = operator_workbench_views_data()
+    results.append(
+        {
+            "name": "operator workbench minimum views are defined",
+            "ok": data["ok"]
+            and data["index_path"] == "docs/workbench/README.md"
+            and data["views_path"] == "docs/workbench/operator-views.md"
+            and {
+                "Executive Snapshot",
+                "Roadmap And Goals",
+                "Increment And Work Queue",
+                "Evidence Map",
+                "Review Gate",
+                "Trace And Eval",
+                "Branch And PR",
+                "Handoff",
+                "Health And Operations",
+            }.issubset(set(data["views"]))
+            and "Beads" in data["source_of_truth"]
+            and "GitHub unavailable" in data["fallbacks"],
             "data": data,
         }
     )

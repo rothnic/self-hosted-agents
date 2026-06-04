@@ -5,7 +5,7 @@
 
 ## Goal 006 Phase 1: Information Architecture And Contracts
 
-- [ ] T001 [US1] Research and define the minimum operator views in `docs/workbench/`
+- [X] T001 [US1] Research and define the minimum operator views in `docs/workbench/`
 - [ ] T002 [US1] Add an operator workbench BDD contract for status, evidence, review decisions, and handoffs
 - [ ] T003 [US1] Define the generated artifact schema for workbench status and decision summaries
 
