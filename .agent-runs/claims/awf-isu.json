@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T07:28:10.911135+00:00",
+  "id": "awf-isu",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:00.668424Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:40.824683Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-vht",
+        "issue_id": "awf-isu",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:25.865240Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-isu",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T004\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T004",
+    "id": "awf-isu",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation",
+    "updated_at": "2026-06-04T06:39:40.825030Z"
+  },
+  "worker_branch": "codex/awf-isu-add-a-consolidated-operator-status-repor",
+  "worker_id": "codex-goal006-t004",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-isu-add-a-consolidated-operator-status-repor",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-isu-add-a-consolidated-operator-status-repor ../self-hosted-agents-worktrees/awf-isu-add-a-consolidated-operator-status-repor <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-isu-add-a-consolidated-operator-status-repor && git status --short --branch"
+  }
+}

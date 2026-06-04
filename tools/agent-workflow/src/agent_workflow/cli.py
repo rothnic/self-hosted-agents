@@ -210,6 +210,25 @@ def next_action(json_output: bool = typer.Option(False, "--json", help="Emit typ
     raise typer.Exit(0 if data["ok"] else 1)
 
 
+@app.command("operator-status")
+def operator_status(
+    write: bool = typer.Option(False, "--write", help="Write a repo-local workbench status artifact."),
+    json_output: bool = typer.Option(False, "--json", help="Emit typed JSON output."),
+) -> None:
+    """Generate the consolidated operator workbench status report from repo state."""
+    data = core.operator_status_data(write=write)
+    print_envelope(
+        CommandEnvelope(
+            ok=data["health"]["ok"],
+            command="operator-status",
+            summary=data["executive_snapshot"]["recommendation"],
+            data=data,
+        ),
+        json_output,
+    )
+    raise typer.Exit(0 if data["health"]["ok"] else 1)
+
+
 @app.command("health-status")
 def health_status(
     deep: bool = typer.Option(False, "--deep", help="Run deeper fixture validation too."),

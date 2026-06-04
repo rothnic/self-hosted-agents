@@ -10,6 +10,7 @@ local UI.
 
 - `operator-views.md`: minimum operator views, source artifacts, required decisions, fallback behavior, and sequencing.
 - `status-artifact-schema.md`: generated status and decision-summary artifact schema for later reports or UI surfaces.
+- `operator-status-report.md`: first consolidated CLI/static status report, source inputs, sections, and fallbacks.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -35,5 +36,5 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T004 should build the first consolidated operator status report from the view catalog, BDD contract, and generated
-artifact schema.
+T005 should add a long-horizon goal dashboard with current phase and accepted evidence links on top of the consolidated
+operator status report.

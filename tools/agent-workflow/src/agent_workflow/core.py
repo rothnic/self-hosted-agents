@@ -1882,6 +1882,232 @@ def operator_workbench_status_schema_data() -> dict[str, Any]:
     }
 
 
+def recent_artifact_paths(directory: str, suffixes: tuple[str, ...], limit: int = 8) -> list[str]:
+    base = ROOT / directory
+    if not base.exists():
+        return []
+    paths = [path for path in base.rglob("*") if path.is_file() and path.name.endswith(suffixes)]
+    return [rel(path) for path in sorted(paths, key=lambda item: item.stat().st_mtime, reverse=True)[:limit]]
+
+
+def compact_work_queue_items(items: list[dict[str, Any]], limit: int = 8) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": item.get("id"),
+            "title": item.get("title"),
+            "status": item.get("status"),
+            "external_ref": item.get("external_ref"),
+        }
+        for item in items[:limit]
+    ]
+
+
+def compact_validation_checks(checks: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "ok": all(check.get("ok") for check in checks),
+        "checks": [
+            {
+                "name": check.get("name"),
+                "command": check.get("command"),
+                "ok": check.get("ok"),
+                "error_count": len(check.get("data", {}).get("errors", [])),
+            }
+            for check in checks
+        ],
+    }
+
+
+def goal_paths() -> list[str]:
+    return [rel(path) for path in sorted((ROOT / "docs" / "goals").glob("[0-9][0-9][0-9]-*.md"))]
+
+
+def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
+        for issue in issues
+        if issue.get("status") == "open"
+        and issue.get("issue_type") == "epic"
+        and ("follow-up" in issue.get("labels", []) or "Follow up" in str(issue.get("title", "")))
+    ]
+
+
+def operator_status_data(write: bool = False) -> dict[str, Any]:
+    generated_at = datetime.now(timezone.utc).isoformat()
+    context = context_index_data()
+    ready = ready_work_data()
+    claims = active_claims()
+    issues = beads_issues()
+    increment = increment_status_data(
+        increment_id="007-operator-workbench-review-ux-goal-006",
+        spec_id="007-operator-workbench-review-ux",
+        phase="Goal 006",
+    )
+    status_text = run(["git", "status", "--short", "--branch"]).stdout.strip()
+    branch_name = run(["git", "branch", "--show-current"]).stdout.strip()
+    commit = run(["git", "rev-parse", "--short", "HEAD"]).stdout.strip()
+    validation_checks = [
+        workflow_check("review-gate"),
+        workflow_check("repo-hygiene"),
+        workflow_check("workflow-state-lint"),
+    ]
+    validation = compact_validation_checks(validation_checks)
+    active_claim = claims[0] if claims else None
+    next_ticket = (
+        active_claim.get("id")
+        if active_claim
+        else ready.get("ready", [{}])[0].get("id")
+        if ready.get("ready")
+        else None
+    )
+    current_phase = "implementation" if active_claim or ready.get("ready") else increment.get("review_status")
+    next_owner = "implementer" if active_claim or ready.get("ready") else "pm-steward"
+    next_action = (
+        f"continue claimed ticket {active_claim.get('id')}"
+        if active_claim
+        else "claim one ready Beads ticket"
+        if ready.get("ready")
+        else increment.get("next_action")
+    )
+    reports = recent_artifact_paths(".agent-runs/reports", (".md", ".json"))
+    verifications = recent_artifact_paths(".agent-runs/verifications", (".json",))
+    trace_artifacts = recent_artifact_paths(".agent-runs/traces", (".json",))
+    eval_artifacts = recent_artifact_paths(".agent-runs/evals", (".json",))
+    review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
+    data = {
+        "schema": "awf.operator-workbench.status.v1",
+        "generated_at": generated_at,
+        "generated_by": "uv run awf operator-status --json",
+        "generated_from": {
+            "commands": [
+                "uv run awf context-index --json",
+                "uv run awf ready-work --json",
+                "uv run awf increment-status --spec-id 007-operator-workbench-review-ux --phase 'Goal 006' --json",
+                "uv run awf review-gate --json",
+                "uv run awf repo-hygiene --json",
+                "uv run awf workflow-state-lint --json",
+            ],
+            "artifacts": [
+                "docs/goals/000-self-hosted-agent-system-roadmap.md",
+                "docs/workbench/status-artifact-schema.md",
+                ".beads/issues.jsonl",
+                ".agent-runs/claims/",
+                ".agent-runs/reports/",
+            ],
+        },
+        "scope": {
+            "objective_id": current_objective_id(),
+            "goal": "006-operator-workbench-review-ux",
+            "spec_id": "007-operator-workbench-review-ux",
+            "phase": "Goal 006",
+            "branch": branch_name,
+            "commit": commit,
+            "beads_issue_id": next_ticket,
+        },
+        "availability": {
+            "github": {"state": "not_checked", "fallback": "git branch and commit status"},
+            "self_hosted_langfuse": {"state": "not_checked", "fallback": "repo-local trace artifacts"},
+            "dbos": {"state": "not_checked", "fallback": "repo-local durable smoke evidence"},
+            "repo_local_evidence": {"state": "available", "fallback": None},
+        },
+        "executive_snapshot": {
+            "current_phase": current_phase,
+            "active_role": "implementer" if active_claim else increment.get("review_status"),
+            "recommendation": next_action,
+            "reason": "repo-local Beads, claims, and validation state were summarized",
+            "next_owner": next_owner,
+            "risks": [] if validation["ok"] else ["one or more shallow validation checks failed"],
+        },
+        "roadmap": {
+            "goals": goal_paths(),
+            "current_goal": "006-operator-workbench-review-ux",
+            "next_goal": None,
+            "accepted_evidence": [path for path in reports if "goal-006" in path][:8],
+            "follow_up_epics": open_follow_up_epics(issues),
+        },
+        "work_queue": {
+            "source": ready.get("source"),
+            "ready": compact_work_queue_items(ready.get("ready", [])),
+            "blocked": compact_work_queue_items(ready.get("blocked", [])),
+            "human_required": compact_work_queue_items(ready.get("human_required", [])),
+            "active_claims": [compact_claim_item(claim) for claim in claims],
+            "stale_claims": increment.get("stale_claims", []),
+        },
+        "evidence_map": {
+            "presenter_reports": [path for path in reports if "/t" in path or "/planning" in path],
+            "reviewer_reports": [path for path in reports if "review" in path.lower()],
+            "verification_artifacts": verifications,
+            "trace_artifacts": trace_artifacts,
+            "eval_artifacts": eval_artifacts,
+            "beads_comments": [
+                {"issue_id": issue.get("id"), "comment_count": len(issue.get("comments", []))}
+                for issue in issues
+                if issue.get("comments")
+            ][-8:],
+            "pr_evidence": [],
+        },
+        "review_gate": {
+            "state": "clear" if review_gate_data.get("ok") else "blocked",
+            "reviewer_id": None,
+            "evidence_checked": [],
+            "findings": review_gate_data.get("blocked_files", []) + review_gate_data.get("spec_errors", []),
+            "follow_up_tickets": [],
+            "human_required": bool(review_gate_data.get("human_required")),
+            "human_required_count": review_gate_data.get("human_required_count", 0),
+        },
+        "trace_eval": {
+            "repo_local_trace_links": trace_artifacts,
+            "repo_local_eval_links": eval_artifacts,
+            "self_hosted_langfuse_links": [],
+            "gaps": ["self-hosted Langfuse availability is not checked by this credential-free status command"],
+        },
+        "branch_pr": {
+            "branch": branch_name,
+            "commit": commit,
+            "pr_url": None,
+            "state": "not_checked",
+            "github_fallback": "git status plus branch commit",
+        },
+        "handoff": {
+            "next_role": next_owner,
+            "next_ticket": next_ticket,
+            "required_files": [
+                ".agent-runs/claims/",
+                "docs/workbench/status-artifact-schema.md",
+                "specs/007-operator-workbench-review-ux/tasks.md",
+            ],
+            "validation_commands": [
+                "uv run awf workflow-fixture-test",
+                "uv run awf verify --profile ticket --json",
+            ],
+            "risks": [] if validation["ok"] else ["shallow validation failed; inspect health before continuing"],
+            "artifact_handles": [claim.get("path") for claim in claims if claim.get("path")],
+        },
+        "health": {
+            "ok": validation["ok"],
+            "git": git_state_summary(status_text),
+            "repo_hygiene": next((check.get("ok") for check in validation_checks if check.get("name") == "repo-hygiene"), None),
+            "workflow_state_lint": next(
+                (check.get("ok") for check in validation_checks if check.get("name") == "workflow-state-lint"),
+                None,
+            ),
+            "review_gate": review_gate_data.get("ok"),
+            "acceptance": "not_run_by_operator_status",
+            "validation": validation,
+        },
+        "decision_summaries": [],
+        "source_summary": {
+            "spec_count": len(context.get("specs", [])),
+            "task_count": len(context.get("tasks", [])),
+            "issue_count": len(issues),
+            "claim_count": len(claims),
+            "increment_path": increment.get("path"),
+        },
+    }
+    if write:
+        data["path"] = write_json_artifact("reports/workbench", "operator-status", data)
+    return data
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -5357,6 +5583,23 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
                 "source_artifacts",
             }.issubset(set(data["decision_fields"]))
             and "repo-local evidence" in data["fallbacks"],
+            "data": data,
+        }
+    )
+    data = operator_status_data(write=False)
+    results.append(
+        {
+            "name": "operator workbench consolidated status report is generated",
+            "ok": data["schema"] == "awf.operator-workbench.status.v1"
+            and data["generated_by"] == "uv run awf operator-status --json"
+            and data["scope"]["goal"] == "006-operator-workbench-review-ux"
+            and data["work_queue"]["source"] == "beads"
+            and isinstance(data["work_queue"]["active_claims"], list)
+            and isinstance(data["work_queue"]["blocked"], list)
+            and data["review_gate"]["human_required_count"] == 0
+            and data["health"]["acceptance"] == "not_run_by_operator_status"
+            and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
+            and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
         }
     )

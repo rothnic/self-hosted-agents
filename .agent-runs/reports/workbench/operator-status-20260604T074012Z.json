@@ -1,0 +1,332 @@
+{
+  "availability": {
+    "dbos": {
+      "fallback": "repo-local durable smoke evidence",
+      "state": "not_checked"
+    },
+    "github": {
+      "fallback": "git branch and commit status",
+      "state": "not_checked"
+    },
+    "repo_local_evidence": {
+      "fallback": null,
+      "state": "available"
+    },
+    "self_hosted_langfuse": {
+      "fallback": "repo-local trace artifacts",
+      "state": "not_checked"
+    }
+  },
+  "branch_pr": {
+    "branch": "codex/pydantic-ai-fixture-scaffold",
+    "commit": "dca6bba",
+    "github_fallback": "git status plus branch commit",
+    "pr_url": null,
+    "state": "not_checked"
+  },
+  "decision_summaries": [],
+  "evidence_map": {
+    "beads_comments": [
+      {
+        "comment_count": 5,
+        "issue_id": "awf-vxt"
+      },
+      {
+        "comment_count": 1,
+        "issue_id": "awf-x12"
+      },
+      {
+        "comment_count": 1,
+        "issue_id": "awf-x3q"
+      },
+      {
+        "comment_count": 2,
+        "issue_id": "awf-xei"
+      },
+      {
+        "comment_count": 2,
+        "issue_id": "awf-xjv"
+      },
+      {
+        "comment_count": 1,
+        "issue_id": "awf-yka"
+      },
+      {
+        "comment_count": 1,
+        "issue_id": "awf-yuz"
+      },
+      {
+        "comment_count": 1,
+        "issue_id": "awf-zi9"
+      }
+    ],
+    "eval_artifacts": [],
+    "pr_evidence": [],
+    "presenter_reports": [
+      ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+      ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+      ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+      ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+      ".agent-runs/reports/goal-006/planning-backlog-20260604.md",
+      ".agent-runs/reports/goal-005/t013-independent-review-20260604.md",
+      ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md"
+    ],
+    "reviewer_reports": [
+      ".agent-runs/reports/goal-005/t013-independent-review-20260604.md"
+    ],
+    "trace_artifacts": [],
+    "verification_artifacts": [
+      ".agent-runs/verifications/verify-increment-20260604T024229Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T103037Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102149Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-increment-20260602T102124Z.json",
+      ".agent-runs/verifications/goal-003-t021/verify-health-20260602T102020Z.json",
+      ".agent-runs/verifications/verify-increment-20260602T074617Z.json",
+      ".agent-runs/verifications/verify-ticket-20260602T074546Z.json",
+      ".agent-runs/verifications/pydantic-ai-durable-smoke-t010-20260602.json"
+    ]
+  },
+  "executive_snapshot": {
+    "active_role": "executing",
+    "current_phase": "implementation",
+    "next_owner": "implementer",
+    "reason": "repo-local Beads, claims, and validation state were summarized",
+    "recommendation": "claim one ready Beads ticket",
+    "risks": []
+  },
+  "generated_at": "2026-06-04T07:40:11.491806+00:00",
+  "generated_by": "uv run awf operator-status --json",
+  "generated_from": {
+    "artifacts": [
+      "docs/goals/000-self-hosted-agent-system-roadmap.md",
+      "docs/workbench/status-artifact-schema.md",
+      ".beads/issues.jsonl",
+      ".agent-runs/claims/",
+      ".agent-runs/reports/"
+    ],
+    "commands": [
+      "uv run awf context-index --json",
+      "uv run awf ready-work --json",
+      "uv run awf increment-status --spec-id 007-operator-workbench-review-ux --phase 'Goal 006' --json",
+      "uv run awf review-gate --json",
+      "uv run awf repo-hygiene --json",
+      "uv run awf workflow-state-lint --json"
+    ]
+  },
+  "handoff": {
+    "artifact_handles": [],
+    "next_role": "implementer",
+    "next_ticket": "awf-sdh",
+    "required_files": [
+      ".agent-runs/claims/",
+      "docs/workbench/status-artifact-schema.md",
+      "specs/007-operator-workbench-review-ux/tasks.md"
+    ],
+    "risks": [],
+    "validation_commands": [
+      "uv run awf workflow-fixture-test",
+      "uv run awf verify --profile ticket --json"
+    ]
+  },
+  "health": {
+    "acceptance": "not_run_by_operator_status",
+    "git": {
+      "branch": "codex/pydantic-ai-fixture-scaffold...origin/codex/pydantic-ai-fixture-scaffold",
+      "changed_files": 9,
+      "clean": false,
+      "summary": "9 changed file(s)"
+    },
+    "ok": true,
+    "repo_hygiene": true,
+    "review_gate": true,
+    "validation": {
+      "checks": [
+        {
+          "command": "uv run awf review-gate",
+          "error_count": 0,
+          "name": "review-gate",
+          "ok": true
+        },
+        {
+          "command": "uv run awf repo-hygiene",
+          "error_count": 0,
+          "name": "repo-hygiene",
+          "ok": true
+        },
+        {
+          "command": "uv run awf workflow-state-lint",
+          "error_count": 0,
+          "name": "workflow-state-lint",
+          "ok": true
+        }
+      ],
+      "ok": true
+    },
+    "workflow_state_lint": true
+  },
+  "review_gate": {
+    "evidence_checked": [],
+    "findings": [],
+    "follow_up_tickets": [],
+    "human_required": false,
+    "human_required_count": 0,
+    "reviewer_id": null,
+    "state": "clear"
+  },
+  "roadmap": {
+    "accepted_evidence": [
+      ".agent-runs/reports/goal-006/t004-operator-status-20260604.md",
+      ".agent-runs/reports/goal-006/t003-status-schema-20260604.md",
+      ".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md",
+      ".agent-runs/reports/goal-006/t001-operator-views-20260604.md",
+      ".agent-runs/reports/goal-006/planning-backlog-20260604.md"
+    ],
+    "current_goal": "006-operator-workbench-review-ux",
+    "follow_up_epics": [
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#evaluation-workflow-follow-up",
+        "id": "awf-2du",
+        "title": "Follow up Langfuse evaluation workflow proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#phoenix-opik-fallback-follow-up",
+        "id": "awf-4t2",
+        "title": "Follow up Phoenix or Opik fallback comparison"
+      },
+      {
+        "external_ref": "docs/product-baseline/pydantic-ai-review-gated-work-order.md#runnable-work-order-follow-up",
+        "id": "awf-4x7",
+        "title": "Follow up product baseline runnable work-order app proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#recovery-retention-follow-up",
+        "id": "awf-5ae",
+        "title": "Follow up DBOS recovery rehearsal and retention proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#live-model-tool-trace-follow-up",
+        "id": "awf-6zf",
+        "title": "Follow up live model and tool trace coverage proof"
+      },
+      {
+        "external_ref": "docs/requirements-matrix.md#tool-context-approval-follow-up",
+        "id": "awf-7ck",
+        "title": "Follow up product tool and context approval boundary proof"
+      },
+      {
+        "external_ref": "docs/goals/001-self-hosted-observability-evaluation-control-plane.md#langfuse-operations-follow-up",
+        "id": "awf-eas",
+        "title": "Follow up Langfuse production operations proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#production-storage-follow-up",
+        "id": "awf-lkr",
+        "title": "Follow up DBOS production storage proof"
+      },
+      {
+        "external_ref": "docs/goals/002-durable-agent-execution-runtime.md#worker-topology-follow-up",
+        "id": "awf-ygu",
+        "title": "Follow up DBOS worker and queue topology proof"
+      }
+    ],
+    "goals": [
+      "docs/goals/000-self-hosted-agent-system-roadmap.md",
+      "docs/goals/001-self-hosted-observability-evaluation-control-plane.md",
+      "docs/goals/002-durable-agent-execution-runtime.md",
+      "docs/goals/003-autonomous-multi-agent-delivery-loop.md",
+      "docs/goals/004-candidate-platform-decision-product-baseline.md",
+      "docs/goals/005-self-hosted-deployment-operations-reference.md",
+      "docs/goals/006-operator-workbench-review-ux.md"
+    ],
+    "next_goal": null
+  },
+  "schema": "awf.operator-workbench.status.v1",
+  "scope": {
+    "beads_issue_id": "awf-sdh",
+    "branch": "codex/pydantic-ai-fixture-scaffold",
+    "commit": "dca6bba",
+    "goal": "006-operator-workbench-review-ux",
+    "objective_id": "agentic-development-foundation",
+    "phase": "Goal 006",
+    "spec_id": "007-operator-workbench-review-ux"
+  },
+  "source_summary": {
+    "claim_count": 0,
+    "increment_path": ".agent-runs/increments/007-operator-workbench-review-ux-goal-006.json",
+    "issue_count": 117,
+    "spec_count": 7,
+    "task_count": 137
+  },
+  "trace_eval": {
+    "gaps": [
+      "self-hosted Langfuse availability is not checked by this credential-free status command"
+    ],
+    "repo_local_eval_links": [],
+    "repo_local_trace_links": [],
+    "self_hosted_langfuse_links": []
+  },
+  "work_queue": {
+    "active_claims": [],
+    "blocked": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T009",
+        "id": "awf-09s",
+        "status": "open",
+        "title": "Add reviewer decision records with verdict, evidence checked, findings, and follow-up routing"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T010",
+        "id": "awf-1cx",
+        "status": "open",
+        "title": "Add branch and PR status integration with repo-local fallback when GitHub access is unavailable"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T014",
+        "id": "awf-1f9",
+        "status": "open",
+        "title": "Implement the selected interface with restrained operating-tool design"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T008",
+        "id": "awf-3c5",
+        "status": "open",
+        "title": "Add durable review-gate actions for approve, request changes, defer, and ask questions"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T011",
+        "id": "awf-diw",
+        "status": "open",
+        "title": "Add trace and eval deep links for self-hosted Langfuse-backed and repo-local evidence"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T015",
+        "id": "awf-jr7",
+        "status": "open",
+        "title": "Add accessibility and small-screen review checks if a UI is built, or document why CLI/static remains selected"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T017",
+        "id": "awf-mtv",
+        "status": "open",
+        "title": "Present Goal 006 workbench evidence and record independent reviewer acceptance or rejection"
+      },
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T013",
+        "id": "awf-s6n",
+        "status": "open",
+        "title": "Decide whether the workbench remains CLI/static or becomes a local UI"
+      }
+    ],
+    "human_required": [],
+    "ready": [
+      {
+        "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+        "id": "awf-sdh",
+        "status": "open",
+        "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links"
+      }
+    ],
+    "source": "beads",
+    "stale_claims": []
+  }
+}
