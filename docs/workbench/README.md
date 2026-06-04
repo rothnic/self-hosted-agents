@@ -9,6 +9,7 @@ local UI.
 ## View Index
 
 - `operator-views.md`: minimum operator views, source artifacts, required decisions, fallback behavior, and sequencing.
+- `status-artifact-schema.md`: generated status and decision-summary artifact schema for later reports or UI surfaces.
 - `../goals/006-operator-workbench-review-ux.md`: Goal 006 objective, scope, proof commands, and review blockers.
 - `../../specs/007-operator-workbench-review-ux/spec.md`: requirements and success criteria.
 - `../../specs/007-operator-workbench-review-ux/tasks.md`: Beads-backed implementation task order.
@@ -34,5 +35,5 @@ Beads issues, claims, blockers, validations, traces, evals, branches, PRs, run r
 
 ## Next Implementation Step
 
-T002 should turn the minimum view expectations into an implementation-agnostic BDD contract before status commands or UI
-surfaces are built.
+T004 should build the first consolidated operator status report from the view catalog, BDD contract, and generated
+artifact schema.

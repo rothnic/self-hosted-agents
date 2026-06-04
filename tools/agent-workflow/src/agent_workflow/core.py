@@ -1798,6 +1798,90 @@ def operator_workbench_bdd_contract_data() -> dict[str, Any]:
     }
 
 
+def operator_workbench_status_schema_data() -> dict[str, Any]:
+    schema_path = ROOT / "docs" / "workbench" / "status-artifact-schema.md"
+    index_path = ROOT / "docs" / "workbench" / "README.md"
+    schema_text = read_text(schema_path)
+    index_text = read_text(index_path)
+    required_status_fields = [
+        "schema",
+        "generated_at",
+        "generated_by",
+        "generated_from",
+        "scope",
+        "availability",
+        "executive_snapshot",
+        "roadmap",
+        "work_queue",
+        "evidence_map",
+        "review_gate",
+        "trace_eval",
+        "branch_pr",
+        "handoff",
+        "health",
+        "decision_summaries",
+    ]
+    required_decision_fields = [
+        "decision_id",
+        "recorded_at",
+        "target",
+        "reviewer",
+        "outcome",
+        "evidence_checked",
+        "findings",
+        "follow_up_tickets",
+        "human_required",
+        "source_artifacts",
+    ]
+    required_terms = [
+        "awf.operator-workbench.status.v1",
+        "awf.operator-workbench.decision-summary.v1",
+        "available",
+        "unavailable",
+        "not_checked",
+        "GitHub",
+        "self-hosted Langfuse",
+        "repo-local trace artifacts",
+        "work_queue.source` must remain `beads`",
+        "prior chat context",
+        "reviewer-attributed",
+        "exact next role or ticket",
+    ]
+    checks = [
+        {"name": "schema doc exists", "ok": schema_path.exists(), "detail": rel(schema_path)},
+        {"name": "schema indexed", "ok": "status-artifact-schema.md" in index_text, "detail": rel(index_path)},
+        *[
+            {"name": f"status field:{field}", "ok": f"`{field}`" in schema_text or f'"{field}"' in schema_text, "detail": field}
+            for field in required_status_fields
+        ],
+        *[
+            {
+                "name": f"decision field:{field}",
+                "ok": f"`{field}`" in schema_text or f'"{field}"' in schema_text,
+                "detail": field,
+            }
+            for field in required_decision_fields
+        ],
+        *[
+            {"name": f"term:{term}", "ok": term in schema_text, "detail": term}
+            for term in required_terms
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "schema_path": rel(schema_path),
+        "index_path": rel(index_path),
+        "status_schema": "awf.operator-workbench.status.v1",
+        "decision_schema": "awf.operator-workbench.decision-summary.v1",
+        "status_fields": required_status_fields,
+        "decision_fields": required_decision_fields,
+        "fallbacks": ["GitHub unavailable", "self-hosted Langfuse unavailable", "repo-local evidence"],
+        "checks": checks,
+        "missing": missing,
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -5244,6 +5328,35 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and {"status", "evidence", "review decisions", "handoffs"}.issubset(set(data["required_surfaces"]))
             and {"accept", "reject", "defer", "ask question"}.issubset(set(data["decision_verbs"]))
             and "credential-free fixture" in data["fallbacks"],
+            "data": data,
+        }
+    )
+    data = operator_workbench_status_schema_data()
+    results.append(
+        {
+            "name": "operator workbench generated artifact schema is defined",
+            "ok": data["ok"]
+            and data["schema_path"] == "docs/workbench/status-artifact-schema.md"
+            and data["status_schema"] == "awf.operator-workbench.status.v1"
+            and data["decision_schema"] == "awf.operator-workbench.decision-summary.v1"
+            and {
+                "generated_from",
+                "availability",
+                "work_queue",
+                "evidence_map",
+                "review_gate",
+                "handoff",
+                "decision_summaries",
+            }.issubset(set(data["status_fields"]))
+            and {
+                "reviewer",
+                "outcome",
+                "evidence_checked",
+                "findings",
+                "human_required",
+                "source_artifacts",
+            }.issubset(set(data["decision_fields"]))
+            and "repo-local evidence" in data["fallbacks"],
             "data": data,
         }
     )
