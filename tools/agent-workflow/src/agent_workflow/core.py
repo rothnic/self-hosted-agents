@@ -1921,6 +1921,169 @@ def goal_paths() -> list[str]:
     return [rel(path) for path in sorted((ROOT / "docs" / "goals").glob("[0-9][0-9][0-9]-*.md"))]
 
 
+def goal_title(path: Path) -> str:
+    text = read_text(path)
+    for line in text.splitlines():
+        if line.startswith("# "):
+            return line.removeprefix("# ").strip()
+    return path.stem
+
+
+def reviewer_id_from_text(text: str) -> str | None:
+    patterns = [
+        r"Accepted by independent reviewer agent `([^`]+)`",
+        r"Independent reviewer agent `([^`]+)` accepted",
+        r"Reviewer agent: `([^`]+)`",
+        r"Reviewer agent id: `([^`]+)`",
+        r"Independent reviewer `([^`]+)` accepted",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+    return None
+
+
+def accepted_evidence_item(path: str) -> dict[str, Any]:
+    text = read_text(ROOT / path)
+    return {
+        "path": path,
+        "accepted": report_records_acceptance(text),
+        "reviewer_id": reviewer_id_from_text(text),
+    }
+
+
+def report_records_acceptance(text: str) -> bool:
+    lowered = text.lower()
+    acceptance_markers = [
+        "accepted by independent reviewer",
+        "outcome: accepted",
+        "outcome: `accepted`",
+        "reviewer verdict: accepted",
+        "reviewer outcome: `accepted`",
+        "final outcome: accepted",
+    ]
+    acceptance_patterns = [
+        r"independent reviewer agent `[^`]+` accepted",
+        r"independent reviewer `[^`]+` accepted",
+        r"reviewer accepted",
+    ]
+    return any(marker in lowered for marker in acceptance_markers) or any(
+        re.search(pattern, lowered) for pattern in acceptance_patterns
+    )
+
+
+GOAL_ACCEPTANCE_REPORTS = {
+    "001": [".agent-runs/reports/goal-001-evidence-review-20260601.md"],
+    "002": [".agent-runs/reports/goal-002-evidence-review-20260602.md"],
+    "003": [".agent-runs/reports/goal-003-increment-evidence-20260602.md"],
+    "004": [".agent-runs/reports/goal-004/t014-increment-acceptance-20260604.md"],
+    "005": [
+        ".agent-runs/reports/goal-005/t013-goal-005-evidence-20260604.md",
+        ".agent-runs/reports/goal-005/t013-independent-review-20260604.md",
+    ],
+}
+
+
+def goal_006_accepted_checkpoint_reports() -> list[str]:
+    base = ROOT / ".agent-runs" / "reports" / "goal-006"
+    if not base.exists():
+        return []
+    accepted = []
+    for path in sorted(base.glob("*.md")):
+        text = read_text(path)
+        if report_records_acceptance(text):
+            accepted.append(rel(path))
+    return accepted
+
+
+def goal_006_current_phase(tasks: list[dict[str, Any]]) -> dict[str, Any]:
+    open_tasks = [task for task in tasks if not task.get("done")]
+    completed_tasks = [task for task in tasks if task.get("done")]
+    phase_2_ids = {"T004", "T005", "T006", "T007"}
+    next_task = open_tasks[0] if open_tasks else None
+    phase = "Goal 006 Phase 2: Repo-Backed Status Surfaces"
+    if next_task and str(next_task.get("id")) not in phase_2_ids:
+        phase = "Goal 006 later phase"
+    return {
+        "phase": phase,
+        "completed_task_count": len(completed_tasks),
+        "open_task_count": len(open_tasks),
+        "next_task": {
+            "id": next_task.get("id"),
+            "title": next_task.get("title"),
+            "acceptance": next_task.get("acceptance"),
+        }
+        if next_task
+        else None,
+        "phase_task_ids": sorted(phase_2_ids),
+    }
+
+
+def goal_dashboard_data(
+    issues: list[dict[str, Any]],
+    claims: list[dict[str, Any]],
+    ready: dict[str, Any],
+) -> dict[str, Any]:
+    tasks = [
+        task
+        for task in collect_tasks()
+        if task.get("spec_id") == "007-operator-workbench-review-ux"
+    ]
+    current_phase = goal_006_current_phase(tasks)
+    active_claim = claims[0] if claims else None
+    ready_item = ready.get("ready", [{}])[0] if ready.get("ready") else {}
+    next_ticket = active_claim.get("id") if active_claim else ready_item.get("id")
+    child_goals = []
+    for path in sorted((ROOT / "docs" / "goals").glob("[0-9][0-9][0-9]-*.md")):
+        goal_id = path.name[:3]
+        if goal_id == "000":
+            continue
+        evidence_paths = (
+            goal_006_accepted_checkpoint_reports()
+            if goal_id == "006"
+            else GOAL_ACCEPTANCE_REPORTS.get(goal_id, [])
+        )
+        state = "active" if goal_id == "006" else "accepted"
+        phase = current_phase["phase"] if goal_id == "006" else "complete"
+        child_goals.append(
+            {
+                "id": goal_id,
+                "title": goal_title(path),
+                "path": rel(path),
+                "state": state,
+                "phase": phase,
+                "accepted_evidence": [accepted_evidence_item(item) for item in evidence_paths],
+                "next_ticket": next_ticket if goal_id == "006" else None,
+            }
+        )
+    accepted_links = [
+        item
+        for goal in child_goals
+        for item in goal["accepted_evidence"]
+        if item.get("accepted")
+    ]
+    open_follow_ups = open_follow_up_epics(issues)
+    return {
+        "schema": "awf.operator-workbench.goal-dashboard.v1",
+        "source": "docs/goals/000-self-hosted-agent-system-roadmap.md",
+        "review_model": "presenter evidence plus independent reviewer acceptance or rejection",
+        "current_goal_id": "006",
+        "current_phase": current_phase,
+        "next_ticket": next_ticket,
+        "goals": child_goals,
+        "accepted_evidence_links": accepted_links,
+        "follow_up_epics": open_follow_ups,
+        "counts": {
+            "ordered_goal_count": len(child_goals),
+            "accepted_goal_count": len([goal for goal in child_goals if goal["state"] == "accepted"]),
+            "active_goal_count": len([goal for goal in child_goals if goal["state"] == "active"]),
+            "accepted_evidence_count": len(accepted_links),
+            "follow_up_epic_count": len(open_follow_ups),
+        },
+    }
+
+
 def open_follow_up_epics(issues: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {"id": issue.get("id"), "title": issue.get("title"), "external_ref": issue.get("external_ref")}
@@ -1973,6 +2136,14 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
     trace_artifacts = recent_artifact_paths(".agent-runs/traces", (".json",))
     eval_artifacts = recent_artifact_paths(".agent-runs/evals", (".json",))
     review_gate_data = next((check.get("data", {}) for check in validation_checks if check.get("name") == "review-gate"), {})
+    goal_dashboard = goal_dashboard_data(issues, claims, ready)
+    active_goal_evidence = [
+        item["path"]
+        for goal in goal_dashboard["goals"]
+        if goal["id"] == "006"
+        for item in goal["accepted_evidence"]
+        if item.get("accepted")
+    ]
     data = {
         "schema": "awf.operator-workbench.status.v1",
         "generated_at": generated_at,
@@ -1988,6 +2159,7 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             ],
             "artifacts": [
                 "docs/goals/000-self-hosted-agent-system-roadmap.md",
+                "docs/workbench/goal-dashboard.md",
                 "docs/workbench/status-artifact-schema.md",
                 ".beads/issues.jsonl",
                 ".agent-runs/claims/",
@@ -2021,9 +2193,10 @@ def operator_status_data(write: bool = False) -> dict[str, Any]:
             "goals": goal_paths(),
             "current_goal": "006-operator-workbench-review-ux",
             "next_goal": None,
-            "accepted_evidence": [path for path in reports if "goal-006" in path][:8],
+            "accepted_evidence": active_goal_evidence,
             "follow_up_epics": open_follow_up_epics(issues),
         },
+        "goal_dashboard": goal_dashboard,
         "work_queue": {
             "source": ready.get("source"),
             "ready": compact_work_queue_items(ready.get("ready", [])),
@@ -5601,6 +5774,30 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and "uv run awf workflow-fixture-test" in data["handoff"]["validation_commands"]
             and "repo-local trace artifacts" in data["availability"]["self_hosted_langfuse"]["fallback"],
             "data": data,
+        }
+    )
+    dashboard = data["goal_dashboard"]
+    active_goal = next((goal for goal in dashboard["goals"] if goal["id"] == "006"), {})
+    results.append(
+        {
+            "name": "operator workbench long-horizon goal dashboard is generated",
+            "ok": dashboard["schema"] == "awf.operator-workbench.goal-dashboard.v1"
+            and dashboard["current_goal_id"] == "006"
+            and dashboard["current_phase"]["phase"] == "Goal 006 Phase 2: Repo-Backed Status Surfaces"
+            and dashboard["current_phase"]["next_task"]["id"] in {"T005", "T006"}
+            and dashboard["counts"]["ordered_goal_count"] == 6
+            and dashboard["counts"]["accepted_goal_count"] == 5
+            and dashboard["counts"]["active_goal_count"] == 1
+            and dashboard["counts"]["accepted_evidence_count"] >= 9
+            and active_goal.get("state") == "active"
+            and active_goal.get("accepted_evidence")
+            and any(
+                item.get("path") == ".agent-runs/reports/goal-006/t004-operator-status-20260604.md"
+                for item in active_goal.get("accepted_evidence", [])
+            )
+            and dashboard["review_model"]
+            == "presenter evidence plus independent reviewer acceptance or rejection",
+            "data": dashboard,
         }
     )
     code, data = repo_hygiene_result()

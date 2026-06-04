@@ -12,7 +12,7 @@
 ## Goal 006 Phase 2: Repo-Backed Status Surfaces
 
 - [X] T004 [US1] Add a consolidated operator status report from goals, specs, Beads, claims, blockers, and validation
-- [ ] T005 [US1] Add a long-horizon goal dashboard with current phase and accepted evidence links
+- [X] T005 [US1] Add a long-horizon goal dashboard with current phase and accepted evidence links
 - [ ] T006 [US1] Add an increment dashboard for tickets, claims, blockers, active workers, and validation state
 - [ ] T007 [US1] Add an evidence view linking run artifacts, traces, evals, Beads comments, branches, and PRs
 

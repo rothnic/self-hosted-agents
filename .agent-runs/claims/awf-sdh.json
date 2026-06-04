@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T07:50:34.493232+00:00",
+  "id": "awf-sdh",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T06:38:00.987692Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T06:39:41.464841Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-isu",
+        "issue_id": "awf-sdh",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      },
+      {
+        "created_at": "2026-06-04T06:38:27.060028Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-yug",
+        "issue_id": "awf-sdh",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 007-operator-workbench-review-ux\nTask: T005\nSource: specs/007-operator-workbench-review-ux/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/007-operator-workbench-review-ux/tasks.md#T005",
+    "id": "awf-sdh",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add a long-horizon goal dashboard with current phase and accepted evidence links",
+    "updated_at": "2026-06-04T06:39:41.465193Z"
+  },
+  "worker_branch": "codex/awf-sdh-add-a-long-horizon-goal-dashboard-with-c",
+  "worker_id": "codex-goal006-t005",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-sdh-add-a-long-horizon-goal-dashboard-with-c",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-sdh-add-a-long-horizon-goal-dashboard-with-c ../self-hosted-agents-worktrees/awf-sdh-add-a-long-horizon-goal-dashboard-with-c <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-sdh-add-a-long-horizon-goal-dashboard-with-c && git status --short --branch"
+  }
+}

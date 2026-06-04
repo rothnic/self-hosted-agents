@@ -25,6 +25,7 @@ Required top-level fields:
   and local repo evidence.
 - `executive_snapshot`: current phase, active role, recommendation, reason, next owner, and risks.
 - `roadmap`: ordered goals, accepted evidence, current goal, next child goal, and follow-up epics.
+- `goal_dashboard`: ordered child goals with accepted evidence links, current phase, next ticket, and follow-up epics.
 - `work_queue`: ready work, blocked work, human-required work, active claims, stale claims, and Beads source metadata.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace artifacts, eval artifacts, Beads
   comments, and PR evidence.
@@ -84,6 +85,21 @@ Minimal shape:
     "next_goal": null,
     "accepted_evidence": [".agent-runs/reports/goal-006/t002-bdd-contract-20260604.md"],
     "follow_up_epics": ["awf-eas", "awf-lkr"]
+  },
+  "goal_dashboard": {
+    "schema": "awf.operator-workbench.goal-dashboard.v1",
+    "source": "docs/goals/000-self-hosted-agent-system-roadmap.md",
+    "current_goal_id": "006",
+    "current_phase": {
+      "phase": "Goal 006 Phase 2: Repo-Backed Status Surfaces",
+      "completed_task_count": 4,
+      "open_task_count": 13,
+      "next_task": {"id": "T005", "title": "Add a long-horizon goal dashboard"}
+    },
+    "next_ticket": "awf-sdh",
+    "goals": [],
+    "accepted_evidence_links": [],
+    "follow_up_epics": []
   },
   "work_queue": {
     "source": "beads",

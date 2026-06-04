@@ -26,6 +26,7 @@ The report is generated from:
 
 - `executive_snapshot`: phase, active role, recommendation, next owner, and risks.
 - `roadmap`: ordered goal files, accepted Goal 006 evidence, and follow-up epics.
+- `goal_dashboard`: ordered child goals, current Goal 006 phase, next ticket, and accepted evidence links.
 - `work_queue`: Beads-ready work, blocked work, human-required work, active claims, and stale claims.
 - `evidence_map`: presenter reports, reviewer reports, verification artifacts, trace/eval artifacts, Beads comments,
   and PR evidence placeholders.
