@@ -1180,6 +1180,81 @@ def deployment_credential_free_fallback_data(
     }
 
 
+def deployment_backup_restore_reset_runbook_data() -> dict[str, Any]:
+    path = ROOT / "docs" / "operations" / "backup-restore-reset.md"
+    text = read_text(path)
+    required_sections = [
+        "## State Inventory",
+        "## Backup Procedure",
+        "## Restore Procedure",
+        "## Reset Procedure",
+        "## T009 Evidence Expectations",
+        "## Current Gaps",
+    ]
+    required_terms = [
+        ".beads/issues.jsonl",
+        ".agent-runs/claims",
+        ".agent-runs/reports",
+        ".agent-runs/verifications",
+        "DBOS",
+        "Langfuse",
+        "pg_dump",
+        "pg_restore",
+        "docker compose",
+        "/tmp/self-hosted-agents-backups",
+        "uv run awf deployment-smoke --profile local --write --json",
+    ]
+    evidence_expectations = [
+        "backup archive",
+        "repo-local evidence paths",
+        "DBOS local proof artifact",
+        "Langfuse backup artifacts",
+        "restore target",
+        "reset command boundaries",
+    ]
+    checks = [
+        {
+            "name": "runbook exists",
+            "ok": path.exists(),
+            "detail": rel(path),
+        },
+        *[
+            {
+                "name": f"section:{section}",
+                "ok": section in text,
+                "detail": section,
+            }
+            for section in required_sections
+        ],
+        *[
+            {
+                "name": f"term:{term}",
+                "ok": term in text,
+                "detail": term,
+            }
+            for term in required_terms
+        ],
+        *[
+            {
+                "name": f"evidence:{expectation}",
+                "ok": expectation in text,
+                "detail": expectation,
+            }
+            for expectation in evidence_expectations
+        ],
+    ]
+    missing = [check["name"] for check in checks if not check["ok"]]
+    return {
+        "ok": not missing,
+        "path": rel(path),
+        "checks": checks,
+        "missing": missing,
+        "profiles": ["local", "development-server", "production-like"],
+        "state_surfaces": ["repo-local evidence", "DBOS state", "Langfuse service state"],
+        "rehearsal_boundary": "T012 records the clean-path restore rehearsal after operations runbooks are complete.",
+    }
+
+
 def spec_lint(args: argparse.Namespace, root: Path = ROOT) -> tuple[int, dict[str, Any]]:
     errors = []
     for spec in collect_specs(root):
@@ -4521,6 +4596,19 @@ def workflow_fixture_test_result(write: bool, include_orchestration: bool = True
             and data["proof"]["required"]["local_no_network"]
             and data["proof"]["required"]["service_profiles_fail_fast_without_secrets"]
             and all(item["missing_secret_names"] for item in data["proof"]["service_backed_profiles"]),
+            "data": data,
+        }
+    )
+    data = deployment_backup_restore_reset_runbook_data()
+    results.append(
+        {
+            "name": "deployment backup restore reset runbook covers state and evidence surfaces",
+            "ok": data["ok"]
+            and data["path"] == "docs/operations/backup-restore-reset.md"
+            and {"local", "development-server", "production-like"}.issubset(set(data["profiles"]))
+            and {"repo-local evidence", "DBOS state", "Langfuse service state"}.issubset(
+                set(data["state_surfaces"])
+            ),
             "data": data,
         }
     )

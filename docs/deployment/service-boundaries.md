@@ -1,6 +1,6 @@
 # Deployment Service Boundaries
 
-Status: updated through Goal 005 T008
+Status: updated through Goal 005 T009
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 
@@ -10,8 +10,8 @@ This document names the service boundaries, ports, volumes, storage paths, secre
 selected self-hosted stack. It extends `docs/deployment/profiles.md` and is paired with
 `docs/deployment/environment-readiness.md` for environment templates and readiness checks,
 `docs/deployment/startup.md` for startup commands and documented service equivalents, and
-`docs/deployment/smoke.md` for the representative selected-stack smoke command. Committed smoke evidence and runbooks
-are routed to later Goal 005 tickets.
+`docs/deployment/smoke.md` for the representative selected-stack smoke command, and
+`docs/operations/backup-restore-reset.md` for backup, restore, and reset procedures.
 
 ## Boundary Rules
 
@@ -77,7 +77,7 @@ this table as live service evidence.
 | Langfuse checkout | optional `~/data/projects/langfuse` | `~/data/projects/langfuse` | `~/data/projects/langfuse` or documented equivalent | do not vendor upstream checkout |
 | Langfuse database volumes | Docker-managed or documented local paths | under Langfuse deployment root or Docker volumes | documented persistent volume paths | do not commit service data |
 | Langfuse object storage | Docker-managed or documented local paths | under Langfuse deployment root or Docker volumes | documented persistent volume paths | do not commit object data |
-| Backup targets | not required | later T009 path | later T009 path | commit runbook, not backups |
+| Backup targets | `/tmp/self-hosted-agents-backups` | host-local backup path under operator control | host-local or operator-approved backup target | commit runbook, not backups |
 
 ## Secret Names
 
@@ -146,5 +146,6 @@ Fixture validation must pass when all observability, durable storage, and model-
 - T006 added the selected-stack smoke command.
 - T007 captured committed local smoke evidence across the app, observability, durable runtime, and health boundaries.
 - T008 captured credential-free fallback proof for absent deployment services or secrets.
-- T009-T012 add backup, restore, reset, diagnostics, recovery, operating burden, and rehearsal evidence.
+- T009 added backup, restore, and reset runbooks for database, service state, and run evidence.
+- T010-T012 add diagnostics, recovery, operating burden, and rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

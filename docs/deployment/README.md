@@ -12,6 +12,8 @@ Start here when an agent needs the deployment profile, target machine, or operat
 - `environment-readiness.md`: environment templates and the `awf deployment-readiness` credential-free readiness check.
 - `startup.md`: one-command local startup and documented service-backed startup equivalents.
 - `smoke.md`: representative selected-stack smoke command and repo-local correlation evidence shape.
+- `../operations/backup-restore-reset.md`: backup, restore, and reset runbook for database, service state, and run
+  evidence.
 
 ## Current Profile Recommendation
 
@@ -31,5 +33,6 @@ production promotion until backup, restore, reset, health, trace, recovery, and 
 - Environment readiness defines credential-free templates and prerequisite checks.
 - Startup defines the local one-command manifest and service-backed equivalent commands.
 - Smoke defines the representative selected-stack workflow command.
-- Later Goal 005 tickets add committed smoke evidence, runbooks, and rehearsal evidence.
+- Operations runbooks define backup, restore, reset, diagnostics, recovery, retention, and rehearsal surfaces as they
+  are completed.
 - Deterministic fixture validation remains the closure gate unless a ticket explicitly requires service-backed proof.

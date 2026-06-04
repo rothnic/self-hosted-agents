@@ -1,6 +1,6 @@
 # Self-Hosted Deployment Profiles
 
-Status: updated through Goal 005 T008
+Status: updated through Goal 005 T009
 Selected stack: Pydantic AI plus Langfuse and DBOS
 Acceptance command: `uv run awf workflow-fixture-test`
 BDD contract: `tests/workflow/features/self_hosted_deployment_operations.feature`
@@ -83,6 +83,7 @@ The local profile must pass when these are unset:
 - `uv run awf deployment-startup --profile local --write --json`
 - `uv run awf deployment-smoke --profile local --write --json`
 - `uv run awf deployment-fallback-proof --write --json`
+- `docs/operations/backup-restore-reset.md`
 - repo-local `.trace.json` and `.evaluation.json` artifacts when a Pydantic AI run is part of the slice
 - explicit gaps when Langfuse, production DBOS storage, live model calls, or service-backed smoke evidence are absent
 
@@ -175,5 +176,6 @@ The production-like profile must use externally managed secrets, never committed
 - T006 added the deployment smoke command for the representative selected-stack workflow.
 - T007 captured committed local smoke evidence with run, trace, eval, durable, and health correlation.
 - T008 captured credential-free fallback evidence for absent deployment services or secrets.
-- T009-T012 add runbooks and fresh-setup rehearsal evidence.
+- T009 added backup, restore, and reset runbooks.
+- T010-T012 add diagnostics, recovery, operating-burden, and fresh-setup rehearsal evidence.
 - T013 presents final Goal 005 evidence to an independent reviewer.

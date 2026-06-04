@@ -1,0 +1,49 @@
+{
+  "claimed_at": "2026-06-04T05:24:16.405437+00:00",
+  "id": "awf-71o",
+  "work": {
+    "compaction_level": 0,
+    "created_at": "2026-06-04T03:05:11.518628Z",
+    "created_by": "nroth",
+    "dependencies": [
+      {
+        "created_at": "2026-06-04T03:09:07.623204Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-h2u",
+        "issue_id": "awf-71o",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "parent-child"
+      },
+      {
+        "created_at": "2026-06-04T03:05:31.535050Z",
+        "created_by": "nroth",
+        "depends_on_id": "awf-rgf",
+        "issue_id": "awf-71o",
+        "metadata": "{}",
+        "thread_id": "",
+        "type": "blocks"
+      }
+    ],
+    "description": "Objective: agentic-development-foundation\nSpec: 006-self-hosted-deployment-operations-reference\nTask: T009\nSource: specs/006-self-hosted-deployment-operations-reference/tasks.md\nAcceptance: uv run awf workflow-fixture-test",
+    "external_ref": "specs/006-self-hosted-deployment-operations-reference/tasks.md#T009",
+    "id": "awf-71o",
+    "issue_type": "task",
+    "labels": [
+      "role:worker"
+    ],
+    "original_size": 0,
+    "priority": 2,
+    "source_repo": "self-hosted-agents",
+    "status": "open",
+    "title": "Add backup, restore, and reset runbooks for databases, service state, and run evidence",
+    "updated_at": "2026-06-04T03:09:07.623490Z"
+  },
+  "worker_branch": "codex/awf-71o-add-backup-restore-and-reset-runbooks-fo",
+  "worker_id": "codex-goal005-t009",
+  "worktree_path": "../self-hosted-agents-worktrees/awf-71o-add-backup-restore-and-reset-runbooks-fo",
+  "worktree_setup": {
+    "add_worktree": "git worktree add -b codex/awf-71o-add-backup-restore-and-reset-runbooks-fo ../self-hosted-agents-worktrees/awf-71o-add-backup-restore-and-reset-runbooks-fo <feature-branch>",
+    "resume": "cd ../self-hosted-agents-worktrees/awf-71o-add-backup-restore-and-reset-runbooks-fo && git status --short --branch"
+  }
+}
